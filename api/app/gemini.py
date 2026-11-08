@@ -49,7 +49,10 @@ class GeminiProvider:
         self.key = api_key or os.environ.get("GEMINI_API_KEY", "")
         if not self.key:
             raise GeminiError("GEMINI_API_KEY not set")
-        self.model = model or os.environ.get("GEMINI_MODEL", "gemini-3.5-flash")
+        chain = os.environ.get("GEMINI_MODELS") or "gemini-3.5-flash,gemini-3.1-flash-lite,gemini-3.5-flash-lite,gemma-4-31b-it"
+        self.models = [model] if model else [m.strip() for m in chain.split(",") if m.strip()]
+        self.model = self.models[0]
+        self.exhausted: set[str] = set()  # models whose free daily quota is used up
         self.calls = {"api": 0, "cache": 0}
         self._lock = threading.Lock()
         self._last = 0.0
@@ -63,7 +66,7 @@ class GeminiProvider:
             "generationConfig": {"temperature": 0, "responseMimeType": "application/json",
                                  "responseSchema": schema},
         }
-        h = hashlib.sha256(json.dumps([self.model, system, prompt, schema], sort_keys=True).encode()).hexdigest()
+        h = hashlib.sha256(json.dumps([system, prompt, schema], sort_keys=True).encode()).hexdigest()
         cf = CACHE_DIR / f"{h}.json"
         if cf.exists():
             self.calls["cache"] += 1
@@ -91,6 +94,14 @@ class GeminiProvider:
                         self.calls["api"] += 1
                         cf.write_text(json.dumps(data), encoding="utf-8")
                         return data
+                elif r.status_code == 429 and "PerDay" in r.text:
+                    # daily free-tier quota gone for this model: move to the next one
+                    self.exhausted.add(self.model)
+                    nxt = [m for m in self.models if m not in self.exhausted]
+                    if not nxt:
+                        raise GeminiError("Daily quota exhausted on all configured models: " + ", ".join(self.models))
+                    self.model = nxt[0]
+                    continue
                 elif r.status_code in (429, 500, 502, 503, 504):
                     last = f"HTTP {r.status_code}"
                 else:
