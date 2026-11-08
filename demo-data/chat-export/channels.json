@@ -1,0 +1,17 @@
+[
+  {
+    "id": "C01GENERAL",
+    "name": "general",
+    "created": 1784086200
+  },
+  {
+    "id": "C02DEV",
+    "name": "dev",
+    "created": 1784086200
+  },
+  {
+    "id": "C03PAY",
+    "name": "payments",
+    "created": 1784086200
+  }
+]

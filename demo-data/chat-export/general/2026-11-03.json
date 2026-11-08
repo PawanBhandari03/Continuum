@@ -1,0 +1,21 @@
+[
+  {
+    "type": "message",
+    "user": "U05KARAN",
+    "text": "has joined the channel",
+    "ts": "1793680200.000000",
+    "subtype": "channel_join"
+  },
+  {
+    "type": "message",
+    "user": "U01ADITI",
+    "text": "anyone free to test on an iPhone?",
+    "ts": "1793695105.000000"
+  },
+  {
+    "type": "message",
+    "user": "U04DEV",
+    "text": "posters printed, kal lagayenge",
+    "ts": "1793719550.000000"
+  }
+]

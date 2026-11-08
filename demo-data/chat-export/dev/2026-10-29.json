@@ -1,0 +1,20 @@
+[
+  {
+    "type": "message",
+    "user": "U01ADITI",
+    "text": "merged main into my branch",
+    "ts": "1793260520.000000"
+  },
+  {
+    "type": "message",
+    "user": "U03MEERA",
+    "text": "dark mode ka toggle add kiya",
+    "ts": "1793285012.000000"
+  },
+  {
+    "type": "message",
+    "user": "U04DEV",
+    "text": "will write tests tomorrow",
+    "ts": "1793290021.000000"
+  }
+]

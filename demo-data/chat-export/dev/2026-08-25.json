@@ -1,0 +1,26 @@
+[
+  {
+    "type": "message",
+    "user": "U01ADITI",
+    "text": "search page slow lag raha hai, index add karna padega",
+    "ts": "1787632904.000000"
+  },
+  {
+    "type": "message",
+    "user": "U03MEERA",
+    "text": "image uploads ab third-party bucket pe ja rahe hain. Bucket ka credential sirf mere paas hai, kisi ko chahiye to mujhse lena.",
+    "ts": "1787636100.000000"
+  },
+  {
+    "type": "message",
+    "user": "U01ADITI",
+    "text": "nice, thanks Meera. Resizing abhi bhi client side hai",
+    "ts": "1787636340.000000"
+  },
+  {
+    "type": "message",
+    "user": "U01ADITI",
+    "text": "reminder: update .env.example when adding vars",
+    "ts": "1787674974.000000"
+  }
+]

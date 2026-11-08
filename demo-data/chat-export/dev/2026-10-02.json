@@ -1,0 +1,14 @@
+[
+  {
+    "type": "message",
+    "user": "U04DEV",
+    "text": "pushed vercel.json, trying the frontend on Vercel preview",
+    "ts": "1790930100.000000"
+  },
+  {
+    "type": "message",
+    "user": "U01ADITI",
+    "text": "search page slow lag raha hai, index add karna padega",
+    "ts": "1790941655.000000"
+  }
+]

@@ -1,0 +1,10 @@
+[
+  {
+    "type": "message",
+    "user": "UBOT001",
+    "text": "Deploy succeeded: campuskart-web (production)",
+    "ts": "1791009060.000000",
+    "subtype": "bot_message",
+    "bot_id": "B01DEPLOY"
+  }
+]

@@ -1,0 +1,34 @@
+[
+  {
+    "type": "message",
+    "user": "U03MEERA",
+    "text": "rebased on main, conflicts fixed",
+    "ts": "1789102061.000000"
+  },
+  {
+    "type": "message",
+    "user": "U03MEERA",
+    "text": "rebased on main, conflicts fixed",
+    "ts": "1789109730.000000"
+  },
+  {
+    "type": "message",
+    "user": "UBOT001",
+    "text": "Deploy succeeded: campuskart-web (production)",
+    "ts": "1789119120.000000",
+    "subtype": "bot_message",
+    "bot_id": "B01DEPLOY"
+  },
+  {
+    "type": "message",
+    "user": "U01ADITI",
+    "text": "can someone review my small PR?",
+    "ts": "1789123665.000000"
+  },
+  {
+    "type": "message",
+    "user": "U02ROHAN",
+    "text": "will write tests tomorrow",
+    "ts": "1789146488.000000"
+  }
+]

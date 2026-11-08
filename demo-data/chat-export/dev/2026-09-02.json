@@ -1,0 +1,26 @@
+[
+  {
+    "type": "message",
+    "user": "U03MEERA",
+    "text": "verification emails college SMTP account se ja rahe hain. Password mere paas nahi hai, pata nahi kisne setup kiya tha.",
+    "ts": "1788335100.000000"
+  },
+  {
+    "type": "message",
+    "user": "U04DEV",
+    "text": "haan SMTP wala toh pehle se tha, humne bas use kar liya",
+    "ts": "1788335520.000000"
+  },
+  {
+    "type": "message",
+    "user": "U03MEERA",
+    "text": "reminder: update .env.example when adding vars",
+    "ts": "1788348411.000000"
+  },
+  {
+    "type": "message",
+    "user": "U04DEV",
+    "text": "linter is failing on unused import",
+    "ts": "1788361699.000000"
+  }
+]

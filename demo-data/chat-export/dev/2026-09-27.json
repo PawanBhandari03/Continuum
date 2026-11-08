@@ -1,0 +1,15 @@
+[
+  {
+    "type": "message",
+    "user": "U02ROHAN",
+    "text": "has left the channel",
+    "ts": "1790479800.000000",
+    "subtype": "channel_leave"
+  },
+  {
+    "type": "message",
+    "user": "U04DEV",
+    "text": "profile page avatar crop issue hai",
+    "ts": "1790500252.000000"
+  }
+]

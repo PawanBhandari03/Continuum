@@ -1,0 +1,22 @@
+[
+  {
+    "type": "message",
+    "user": "UBOT001",
+    "text": "Deploy succeeded: campuskart-web (production)",
+    "ts": "1793598060.000000",
+    "subtype": "bot_message",
+    "bot_id": "B01DEPLOY"
+  },
+  {
+    "type": "message",
+    "user": "U01ADITI",
+    "text": "migration naming consistent rakho",
+    "ts": "1793613880.000000"
+  },
+  {
+    "type": "message",
+    "user": "U04DEV",
+    "text": "migration naming consistent rakho",
+    "ts": "1793627075.000000"
+  }
+]

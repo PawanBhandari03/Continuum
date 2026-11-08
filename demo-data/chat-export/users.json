@@ -1,0 +1,38 @@
+[
+  {
+    "id": "U01ADITI",
+    "name": "aditi",
+    "real_name": "Aditi Sharma",
+    "is_bot": false
+  },
+  {
+    "id": "U02ROHAN",
+    "name": "rohan",
+    "real_name": "Rohan Verma",
+    "is_bot": false
+  },
+  {
+    "id": "U03MEERA",
+    "name": "meera",
+    "real_name": "Meera Nair",
+    "is_bot": false
+  },
+  {
+    "id": "U04DEV",
+    "name": "dev",
+    "real_name": "Dev Patel",
+    "is_bot": false
+  },
+  {
+    "id": "U05KARAN",
+    "name": "karan",
+    "real_name": "Karan Singh",
+    "is_bot": false
+  },
+  {
+    "id": "UBOT001",
+    "name": "deploybot",
+    "real_name": "Deploy Bot",
+    "is_bot": true
+  }
+]

@@ -1,0 +1,22 @@
+[
+  {
+    "type": "message",
+    "user": "UBOT001",
+    "text": "Deploy succeeded: campuskart-web (production)",
+    "ts": "1787801400.000000",
+    "subtype": "bot_message",
+    "bot_id": "B01DEPLOY"
+  },
+  {
+    "type": "message",
+    "user": "U04DEV",
+    "text": "can someone review my small PR?",
+    "ts": "1787825368.000000"
+  },
+  {
+    "type": "message",
+    "user": "U04DEV",
+    "text": "tests green now",
+    "ts": "1787840740.000000"
+  }
+]
