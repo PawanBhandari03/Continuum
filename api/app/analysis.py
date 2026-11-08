@@ -1,6 +1,7 @@
 """Conflicts, gaps, sections and the readiness score. Deterministic where possible."""
 from __future__ import annotations
 from itertools import combinations
+from rapidfuzz import fuzz
 from .models import Claim, Conflict, Gap, Readiness, EvidenceUnit
 from .llm import Provider, contradicts_all
 
@@ -18,6 +19,63 @@ MAX_PAIRS_PER_GROUP = 6
 _SECTION = {"decision": "decision_log", "risk": "risks", "dependency": "dependencies",
             "owner": "dependencies", "next_action": "first_week",
             "open_question": "unresolved", "fact": "state", "gap": "unresolved"}
+
+
+# Deterministic mapping of free-form model topics onto the handover's required slots.
+SLOT_KEYWORDS = {
+    "deploy": ["render", "vercel", "netlify", "heroku", "deploy", "hosting", "hosted", "production server"],
+    "payments": ["payment", "upi", "gateway", "kyc", "razorpay", "paise", "refund", "cash on delivery", "cod "],
+    "auth": ["login", "log in", "auth", "session", "refresh token", "password", "sign-in", "signin"],
+    "email": ["smtp", "email", "e-mail", "verification mail"],
+    "storage": ["bucket", "image upload", "object storage", "s3", "storage", "uploaded image", "listing images"],
+}
+
+
+def normalize_entities(claims: list[Claim]) -> None:
+    """Set entity_key/workstream to a required slot when the claim is clearly about one.
+    Order matters: the statement decides first, then the model's own keys."""
+    for c in claims:
+        if c.type == "gap":
+            continue
+        for text in (c.statement.lower() + " ", f"{c.entity_key} {c.workstream}".lower() + " "):
+            hit = next((slot for slot, kws in SLOT_KEYWORDS.items() if any(k in text for k in kws)), None)
+            if hit:
+                c.entity_key = c.workstream = hit
+                break
+
+
+_FILLING_TYPES = {"decision", "dependency", "owner", "fact"}
+
+
+def fills_slot(c: Claim, slot: str) -> bool:
+    """A claim only fills a required slot if it is a stable statement (not a risk,
+    to-do or question) and its OWN text is about that topic; the model's tags alone
+    are not trusted for readiness."""
+    text = c.statement.lower() + " "
+    return (c.entity_key == slot and c.type in _FILLING_TYPES
+            and any(k in text for k in SLOT_KEYWORDS[slot]))
+
+
+_RANK_STATE = {"confirmed": 3, "verified": 2, "conflicting": 1, "inferred": 0}
+
+
+def dedup_claims(claims: list[Claim], threshold: int = 86) -> list[Claim]:
+    """Merge near-identical claims of the same type (same fact extracted from different
+    batches): keep the strongest state, union the citations."""
+    kept: list[Claim] = []
+    for c in claims:
+        twin = next((k for k in kept if k.type == c.type and k.label == c.label and
+                     fuzz.token_set_ratio(k.statement.lower(), c.statement.lower()) >= threshold), None)
+        if twin is None:
+            kept.append(c)
+            continue
+        have = {x.evidence_id for x in twin.citations}
+        twin.citations += [x for x in c.citations if x.evidence_id not in have]
+        if _RANK_STATE.get(c.state, 0) > _RANK_STATE.get(twin.state, 0):
+            twin.state, twin.confidence_reason = c.state, c.confidence_reason
+            twin.statement = c.statement
+        twin.owner = twin.owner or c.owner
+    return kept
 
 
 def assign_sections(claims: list[Claim]) -> None:
@@ -63,7 +121,9 @@ def detect_gaps(claims: list[Claim], units: list[EvidenceUnit]) -> tuple[list[Cl
     gaps: list[Gap] = []
     # A slot with conflicting claims is not "missing" (evidence exists, it disagrees);
     # it is surfaced through the conflict, and still does not count as filled for readiness.
-    covered = {c.entity_key for c in claims if c.state in ("verified", "confirmed", "conflicting")}
+    covered = {slot for slot in REQUIRED_SLOTS for c in claims
+               if c.state in ("verified", "confirmed", "conflicting")
+               and (fills_slot(c, slot) or (c.state == "conflicting" and c.entity_key == slot))}
     for slot, question in REQUIRED_SLOTS.items():
         if slot in covered:
             continue
@@ -86,8 +146,8 @@ def detect_gaps(claims: list[Claim], units: list[EvidenceUnit]) -> tuple[list[Cl
 
 def compute_readiness(claims: list[Claim], conflicts: list[Conflict], gaps: list[Gap]) -> Readiness:
     total = len(REQUIRED_SLOTS)
-    filled = len({c.entity_key for c in claims
-                  if c.state in ("verified", "confirmed") and c.entity_key in REQUIRED_SLOTS})
+    filled = len({slot for slot in REQUIRED_SLOTS for c in claims
+                  if c.state in ("verified", "confirmed") and fills_slot(c, slot)})
     oc = sum(1 for c in conflicts if c.resolution == "open")
     og = sum(1 for g in gaps if g.status == "open")
     score = max(0, min(100, round(filled / total * 100 - 5 * oc - 3 * og)))

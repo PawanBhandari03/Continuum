@@ -15,3 +15,4 @@ dist/
 .claude/
 .cache/
 .cache_result_*.json
+run*.log

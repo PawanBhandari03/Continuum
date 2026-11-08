@@ -175,3 +175,34 @@ def test_real_demo_chat_through_pipeline_runs():
     units, _ = parse_chat_export(DEMO / "chat-export")
     res = run(units, FakeProvider([]), role="contributor")
     assert res.readiness is not None and res.gaps  # gaps surface when nothing is verified
+
+
+# ---------- normalisation and dedup ----------
+def test_entities_normalised_to_slots_and_duplicates_merged():
+    from app.models import Claim, Citation
+    from app.analysis import normalize_entities, dedup_claims
+    a = Claim(id="a", type="dependency", statement="Verification emails use the college SMTP account",
+              state="verified", entity_key="smtp", citations=[Citation(evidence_id="e1", quote="smtp")])
+    b = Claim(id="b", type="dependency", statement="Sign-up verification emails use the college SMTP account.",
+              state="verified", entity_key="mail", citations=[Citation(evidence_id="e2", quote="smtp")])
+    normalize_entities([a, b])
+    assert a.entity_key == "email" and b.entity_key == "email"
+    merged = dedup_claims([a, b])
+    assert len(merged) == 1 and {c.evidence_id for c in merged[0].citations} == {"e1", "e2"}
+
+
+def test_dedup_keeps_different_facts_separate():
+    from app.models import Claim
+    from app.analysis import dedup_claims
+    x = Claim(id="x", type="risk", statement="Search page is slow", state="verified")
+    y = Claim(id="y", type="risk", statement="Avatar cropping is broken on profile page", state="verified")
+    assert len(dedup_claims([x, y])) == 2
+
+
+def test_dedup_never_merges_across_access_labels():
+    from app.models import Claim
+    from app.analysis import dedup_claims
+    pub = Claim(id="p", type="risk", statement="Dev misses deadlines often", state="verified", label="contributor")
+    lead = Claim(id="l", type="risk", statement="Dev misses deadlines often", state="verified", label="lead_only")
+    out = dedup_claims([pub, lead])
+    assert len(out) == 2 and {c.label for c in out} == {"contributor", "lead_only"}

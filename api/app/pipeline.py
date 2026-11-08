@@ -5,7 +5,7 @@ from .models import EvidenceUnit, Claim, Conflict, Gap, Readiness, Role
 from .llm import Provider, support_all
 from .visibility import filter_units, claim_label
 from .verify import check_citations, build_claim
-from .analysis import assign_sections, detect_conflicts, detect_gaps, compute_readiness
+from .analysis import normalize_entities, dedup_claims, assign_sections, detect_conflicts, detect_gaps, compute_readiness
 
 BATCH_SIZE = 35
 
@@ -58,6 +58,8 @@ def run(units: list[EvidenceUnit], provider: Provider, role: Role = "lead",
                 claim.sensitive = claim.sensitive or claim.label == "lead_only"
             res.claims.append(claim)
     on_stage("conflicts_gaps", 90)
+    normalize_entities(res.claims)
+    res.claims = dedup_claims(res.claims)
     assign_sections(res.claims)
     res.conflicts = detect_conflicts(res.claims, provider)
     gap_claims, res.gaps = detect_gaps(res.claims, allowed)
