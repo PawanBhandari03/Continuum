@@ -84,9 +84,30 @@ Lead/reviewer (sees everything, approves), Contributor/successor (sees only perm
 - (Add real measured limitations here as we find them.)
 
 ## 12. Current status
-Pre-build. Accepted into Round 2. No product code yet.
+Round 2 build in progress (started 8 Nov 10:00 IST). **Frontend (Rahul + Claude):** all screens exist and work end to end on a built-in mock API: demo login by role, handover list + create, connect sources, reconstruct progress, claim ledger (filters, actions, readiness formula, version history, publish gate), evidence drawer, conflict resolution, Gap Interview, successor Start here with acknowledge / unclear. **Backend (Pawan):** see `api/` and `supabase/`. Not yet connected.
 
 ## 13. Build log (Claude appends as we go)
 | When | What was built / decided | Notes |
 |---|---|---|
 | 7 Nov | Planning docs written | No code |
+| 8 Nov | `web/` scaffolded (Next.js 15, Tailwind v4), typed contracts in `web/lib/types.ts` | Rahul + Claude |
+| 8 Nov | Mock API + CampusKart fixture (`web/mocks`, `web/lib/mock-api.ts`): five evidence states, 1 conflict, 2 gaps, versions, 2 lead-only claims | In-browser, persisted in localStorage; enforces the same permission rule as the real system |
+| 8 Nov | All 8 screens built on the mock API (see section 14) | UI works end to end without keys |
+| 8 Nov | `web/tests/permissions.test.ts`: 17 checks (contributor view has no lead-only text/fake key/fake phone; publish gate) all pass | Tests the **mock** only. The real API/RLS needs its own test |
+
+## 14. Frontend guide (for teammates)
+**Run it:** `cd web && npm install && npm run dev`, open http://localhost:3000. No keys needed; it runs on mock data.
+
+**Where things are**
+| Path | What |
+|---|---|
+| `web/lib/types.ts` | TypeScript version of the data contracts (HANDOFF section 6). Added one section key, `project` ("Project in five lines"), which the contract enum lacked. |
+| `web/lib/api.ts` | One client interface. `NEXT_PUBLIC_USE_MOCKS=true` uses the mock; `false` calls the FastAPI at `NEXT_PUBLIC_API_URL`. |
+| `web/lib/mock-api.ts`, `web/mocks/campuskart.ts` | Mock backend + synthetic CampusKart data. Applies the "claim visible only if the role may read ALL cited evidence" rule. |
+| `web/lib/session.tsx` | Demo role entry (no sign-in). Replaced by Supabase Auth when keys exist. |
+| `web/components/evidence.tsx` | Source chips and the evidence drawer (quote highlighted, redactions as blocks). |
+| `web/app/handovers/[id]/...` | `connect`, `reconstruct`, `ledger`, `conflicts`, `interview`, `start` screens. |
+
+**Judge walk-through (about 3 minutes):** Enter as Reviewer → open CampusKart → ledger: click a source chip → Conflicts: mark it or resolve it → switch to Leaver and answer a question → back as Reviewer: "Approve all Verified claims", approve the rest, Publish → switch to Successor: see the handover, note "N items hidden by your access level", acknowledge or flag a section.
+
+**Known limitations (frontend):** mock data lives in the browser, so it is per-browser and "Reset demo" clears it. The successor view shows a draft preview before publish (labelled) so judges can explore without finishing review. File uploads in mock mode register a source but do not parse the file. Tokens typed into the GitHub field are never stored. Accessibility: badges use icon + text, controls are keyboard reachable; not yet audited with a screen reader.
