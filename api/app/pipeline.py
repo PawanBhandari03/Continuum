@@ -1,5 +1,6 @@
 """Reconstruct pipeline: permission filter -> extract -> verify -> conflicts/gaps -> readiness."""
 from __future__ import annotations
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from .models import EvidenceUnit, Claim, Conflict, Gap, Readiness, Role
 from .llm import Provider
@@ -8,6 +9,7 @@ from .verify import check_citations, build_claim
 from .analysis import assign_sections, detect_conflicts, detect_gaps, compute_readiness
 
 BATCH_SIZE = 35
+SUPPORT_WORKERS = 6
 
 
 @dataclass
@@ -36,14 +38,21 @@ def run(units: list[EvidenceUnit], provider: Provider, role: Role = "lead",
         except Exception as e:  # never silently produce a partial handover
             res.errors.append(f"batch {bi + 1}/{len(batches)} failed: {type(e).__name__}: {e}")
             continue
-        for raw in raws:
-            cites, problems = check_citations(raw, by_id, ids)
-            support = None
-            if cites and not raw.inferred:
-                try:
-                    support = provider.support(raw.statement, [c.quote for c in cites])
-                except Exception as e:
-                    problems.append(f"support check failed: {type(e).__name__}")
+        checked = [(raw, *check_citations(raw, by_id, ids)) for raw in raws]
+
+        def _support(item):
+            raw, cites, problems = item
+            if not cites or raw.inferred:
+                return None
+            try:
+                return provider.support(raw.statement, [c.quote for c in cites])
+            except Exception as e:
+                problems.append(f"support check failed: {type(e).__name__}")
+                return None
+
+        with ThreadPoolExecutor(max_workers=SUPPORT_WORKERS) as pool:
+            supports = list(pool.map(_support, checked))
+        for (raw, cites, problems), support in zip(checked, supports):
             n += 1
             claim = build_claim(raw, f"cl_{n}", cites, support, problems)
             if claim is None:

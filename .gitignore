@@ -13,3 +13,5 @@ dist/
 *.log
 .vscode/
 .claude/
+.cache/
+.cache_result_*.json
