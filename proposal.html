@@ -1,0 +1,756 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Continuum — Round 1 Proposal — Binary Builders</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#18212B; --ink2:#3C4652; --muted:#6B7480; --line:#DCE1E7; --soft:#F4F6F8;
+    --navy:#17324D; --accent:#C2682B; --accent-soft:#FBF1E9;
+    --ok:#2D7A4F; --ok-soft:#E7F3EC; --inf:#3A67A0; --inf-soft:#E8EFF8;
+    --warn:#B5531A; --warn-soft:#FBEDE3; --miss:#8E3B46; --miss-soft:#F7E8EA;
+  }
+  @page{ size:A4; margin:14mm 15mm 15mm 15mm;
+    @bottom-left{ content:"Continuum  ·  Team Binary Builders  ·  CodeFrontier Round 1"; font:8pt Inter, "Segoe UI", sans-serif; color:#8A929C; }
+    @bottom-right{ content:counter(page) " / " counter(pages); font:8pt Inter, "Segoe UI", sans-serif; color:#8A929C; }
+  }
+  @page cover{ margin:0; @bottom-left{content:none} @bottom-right{content:none} }
+  *{ box-sizing:border-box; }
+  html{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  body{ margin:0; font-family:Inter, "Segoe UI", Arial, sans-serif; font-size:9.1pt; line-height:1.42; color:var(--ink); background:#fff; }
+  h1,h2,h3{ font-family:"Source Serif 4", Georgia, serif; color:var(--navy); margin:0; }
+  h2{ font-size:18pt; font-weight:600; letter-spacing:-.2px; margin-bottom:2.5mm; }
+  h3{ font-size:11.5pt; font-weight:600; margin:4mm 0 1.6mm; break-after:avoid; }
+  h4{ font-size:9.6pt; margin:0 0 1.2mm; color:var(--ink); font-weight:600; }
+  p{ margin:0 0 2.6mm; }
+  ul,ol{ margin:0 0 2.6mm; padding-left:5mm; }
+  li{ margin-bottom:1mm; }
+  strong{ font-weight:600; }
+  .mono{ font-family:"JetBrains Mono", Consolas, monospace; font-size:8.4pt; }
+  .section{ break-before:page; }
+  .kicker{ font-size:8pt; font-weight:600; letter-spacing:1.4px; text-transform:uppercase; color:var(--accent); margin-bottom:1.5mm; }
+  .lede{ font-size:10.6pt; color:var(--ink2); margin-bottom:4mm; }
+  .rule{ height:2px; background:var(--navy); width:22mm; margin:0 0 4mm; }
+  .muted{ color:var(--muted); }
+  .small{ font-size:8.4pt; }
+  .keep{ break-inside:avoid; }
+
+  /* cover */
+  .cover{ page:cover; height:297mm; position:relative; background:var(--navy); color:#fff; padding:24mm 20mm; overflow:hidden; }
+  .cover .event{ font-size:9pt; letter-spacing:2px; text-transform:uppercase; color:#C9D4E0; }
+  .cover h1{ color:#fff; font-size:50pt; font-weight:600; letter-spacing:-1px; margin-top:58mm; line-height:1; }
+  .cover .tag{ font-family:"Source Serif 4", Georgia, serif; font-size:17pt; color:#F3D2B9; margin-top:5mm; max-width:140mm; line-height:1.3; }
+  .cover .desc{ font-size:10.5pt; color:#D6DEE7; max-width:130mm; margin-top:8mm; line-height:1.6; }
+  .cover .bar{ position:absolute; left:20mm; top:120mm; width:30mm; height:3px; background:var(--accent); }
+  .cover .meta{ position:absolute; left:20mm; right:20mm; bottom:22mm; display:grid; grid-template-columns:1.1fr 1fr 1fr; gap:8mm; border-top:1px solid rgba(255,255,255,.25); padding-top:6mm; }
+  .cover .meta div{ font-size:8.4pt; color:#AFC0D1; text-transform:uppercase; letter-spacing:1px; }
+  .cover .meta b{ display:block; font-size:10.5pt; color:#fff; text-transform:none; letter-spacing:0; font-weight:500; margin-top:1.5mm; line-height:1.45; }
+  .cover .ps{ position:absolute; right:20mm; top:24mm; text-align:right; font-size:8.4pt; color:#AFC0D1; line-height:1.6; }
+  .cover .glyph{ position:absolute; right:-30mm; top:150mm; opacity:.09; }
+
+  /* tables */
+  table{ width:100%; border-collapse:collapse; margin:1mm 0 3mm; font-size:8.5pt; line-height:1.38; }
+  th{ text-align:left; font-weight:600; color:var(--navy); background:var(--soft); border-bottom:1.5px solid var(--navy); padding:1.5mm 2mm; font-size:8pt; letter-spacing:.2px; }
+  td{ padding:1.5mm 2mm; border-bottom:1px solid var(--line); vertical-align:top; }
+  tr{ break-inside:avoid; }
+  td.c, th.c{ text-align:center; }
+
+  /* blocks */
+  .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:5mm; }
+  .grid3{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:4mm; }
+  .card{ border:1px solid var(--line); border-radius:2mm; padding:3.5mm 4mm; background:#fff; break-inside:avoid; }
+  .card.soft{ background:var(--soft); border-color:var(--soft); }
+  .card h4{ color:var(--navy); }
+  .note{ border-left:3px solid var(--accent); background:var(--accent-soft); padding:3mm 4mm; margin:2mm 0 4mm; break-inside:avoid; }
+  .note.blue{ border-color:var(--navy); background:#EEF2F6; }
+  .num{ display:inline-block; width:5.5mm; height:5.5mm; border-radius:50%; background:var(--navy); color:#fff; font-size:7.6pt; font-weight:600; text-align:center; line-height:5.5mm; margin-right:1.5mm; }
+  .pill{ display:inline-block; font-size:7pt; font-weight:600; letter-spacing:.6px; text-transform:uppercase; padding:.6mm 1.8mm; border-radius:1mm; vertical-align:1px; }
+  .p-ok{ background:var(--ok-soft); color:var(--ok); } .p-inf{ background:var(--inf-soft); color:var(--inf); }
+  .p-warn{ background:var(--warn-soft); color:var(--warn); } .p-miss{ background:var(--miss-soft); color:var(--miss); }
+  .p-hum{ background:#ECE9F6; color:#55408F; }
+  .chip{ display:inline-block; font-family:"JetBrains Mono", Consolas, monospace; font-size:7.4pt; border:1px solid #C9D2DC; color:var(--ink2); background:#fff; padding:.3mm 1.6mm; border-radius:1mm; margin-right:1mm; }
+
+  /* map table on summary page */
+  .map td:first-child{ font-weight:600; color:var(--navy); width:36mm; }
+  .pts{ font-family:"Source Serif 4", Georgia, serif; font-weight:700; color:var(--accent); font-size:11pt; }
+
+  /* mock UI */
+  .mock{ border:1px solid #C7CFD8; border-radius:2.5mm; overflow:hidden; break-inside:avoid; margin:2mm 0 4mm; box-shadow:0 1px 0 #E6EAEE; }
+  .mock .top{ background:#EEF1F4; padding:2mm 3.5mm; font-size:8pt; color:var(--ink2); display:flex; justify-content:space-between; border-bottom:1px solid #D5DBE2; }
+  .mock .top b{ color:var(--navy); }
+  .mock .body{ padding:2.5mm 3.5mm; }
+  .claim{ display:grid; grid-template-columns:24mm 1fr 30mm; gap:3mm; padding:2.4mm 0; border-bottom:1px dashed #DDE2E8; align-items:start; }
+  .claim:last-child{ border-bottom:none; }
+  .claim .txt{ font-size:8.8pt; }
+  .claim .src{ margin-top:1mm; }
+  .claim .act{ font-size:7.6pt; color:var(--muted); text-align:right; line-height:1.7; }
+  .claim .act span{ display:inline-block; border:1px solid #CBD3DC; border-radius:1mm; padding:0 1.5mm; margin-left:.8mm; color:var(--ink2); }
+  .ready{ display:flex; align-items:center; gap:3mm; font-size:8pt; }
+  .meter{ width:38mm; height:2.2mm; background:#DCE2E8; border-radius:2mm; overflow:hidden; }
+  .meter i{ display:block; height:100%; width:72%; background:var(--ok); }
+
+  /* gantt */
+  .gantt td{ padding:1.6mm 2mm; font-size:8.4pt; }
+  .gantt td.bar{ padding:1.6mm 0; }
+  .gantt .b{ height:3.4mm; border-radius:1mm; }
+  .b1{ background:var(--navy);} .b2{ background:#6F8BA8;} .b3{ background:var(--accent);} .b0{ background:transparent; }
+
+  .twocol{ column-count:2; column-gap:6mm; }
+  .twocol > *{ break-inside:avoid; }
+  .sig{ font-size:8.4pt; color:var(--muted); }
+</style>
+</head>
+<body>
+
+<!-- ============ COVER ============ -->
+<section class="cover">
+  <div class="event">CodeFrontier Hackathon &nbsp;·&nbsp; Round 1 &nbsp;·&nbsp; The Plan</div>
+  <div class="ps">Problem Statement 01<br><span style="color:#fff">Prevent Critical Knowledge<br>From Leaving With People</span></div>
+  <h1>Continuum</h1>
+  <div class="tag">Project handovers that show their work.</div>
+  <div class="bar"></div>
+  <div class="desc" style="margin-top:14mm">
+    Continuum rebuilds the current state of a project from its repository, team chat, notes and task board,
+    turns it into a handover where every statement points to its source, asks the departing member only the questions
+    the evidence cannot answer, and lets a reviewer approve exactly what the successor is allowed to see.
+  </div>
+  <svg class="glyph" width="150mm" height="150mm" viewBox="0 0 200 200" fill="none" stroke="#fff" stroke-width="10">
+    <circle cx="70" cy="100" r="55"/><circle cx="130" cy="100" r="55"/>
+  </svg>
+  <div class="meta">
+    <div>Team<b>Binary Builders</b></div>
+    <div>Members<b>Pawan Singh Bhandari<br>Rahul Bramhankar</b></div>
+    <div>Submitted<b>6 November 2026<br>Round 1 Proposal (PDF)</b></div>
+  </div>
+</section>
+
+<!-- ============ 1. SUMMARY ============ -->
+<section>
+  <div class="kicker">At a glance</div>
+  <h2>The proposal in one page</h2>
+  <div class="rule"></div>
+
+  <p class="lede">When someone leaves a small software team, the code stays but the reasons, the half-finished work and the
+  “ask Aditi, she knows” knowledge leave with them. Handover notes are usually written in the last few days, from memory,
+  by the person with the least time left. We think that order is backwards.</p>
+
+  <div class="grid2">
+    <div class="card soft">
+      <h4>What we are solving</h4>
+      <p class="small" style="margin:0">The handover of an <strong>active software project</strong> in a <strong>small team (3–25 people)</strong> whose work lives in
+      a Git repository, a team chat, shared notes and a task board — from the day a departure is known until the
+      successor’s first productive week. Primary setting: student tech clubs and college project teams, where turnover happens
+      every semester.</p>
+    </div>
+    <div class="card soft">
+      <h4>What we will build</h4>
+      <p class="small" style="margin:0">A web app that follows the required <strong>Connect → Reconstruct → Verify → Review → Handover</strong> flow and produces a
+      <strong>role-scoped handover</strong>: current state, decisions and their reasons, owners, risks, dependencies, contacts and a
+      first-week plan — with a citation on every line and an honest label wherever evidence is thin, missing or contradictory.</p>
+    </div>
+  </div>
+
+  <h3>Four ideas that make Continuum different</h3>
+  <table>
+    <tr><th style="width:44mm">Idea</th><th>What it means in practice</th></tr>
+    <tr><td><strong>1. Claims, not summaries</strong></td><td>The handover is built from atomic claims. Each carries an evidence state —
+      <span class="pill p-ok">Verified</span> <span class="pill p-inf">Inferred</span> <span class="pill p-warn">Conflicting</span> <span class="pill p-miss">Missing</span> —
+      and one or more source links. Nothing is presented as fact without a source.</td></tr>
+    <tr><td><strong>2. Gap Interview</strong></td><td>Instead of asking the leaver to write a document from scratch, Continuum asks them a short list of targeted
+      questions only where evidence is missing or contradictory. Their answers become new, citable evidence.</td></tr>
+    <tr><td><strong>3. Permission before generation</strong></td><td>Access rules are applied before any text reaches the AI model. A successor’s view is
+      generated only from sources that person is cleared to see, so the model cannot leak what it was never given.</td></tr>
+    <tr><td><strong>4. Handover as a loop</strong></td><td>The successor acknowledges each section or marks it “unclear”. Unclear items go back to the reviewer
+      and leaver while the leaver is still reachable — the notice period becomes a working window, not a deadline.</td></tr>
+  </table>
+
+  <h3>Where each judging criterion is answered</h3>
+  <table class="map">
+    <tr><th>Criterion</th><th class="c" style="width:14mm">Points</th><th>Sections in this document</th></tr>
+    <tr><td>Understanding of the problem</td><td class="c pts">25</td><td>§2 What is lost and why documentation fails · §3 Users, scenarios and the part we solve</td></tr>
+    <tr><td>Proposed solution</td><td class="c pts">25</td><td>§4 Solution · §5 End-to-end workflow with screens · §6 Feature scope</td></tr>
+    <tr><td>Technical plan</td><td class="c pts">20</td><td>§7 Architecture, stack and evidence model · §8 Hardest technical problems · §9 Trust, privacy and permissions</td></tr>
+    <tr><td>Originality of approach</td><td class="c pts">15</td><td>Ideas 1–4 above, expanded in §4 and §8</td></tr>
+    <tr><td>Feasibility and scope</td><td class="c pts">15</td><td>§6 Scope and exclusions · §10 Team · §11 Three-round plan, cut list and test plan</td></tr>
+  </table>
+  <p class="small muted">Also covered: expected impact (§12), future scope (§13), team and participant details with tool disclosures (§14).</p>
+</section>
+
+<!-- ============ 2. PROBLEM ============ -->
+<section class="section">
+  <div class="kicker">§2 · Understanding of the problem</div>
+  <h2>Knowledge does not disappear. It was never in one place.</h2>
+  <div class="rule"></div>
+  <p class="lede">Most teams do have documents. The problem is that the knowledge a successor actually needs is not in them —
+  it is spread across commit messages, PR review threads, late-night chat discussions, meeting notes and the leaver’s memory.</p>
+
+  <h3>What exactly is lost when someone leaves</h3>
+  <table>
+    <tr><th style="width:38mm">Type of knowledge</th><th>Where it usually lives</th><th style="width:58mm">What happens without it</th></tr>
+    <tr><td><strong>Reasons behind decisions</strong></td><td>PR review comments, chat threads, a meeting note no one links to</td><td>The successor reverses a decision that was made for a good reason, and repeats the same mistake.</td></tr>
+    <tr><td><strong>True state of unfinished work</strong></td><td>Open PRs, stale branches, TODOs, “almost done” tasks</td><td>Work marked 90% done turns out to be 40% done; deadlines slip.</td></tr>
+    <tr><td><strong>Dependencies and access</strong></td><td>Environment configs, third-party dashboards, who owns which credential</td><td>Production breaks and nobody knows who holds the account.</td></tr>
+    <tr><td><strong>Recurring problems and workarounds</strong></td><td>Chat (“restart the bot again”), issue comments, the leaver’s habits</td><td>Known issues are rediscovered from scratch, often under pressure.</td></tr>
+    <tr><td><strong>People and contacts</strong></td><td>DMs, email, the leaver’s phone</td><td>The successor doesn’t know who to ask — the sponsor, the faculty coordinator, the API vendor.</td></tr>
+  </table>
+
+  <h3>Why existing documentation fails</h3>
+  <div class="grid2">
+    <div class="card"><h4><span class="num">1</span>It records the what, not the why</h4><p class="small" style="margin:0">A README explains how to run the project. The reason payments moved to UPI links is in a chat thread from August.</p></div>
+    <div class="card"><h4><span class="num">2</span>It drifts out of date</h4><p class="small" style="margin:0">Docs are written once and code keeps changing. The README says “deployed on Render”; the last three commits configure Vercel.</p></div>
+    <div class="card"><h4><span class="num">3</span>The handover note is written at the worst time</h4><p class="small" style="margin:0">In the last week, from memory, by a person with exams, a new job or simply less motivation. It covers what they remember, not what matters.</p></div>
+    <div class="card"><h4><span class="num">4</span>The successor doesn’t know what to ask</h4><p class="small" style="margin:0">Unknown unknowns. They discover the gap only when something breaks — usually after the leaver has stopped replying.</p></div>
+  </div>
+
+  <h3>Why a plain AI summary is not the answer either</h3>
+  <p>Pointing a language model at a chat export produces fluent text, but it mixes fact with guesswork, cannot say where a statement came from,
+  quietly picks a side when sources disagree, and happily repeats something from a private channel. For a handover — which people will act on —
+  those are exactly the failures that matter. This is why the problem statement insists on traceability, uncertainty marking, human approval and
+  permission awareness, and why we treat those as the core of the product rather than add-ons.</p>
+
+  <div class="note blue keep">
+    <h4 style="margin-bottom:1mm">How we framed the problem</h4>
+    <p class="small" style="margin:0">A handover has three jobs: <strong>tell the truth</strong> about the project’s state (traceable), <strong>tell the successor what to do next</strong> (actionable),
+    and <strong>tell them only what they may know</strong> (permission-aware). These map one-to-one to the “Success Looks Like” criteria in the brief, and every feature in §6 serves at least one of them.</p>
+  </div>
+</section>
+
+<!-- ============ 3. USERS ============ -->
+<section class="section">
+  <div class="kicker">§3 · Users, scenarios and scope</div>
+  <h2>Who feels this problem</h2>
+  <div class="rule"></div>
+
+  <table>
+    <tr><th style="width:30mm">User</th><th style="width:48mm">Who they are</th><th>What they need from Continuum</th></tr>
+    <tr><td><strong>Departing member</strong><br><span class="small muted">the “leaver”</span></td><td>Graduating club lead, intern finishing a term, volunteer stepping down</td><td>Hand over properly without writing a long document. Spend their limited time only on what nobody else can answer.</td></tr>
+    <tr><td><strong>Incoming member</strong><br><span class="small muted">the “successor”</span></td><td>Junior taking over, new hire, replacement volunteer</td><td>Understand the current state, owners, risks and next steps quickly — and be able to check any statement against its source.</td></tr>
+    <tr><td><strong>Reviewer</strong></td><td>Team lead, project mentor, faculty coordinator, maintainer</td><td>Confidence that the handover is correct and that it shares nothing it shouldn’t. A fast way to correct, reject and approve.</td></tr>
+    <tr><td><strong>Workspace admin</strong></td><td>Club/organisation tech lead</td><td>Control which sources are connected and which roles may see which channels, folders and repositories.</td></tr>
+  </table>
+
+  <h3>Three departure scenarios we design for</h3>
+  <div class="grid3">
+    <div class="card"><h4>Graduating club lead</h4><p class="small" style="margin:0">A final-year student hands the club’s event app to a second-year. Time: two to three weeks before exams. Sources: GitHub, Discord, Google Docs. Sensitive: sponsor contacts, payment keys.</p></div>
+    <div class="card"><h4>Intern leaving mid-project</h4><p class="small" style="margin:0">A six-month intern leaves a feature half-built. Time: notice period of a week or two. Sources: repo, Slack, task board. Sensitive: client names, internal channels.</p></div>
+    <div class="card"><h4>Volunteer stepping down</h4><p class="small" style="margin:0">A maintainer of a community or NGO tool rotates out. Often no formal notice. Sources: public repo, issue tracker, chat. Sensitive: donor or member data.</p></div>
+  </div>
+
+  <h3>Why we start with student tech teams</h3>
+  <ul>
+    <li><strong>Turnover is guaranteed and predictable.</strong> Every semester and every graduating batch triggers handovers, so the problem recurs on a schedule.</li>
+    <li><strong>The sources are standard and exportable.</strong> GitHub, Discord or Slack, and Google Docs/Notion all offer APIs or exports — no unrealistic enterprise access is needed.</li>
+    <li><strong>We are the users.</strong> We work in this environment, can test with real club teams, and can build realistic synthetic data without touching confidential company material.</li>
+    <li><strong>It generalises.</strong> The same workflow applies to startups, research groups and volunteer teams; only the connectors and role labels change.</li>
+  </ul>
+
+  <h3>Evidence and validation</h3>
+  <p>Our Round 1 understanding comes from working inside student project teams and from the brief itself, so we treat it as a hypothesis, not proof.
+  Before and during Round 2 we will run <strong>short structured interviews with at least five club leads, mentors or maintainers</strong>
+  (what was lost in their last handover, how long the successor took to become productive, what they would never share with a successor) and a
+  <strong>handover test</strong>: one person takes over a seeded demo project with and without Continuum. Findings and any resulting changes will be reported in the Round 2 document.</p>
+
+  <div class="note keep">
+    <h4 style="margin-bottom:1mm">The specific part of the problem we solve — and what we leave out</h4>
+    <p class="small" style="margin:0"><strong>In scope:</strong> reconstructing project state from authorised sources, evidence-linked claims with uncertainty labels, a gap interview with the leaver,
+    human review and approval, and a role-scoped handover with acknowledgement. <strong>Out of scope for this event:</strong> HR offboarding, company-wide knowledge bases,
+    live meeting transcription, and live OAuth connectors for every chat tool — we use official exports instead (see §6).</p>
+  </div>
+</section>
+
+<!-- ============ 4. SOLUTION ============ -->
+<section class="section">
+  <div class="kicker">§4 · Proposed solution</div>
+  <h2>Continuum: a handover that shows its work</h2>
+  <div class="rule"></div>
+  <p class="lede">Continuum turns scattered project activity into a reviewed, role-appropriate handover. It does three things a document or a chatbot cannot:
+  it keeps every statement tied to evidence, it asks the leaver only about the gaps, and it filters by permission before generating anything.</p>
+
+  <h3>The core unit: an evidence-backed claim</h3>
+  <p>All imported material is broken into <strong>evidence units</strong> — one commit, one PR comment, one chat thread, one paragraph of a note. The AI extracts
+  <strong>claims</strong> from them (a decision, an owner, a risk, a dependency, a next action), and every claim carries its evidence state:</p>
+  <table>
+    <tr><th style="width:30mm">State</th><th>Meaning</th><th style="width:56mm">How it is shown to people</th></tr>
+    <tr><td><span class="pill p-ok">Verified</span></td><td>At least one source states it directly, and an automated check confirms the source supports it.</td><td>Normal text with source chips.</td></tr>
+    <tr><td><span class="pill p-inf">Inferred</span></td><td>A reasonable conclusion drawn from sources, but no source says it outright.</td><td>Labelled “AI inference — not stated in any source”.</td></tr>
+    <tr><td><span class="pill p-warn">Conflicting</span></td><td>Two or more sources disagree.</td><td>Both versions shown side by side. Never auto-resolved.</td></tr>
+    <tr><td><span class="pill p-miss">Missing</span></td><td>Something a handover needs has no evidence at all (for example, an open PR with no owner).</td><td>Listed as a gap; turned into a Gap Interview question.</td></tr>
+    <tr><td><span class="pill p-hum">Confirmed</span></td><td>A human reviewer approved or corrected the claim.</td><td>Shows who confirmed it and when.</td></tr>
+  </table>
+
+  <h3>What the successor receives</h3>
+  <div class="grid2">
+    <div>
+      <ol style="margin-bottom:0">
+        <li><strong>Project in five lines</strong> — goal, users, stack, current phase.</li>
+        <li><strong>Current state by workstream</strong> — done, in progress, blocked, with the real status of open work.</li>
+        <li><strong>Decision log</strong> — a timeline of key decisions and why they were made.</li>
+        <li><strong>Your first week</strong> — ordered next actions, each linked to its issue, PR or thread.</li>
+      </ol>
+    </div>
+    <div>
+      <ol start="5" style="margin-bottom:0">
+        <li><strong>Risks and landmines</strong> — recurring problems, workarounds, fragile parts.</li>
+        <li><strong>Dependencies and people</strong> — services, credential owners, who to ask for what.</li>
+        <li><strong>Still unresolved</strong> — open questions and conflicts the team could not settle, stated honestly.</li>
+      </ol>
+    </div>
+  </div>
+
+  <h3>The Gap Interview</h3>
+  <p>After reconstruction, Continuum knows what it could not find. It turns each <span class="pill p-miss">Missing</span> or <span class="pill p-warn">Conflicting</span> item into a short,
+  specific question for the leaver, for example:</p>
+  <div class="card soft keep" style="margin-bottom:3mm">
+    <p class="small" style="margin:0 0 1.2mm">“PR #91 <em>‘temporary fix for login loop’</em> was merged with a TODO on 18 Sep. Is this still temporary, and what would the proper fix be?”</p>
+    <p class="small" style="margin:0 0 1.2mm">“The README says production runs on Render, but commits since 2 Oct configure Vercel. Which is live today?”</p>
+    <p class="small" style="margin:0">“Who owns the college SMTP account used for event emails? No source mentions it.”</p>
+  </div>
+  <p>The leaver answers in a few minutes per question, and each answer is stored as a new evidence unit — cited as <span class="chip">Exit Q&amp;A · Aditi · 3 Nov</span> — so
+  even their personal knowledge becomes traceable. A typical handover should need a short list of questions, not a blank document.</p>
+</section>
+
+<!-- ============ 5. WORKFLOW ============ -->
+<section class="section">
+  <div class="kicker">§5 · Complete product workflow</div>
+  <h2>From connected sources to an approved handover</h2>
+  <div class="rule"></div>
+  <p>The workflow follows the five stages required by the brief. Each stage has a clear owner and a clear output.</p>
+
+  <svg viewBox="0 0 700 150" width="100%" style="margin:1mm 0 3mm" font-family="Inter, Segoe UI, sans-serif">
+    <defs><marker id="ar" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#17324D"/></marker></defs>
+    <g font-size="10.5">
+      <g><rect x="2" y="10" width="122" height="64" rx="5" fill="#17324D"/><text x="12" y="30" fill="#F3D2B9" font-size="9" font-weight="600">01</text><text x="12" y="50" fill="#fff" font-size="14" font-weight="600">Connect</text><text x="12" y="65" fill="#C9D4E0" font-size="8.5">Reviewer / admin</text></g>
+      <g><rect x="146" y="10" width="122" height="64" rx="5" fill="#17324D"/><text x="156" y="30" fill="#F3D2B9" font-size="9" font-weight="600">02</text><text x="156" y="50" fill="#fff" font-size="14" font-weight="600">Reconstruct</text><text x="156" y="65" fill="#C9D4E0" font-size="8.5">Automatic</text></g>
+      <g><rect x="290" y="10" width="122" height="64" rx="5" fill="#17324D"/><text x="300" y="30" fill="#F3D2B9" font-size="9" font-weight="600">03</text><text x="300" y="50" fill="#fff" font-size="14" font-weight="600">Verify</text><text x="300" y="65" fill="#C9D4E0" font-size="8.5">Automatic + leaver</text></g>
+      <g><rect x="434" y="10" width="122" height="64" rx="5" fill="#17324D"/><text x="444" y="30" fill="#F3D2B9" font-size="9" font-weight="600">04</text><text x="444" y="50" fill="#fff" font-size="14" font-weight="600">Review</text><text x="444" y="65" fill="#C9D4E0" font-size="8.5">Reviewer</text></g>
+      <g><rect x="578" y="10" width="120" height="64" rx="5" fill="#C2682B"/><text x="588" y="30" fill="#FFE7D6" font-size="9" font-weight="600">05</text><text x="588" y="50" fill="#fff" font-size="14" font-weight="600">Handover</text><text x="588" y="65" fill="#FBE3D2" font-size="8.5">Successor</text></g>
+      <line x1="125" y1="42" x2="143" y2="42" stroke="#17324D" stroke-width="1.6" marker-end="url(#ar)"/>
+      <line x1="269" y1="42" x2="287" y2="42" stroke="#17324D" stroke-width="1.6" marker-end="url(#ar)"/>
+      <line x1="413" y1="42" x2="431" y2="42" stroke="#17324D" stroke-width="1.6" marker-end="url(#ar)"/>
+      <line x1="557" y1="42" x2="575" y2="42" stroke="#17324D" stroke-width="1.6" marker-end="url(#ar)"/>
+      <g fill="#3C4652" font-size="8.6">
+        <text x="2" y="92">Evidence units with</text><text x="2" y="104">access labels</text>
+        <text x="146" y="92">Draft claims: decisions,</text><text x="146" y="104">owners, risks, next steps</text>
+        <text x="290" y="92">Evidence states +</text><text x="290" y="104">Gap Interview answers</text>
+        <text x="434" y="92">Approved, versioned</text><text x="434" y="104">handover (v1, v2…)</text>
+        <text x="578" y="92">Role-scoped view,</text><text x="578" y="104">acknowledged sections</text>
+      </g>
+      <path d="M 637 116 C 637 140, 351 140, 351 116" fill="none" stroke="#C2682B" stroke-width="1.3" stroke-dasharray="4 3" marker-end="url(#ar)"/>
+      <text x="408" y="146" fill="#C2682B" font-size="8.6">“Unclear” flags go back to reviewer and leaver</text>
+    </g>
+  </svg>
+
+  <table>
+    <tr><th style="width:24mm">Stage</th><th>What the user does</th><th>What Continuum does</th></tr>
+    <tr><td><strong>1 · Connect</strong></td><td>Reviewer creates a handover (leaver, successor, successor’s role, target date), connects a GitHub repo with a read-only token, and uploads a Slack/Discord export, notes and a task-board export. Chooses which channels and folders are in scope.</td><td>Parses everything into evidence units, scans for secrets and personal data, and attaches an access label from the source (e.g. <span class="chip">#core-team → leads</span>).</td></tr>
+    <tr><td><strong>2 · Reconstruct</strong></td><td>Waits a few minutes; can watch progress per source.</td><td>Groups evidence by thread and time window, extracts claims, builds the decision timeline, ownership map, risk list, dependency list and next actions.</td></tr>
+    <tr><td><strong>3 · Verify</strong></td><td>Leaver answers the Gap Interview (link sent by the reviewer).</td><td>Checks every citation, assigns evidence states, detects conflicts and gaps, computes a <strong>handover readiness score</strong>, and folds the leaver’s answers back in as evidence.</td></tr>
+    <tr><td><strong>4 · Review</strong></td><td>Reviewer goes through the claim ledger: approve, edit, reject, mark sensitive, or redact. Conflicts must be resolved or explicitly marked “unresolved — successor to follow up”.</td><td>Records every change with author and time, keeps version history, and locks an approved version when published.</td></tr>
+    <tr><td><strong>5 · Handover</strong></td><td>Successor opens their link, reads the “Start here” page, clicks any source chip to see the original, and acknowledges each section or flags it as unclear.</td><td>Shows only claims whose evidence the successor’s role may see, tracks acknowledgement, and routes unclear flags back to the reviewer and leaver.</td></tr>
+  </table>
+
+  <div class="keep">
+  <h3>What the review screen looks like</h3>
+  <div class="mock">
+    <div class="top"><span><b>CampusKart</b> &nbsp;›&nbsp; Handover: Aditi → Karan &nbsp;›&nbsp; Review</span>
+      <span class="ready">Readiness 72% <span class="meter"><i></i></span></span></div>
+    <div class="body">
+      <div class="claim"><div><span class="pill p-ok">Verified</span><div class="small muted" style="margin-top:1mm">Decision</div></div>
+        <div><div class="txt">Payments moved from a card gateway to UPI deep links in August because the club could not complete merchant KYC.</div>
+        <div class="src"><span class="chip">PR #87</span><span class="chip">#dev · 12 Aug</span></div></div>
+        <div class="act"><span>Approve</span><span>Edit</span><span>Reject</span></div></div>
+      <div class="claim"><div><span class="pill p-warn">Conflicting</span><div class="small muted" style="margin-top:1mm">Dependency</div></div>
+        <div><div class="txt">Production hosting: <em>Render</em> (README) vs <em>Vercel</em> (recent commits). Must be resolved before publishing.</div>
+        <div class="src"><span class="chip">README.md</span><span class="chip">commit 3f9a2c · 2 Oct</span></div></div>
+        <div class="act"><span>Pick source</span><span>Mark unresolved</span></div></div>
+      <div class="claim"><div><span class="pill p-miss">Missing</span><div class="small muted" style="margin-top:1mm">Owner</div></div>
+        <div><div class="txt">No owner found for the college SMTP account used for event emails.</div>
+        <div class="src"><span class="chip">Gap question sent to Aditi</span></div></div>
+        <div class="act"><span>Assign</span><span>Edit</span></div></div>
+      <div class="claim"><div><span class="pill p-inf">Inferred</span><div class="small muted" style="margin-top:1mm">Risk</div></div>
+        <div><div class="txt"><em>AI inference — not stated in any source:</em> the login-loop fix in PR #91 is probably temporary; a TODO remains in <span class="mono">auth/session.ts</span>.</div>
+        <div class="src"><span class="chip">PR #91</span><span class="chip">auth/session.ts:42</span></div></div>
+        <div class="act"><span>Confirm</span><span>Edit</span><span>Reject</span></div></div>
+    </div>
+  </div>
+  <p class="small muted">Mock-up based on our synthetic demo project “CampusKart”. Names and data are fictional.</p>
+  </div>
+</section>
+
+<!-- ============ 6. FEATURES ============ -->
+<section style="margin-top:7mm">
+  <div class="kicker">§6 · Main features and scope</div>
+  <h2>What we will build, and what we won’t</h2>
+  <div class="rule"></div>
+  <p>The brief rewards a focused workflow that works end to end over a long feature list. We split features into what must work in Round 2
+  (the full central workflow), what we will add in Round 3, and what we are deliberately not building.</p>
+
+  <table>
+    <tr><th style="width:44mm">Feature</th><th>Description</th><th class="c" style="width:17mm">Round</th></tr>
+    <tr><td><strong>Source connectors</strong></td><td>GitHub (commits, PRs, issues, review comments, README) via read-only token; Slack and Discord official JSON exports; notes and docs as Markdown/PDF/DOCX; task board via GitHub Issues or Trello CSV.</td><td class="c">2</td></tr>
+    <tr><td><strong>Evidence store with access labels</strong></td><td>Every unit keeps author, timestamp, link back to the original, and an access label inherited from its channel, folder or repo.</td><td class="c">2</td></tr>
+    <tr><td><strong>Project-state reconstruction</strong></td><td>Decisions with reasons, owners, open work and its real status, risks, recurring problems, dependencies, contacts, next actions, decision timeline.</td><td class="c">2</td></tr>
+    <tr><td><strong>Claim verification</strong></td><td>Citation checks and evidence states (Verified / Inferred / Conflicting / Missing). Claims that fail verification are never shown as verified.</td><td class="c">2</td></tr>
+    <tr><td><strong>Gap Interview</strong></td><td>Auto-generated questions for the leaver; answers stored as citable evidence.</td><td class="c">2</td></tr>
+    <tr><td><strong>Review and approval</strong></td><td>Claim ledger with approve / edit / reject / redact, readiness score, version history, publish lock.</td><td class="c">2</td></tr>
+    <tr><td><strong>Role-scoped handover view</strong></td><td>“Start here” page for the successor with source chips that open the original evidence. Two roles in Round 2: Lead and Contributor.</td><td class="c">2</td></tr>
+    <tr><td><strong>Cross-source conflict resolution</strong></td><td>Detect contradictions between sources across the whole project (not just within one thread) and resolve them side by side.</td><td class="c">3</td></tr>
+    <tr><td><strong>Acknowledgement loop and version diff</strong></td><td>Successor acknowledges or flags each section; flags route back; reviewers see what changed between v1 and v2.</td><td class="c">3</td></tr>
+    <tr><td><strong>Sensitive-data protection</strong></td><td>Automatic secret and personal-data detection with a redaction queue, more role levels (e.g. Guest), and a full audit log of views, approvals and exports.</td><td class="c">3</td></tr>
+    <tr><td><strong>Export</strong></td><td>Approved handover exported as PDF/Markdown with citations kept as links.</td><td class="c">3</td></tr>
+  </table>
+
+  <h3>Deliberately out of scope during the event</h3>
+  <div class="grid2">
+    <ul class="small" style="margin:0">
+      <li><strong>Live Slack/Discord/Notion OAuth sync.</strong> Exports are official, permission-respecting and enough to prove the workflow. Live sync is future scope.</li>
+      <li><strong>Meeting audio and transcription.</strong> Text notes only.</li>
+    </ul>
+    <ul class="small" style="margin:0">
+      <li><strong>Mobile app, Slack bot, HR integrations.</strong> Not needed to complete a handover.</li>
+      <li><strong>Real organisational data.</strong> All demos use synthetic or public data, as the brief requires.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ 7. TECH ============ -->
+<section class="section">
+  <div class="kicker">§7 · Technical plan</div>
+  <h2>Architecture, stack and evidence model</h2>
+  <div class="rule"></div>
+
+  <svg viewBox="0 0 718 395" width="100%" font-family="Inter, Segoe UI, sans-serif" style="margin-bottom:2mm">
+    <defs><marker id="a2" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#6B7480"/></marker></defs>
+    <text x="0" y="12" font-size="8.5" fill="#6B7480" font-weight="600" letter-spacing="1">AUTHORISED SOURCES</text>
+    <g font-size="9.5" fill="#18212B">
+      <rect x="0" y="20" width="128" height="34" rx="4" fill="#F4F6F8" stroke="#C9D2DC"/><text x="10" y="35" font-weight="600">GitHub repo</text><text x="10" y="47" font-size="8" fill="#6B7480">REST API · read-only token</text>
+      <rect x="143" y="20" width="128" height="34" rx="4" fill="#F4F6F8" stroke="#C9D2DC"/><text x="153" y="35" font-weight="600">Team chat</text><text x="153" y="47" font-size="8" fill="#6B7480">Slack / Discord JSON export</text>
+      <rect x="286" y="20" width="128" height="34" rx="4" fill="#F4F6F8" stroke="#C9D2DC"/><text x="296" y="35" font-weight="600">Notes &amp; docs</text><text x="296" y="47" font-size="8" fill="#6B7480">Markdown · PDF · DOCX</text>
+      <rect x="429" y="20" width="128" height="34" rx="4" fill="#F4F6F8" stroke="#C9D2DC"/><text x="439" y="35" font-weight="600">Task board</text><text x="439" y="47" font-size="8" fill="#6B7480">GitHub Issues · Trello CSV</text>
+      <rect x="572" y="20" width="128" height="34" rx="4" fill="#FBF1E9" stroke="#C2682B"/><text x="582" y="35" font-weight="600">Exit Q&amp;A</text><text x="582" y="47" font-size="8" fill="#6B7480">Gap Interview answers</text>
+    </g>
+    <line x1="350" y1="56" x2="350" y2="72" stroke="#6B7480" stroke-width="1.4" marker-end="url(#a2)"/>
+    <rect x="0" y="75" width="700" height="52" rx="5" fill="#fff" stroke="#17324D" stroke-width="1.3"/>
+    <text x="12" y="92" font-size="10.5" font-weight="600" fill="#17324D">Ingestion &amp; protection  ·  Python worker</text>
+    <g font-size="8.6" fill="#3C4652">
+      <rect x="12" y="99" width="162" height="20" rx="3" fill="#EEF2F6"/><text x="20" y="113">Parse → evidence units</text>
+      <rect x="182" y="99" width="162" height="20" rx="3" fill="#EEF2F6"/><text x="190" y="113">Secret &amp; PII scan, redaction</text>
+      <rect x="352" y="99" width="162" height="20" rx="3" fill="#EEF2F6"/><text x="360" y="113">Access label from source ACL</text>
+      <rect x="522" y="99" width="166" height="20" rx="3" fill="#EEF2F6"/><text x="530" y="113">Embeddings (multilingual)</text>
+    </g>
+    <line x1="350" y1="129" x2="350" y2="145" stroke="#6B7480" stroke-width="1.4" marker-end="url(#a2)"/>
+    <rect x="0" y="148" width="700" height="40" rx="5" fill="#17324D"/>
+    <text x="12" y="166" font-size="10.5" font-weight="600" fill="#fff">Evidence store  ·  PostgreSQL + pgvector (Supabase)</text>
+    <text x="12" y="180" font-size="8.6" fill="#C9D4E0">evidence units · claims · citations · handover versions · roles · audit log  —  row-level security enforces access labels in the database</text>
+    <line x1="350" y1="190" x2="350" y2="206" stroke="#6B7480" stroke-width="1.4" marker-end="url(#a2)"/>
+    <rect x="0" y="209" width="700" height="62" rx="5" fill="#fff" stroke="#17324D" stroke-width="1.3"/>
+    <text x="12" y="226" font-size="10.5" font-weight="600" fill="#17324D">Reconstruction engine  ·  FastAPI + Claude API</text>
+    <g font-size="8.6" fill="#3C4652">
+      <rect x="12" y="234" width="152" height="28" rx="3" fill="#EEF2F6"/><text x="20" y="246" font-weight="600" fill="#18212B">1. Permission filter</text><text x="20" y="257">only allowed evidence</text>
+      <rect x="183" y="234" width="152" height="28" rx="3" fill="#EEF2F6"/><text x="191" y="246" font-weight="600" fill="#18212B">2. Extract claims</text><text x="191" y="257">schema-bound, must cite IDs</text>
+      <rect x="354" y="234" width="152" height="28" rx="3" fill="#EEF2F6"/><text x="362" y="246" font-weight="600" fill="#18212B">3. Verify citations</text><text x="362" y="257">quote match + support check</text>
+      <rect x="525" y="234" width="163" height="28" rx="3" fill="#EEF2F6"/><text x="533" y="246" font-weight="600" fill="#18212B">4. Merge, conflicts, gaps</text><text x="533" y="257">states + gap questions</text>
+      <line x1="165" y1="248" x2="180" y2="248" stroke="#6B7480" stroke-width="1.2" marker-end="url(#a2)"/>
+      <line x1="336" y1="248" x2="351" y2="248" stroke="#6B7480" stroke-width="1.2" marker-end="url(#a2)"/>
+      <line x1="507" y1="248" x2="522" y2="248" stroke="#6B7480" stroke-width="1.2" marker-end="url(#a2)"/>
+    </g>
+    <line x1="350" y1="273" x2="350" y2="289" stroke="#6B7480" stroke-width="1.4" marker-end="url(#a2)"/>
+    <text x="0" y="302" font-size="8.5" fill="#6B7480" font-weight="600" letter-spacing="1">WEB APP  ·  NEXT.JS</text>
+    <g font-size="9.5">
+      <rect x="0" y="309" width="220" height="44" rx="4" fill="#F4F6F8" stroke="#C9D2DC"/><text x="10" y="326" font-weight="600" fill="#18212B">Claim ledger &amp; review</text><text x="10" y="341" font-size="8.2" fill="#6B7480">approve · edit · reject · redact · versions</text>
+      <rect x="240" y="309" width="220" height="44" rx="4" fill="#F4F6F8" stroke="#C9D2DC"/><text x="250" y="326" font-weight="600" fill="#18212B">Gap Interview</text><text x="250" y="341" font-size="8.2" fill="#6B7480">leaver answers targeted questions</text>
+      <rect x="480" y="309" width="220" height="44" rx="4" fill="#FBF1E9" stroke="#C2682B"/><text x="490" y="326" font-weight="600" fill="#18212B">Role-scoped handover</text><text x="490" y="341" font-size="8.2" fill="#6B7480">source chips · acknowledge · flag unclear</text>
+    </g>
+    <path d="M 460 331 C 470 331, 470 331, 478 331" stroke="#6B7480" stroke-width="1.2" fill="none"/>
+    <path d="M 220 331 L 238 331" stroke="#6B7480" stroke-width="1.2" fill="none"/>
+    <path d="M 350 355 V 372 H 712 V 37 H 704" fill="none" stroke="#C2682B" stroke-width="1.2" stroke-dasharray="4 3" marker-end="url(#a2)"/>
+    <text x="360" y="387" font-size="8.4" fill="#C2682B">Gap Interview answers are stored as new evidence</text>
+  </svg>
+
+  <h3>Technology stack and why we chose it</h3>
+  <table>
+    <tr><th style="width:30mm">Layer</th><th style="width:44mm">Choice</th><th>Why this, for this problem</th></tr>
+    <tr><td><strong>Frontend</strong></td><td>Next.js (TypeScript), Tailwind CSS, shadcn/ui</td><td>Fast to build review-heavy interfaces (tables, side panels, diff views); easy deployment; one language for UI work.</td></tr>
+    <tr><td><strong>Backend API</strong></td><td>Python, FastAPI</td><td>Best ecosystem for parsing, text processing and AI; typed request/response models with Pydantic double as the claim schema.</td></tr>
+    <tr><td><strong>Database &amp; auth</strong></td><td>PostgreSQL + pgvector on Supabase, Supabase Auth</td><td>One service gives relational data, vector search and auth. <strong>Row-level security</strong> lets us enforce access labels inside the database, not just in the UI — the main reason we picked it.</td></tr>
+    <tr><td><strong>AI model</strong></td><td>Anthropic Claude API</td><td>Strong at long, messy inputs and at following strict output schemas (tool use / structured JSON), which our citation-bound extraction depends on.</td></tr>
+    <tr><td><strong>Embeddings</strong></td><td>multilingual-e5-small (open source, runs locally)</td><td>Free, private, and handles the mixed Hindi–English (“Hinglish”) chat that is normal in Indian student teams.</td></tr>
+    <tr><td><strong>Background jobs</strong></td><td>Python worker + Postgres job table</td><td>Ingestion takes minutes; a job table avoids running a separate queue service.</td></tr>
+    <tr><td><strong>Supporting libraries</strong></td><td>PyGithub, pypdf, python-docx, rapidfuzz, detect-secrets</td><td>Proven open-source tools for source parsing, quote matching and secret detection.</td></tr>
+    <tr><td><strong>Hosting</strong></td><td>Vercel (web), Render (API + worker), Supabase</td><td>Free tiers are sufficient for judging; judges get a live link.</td></tr>
+  </table>
+  <p class="small muted">Alternatives considered: a separate vector database (Pinecone, Chroma) — rejected because pgvector keeps permissions and vectors in one place;
+  LangChain-style agents — rejected in favour of a small, explicit pipeline we can test step by step.</p>
+</section>
+
+<section class="section">
+  <h3 style="margin-top:0">Evidence model</h3>
+  <p>The data model is what makes traceability and permissions enforceable rather than promised.</p>
+  <table>
+    <tr><th style="width:32mm">Entity</th><th>Key fields</th><th style="width:60mm">Purpose</th></tr>
+    <tr><td><strong>Source</strong></td><td class="mono">type, name, scope, default_access_label, connected_by</td><td>One connected repo, export or folder.</td></tr>
+    <tr><td><strong>EvidenceUnit</strong></td><td class="mono">source_id, author, timestamp, text, url/locator, access_label, redactions[], embedding</td><td>The smallest citable piece. Every claim must point to these.</td></tr>
+    <tr><td><strong>Claim</strong></td><td class="mono">type, statement, state, confidence_reason, workstream, owner</td><td>Decision, owner, risk, dependency, next action, open question, contact.</td></tr>
+    <tr><td><strong>Citation</strong></td><td class="mono">claim_id, evidence_id, quote_span, support (full / partial)</td><td>Links a claim to the exact text that supports it.</td></tr>
+    <tr><td><strong>Handover</strong></td><td class="mono">leaver, successor, successor_role, status, version, approved_by, published_at</td><td>One handover with locked, versioned snapshots.</td></tr>
+    <tr><td><strong>ReviewAction / Ack</strong></td><td class="mono">who, action, before/after, time · section, acknowledged / unclear</td><td>Audit trail of human control and successor receipt.</td></tr>
+  </table>
+
+  <h3>Integrations and data sources</h3>
+  <table>
+    <tr><th style="width:30mm">Source</th><th>How we access it</th><th style="width:62mm">Why it is realistic during the event</th></tr>
+    <tr><td><strong>GitHub</strong></td><td>REST API with a fine-grained, read-only personal access token for one repository</td><td>The repo owner controls the token scope; works for public and private repos.</td></tr>
+    <tr><td><strong>Slack / Discord</strong></td><td>Official workspace export (Slack) or channel export (Discord JSON), uploaded by an admin</td><td>No app approval or OAuth review needed; the admin decides which channels to export.</td></tr>
+    <tr><td><strong>Notes / docs</strong></td><td>File upload (MD, PDF, DOCX) or Google Docs exported as files</td><td>Covers meeting notes, specs and existing READMEs.</td></tr>
+    <tr><td><strong>Task board</strong></td><td>GitHub Issues/Projects via API, Trello board CSV/JSON export</td><td>Most student teams use one of the two.</td></tr>
+    <tr><td><strong>Demo data</strong></td><td>Synthetic project “CampusKart”: a public repo we create during the event plus a generated chat export and notes</td><td>Satisfies the brief’s synthetic-data rule and lets us plant known facts for testing (§11).</td></tr>
+  </table>
+</section>
+
+<!-- ============ 8. CHALLENGES ============ -->
+<section class="section">
+  <div class="kicker">§8 · Major technical challenges</div>
+  <h2>The hard parts, and how we handle them</h2>
+  <div class="rule"></div>
+
+  <h3>Challenge 1 — Making every claim trustworthy (the main one)</h3>
+  <p>Language models produce confident text that may not be supported. A handover that invents a reason for a decision is worse than no handover.
+  We do not rely on prompting alone; we wrap the model in checks we control.</p>
+  <table>
+    <tr><th style="width:8mm" class="c">#</th><th style="width:40mm">Step</th><th>How it works</th></tr>
+    <tr><td class="c">1</td><td><strong>Bounded input</strong></td><td>The model sees one batch at a time (a thread or a time window), with every evidence unit tagged by a stable ID.</td></tr>
+    <tr><td class="c">2</td><td><strong>Schema-bound extraction</strong></td><td>Output must be JSON matching our claim schema: type, statement, cited evidence IDs and the exact quote that supports it. Free text is rejected.</td></tr>
+    <tr><td class="c">3</td><td><strong>Deterministic checks</strong></td><td>Every cited ID must exist and must have been in that batch; the quoted span must fuzzy-match the source text (rapidfuzz). Failures are dropped or downgraded to <span class="pill p-inf">Inferred</span>.</td></tr>
+    <tr><td class="c">4</td><td><strong>Support check</strong></td><td>A second, narrow model call sees only the claim and its cited evidence and answers: supports / partially / does not. Only “supports” can become <span class="pill p-ok">Verified</span>.</td></tr>
+    <tr><td class="c">5</td><td><strong>Human confirmation</strong></td><td>Nothing is published until a reviewer approves it; reviewer edits are stored as <span class="pill p-hum">Confirmed</span> with name and time.</td></tr>
+  </table>
+
+  <h3>Challenge 2 — Not leaking what the successor shouldn’t see</h3>
+  <p>If the model reads a private channel while writing a contributor’s handover, the information can surface in a summary even if the channel is “hidden” in the UI.
+  So we filter <strong>before</strong> generation:</p>
+  <ul>
+    <li>Each evidence unit inherits an access label from its source (e.g. <span class="chip">#core-team → leads</span>, <span class="chip">finance/ → restricted</span>).</li>
+    <li>A handover view is generated only from units the target role may read. Postgres row-level security enforces this at query level, so a bug in the app layer cannot bypass it.</li>
+    <li>A claim takes the most restrictive label of its evidence. If the successor cannot see all of its evidence, they do not see the claim.</li>
+    <li>Secrets (API keys, tokens) and personal data are detected and redacted at ingestion; reviewers can redact any span manually before publishing.</li>
+  </ul>
+
+  <h3>Challenge 3 — Contradictory and stale information</h3>
+  <p>Sources disagree all the time. Claims about the same subject are grouped using embeddings and an entity key (module, service, person); each group is checked
+  for contradiction. Conflicts are shown with both sides and their dates — the newest source is <em>not</em> assumed to be correct. Publishing is blocked until each conflict
+  is resolved or explicitly marked unresolved.</p>
+
+  <h3>Challenge 4 — Long, noisy input and cost</h3>
+  <p>A semester of chat can be thousands of messages of jokes, memes and off-topic talk. We filter obvious noise cheaply (bots, reactions, very short messages),
+  thread messages before extraction, cache results per batch so re-runs only process new evidence, and cap batch size so cost stays predictable on student credits.
+  If the AI API fails or rate-limits, jobs retry with back-off and the UI shows which sources are incomplete instead of producing a partial handover silently.</p>
+</section>
+
+<!-- ============ 9. TRUST ============ -->
+<section class="section">
+  <div class="kicker">§9 · Trust, privacy and human control</div>
+  <h2>How we meet the brief’s trust requirements</h2>
+  <div class="rule"></div>
+  <table>
+    <tr><th style="width:62mm">Requirement in the brief</th><th>How Continuum meets it</th></tr>
+    <tr><td>Do not present generated assumptions as verified organisational truth.</td><td>Five explicit evidence states; inferences labelled in the text itself; only checked claims can be “Verified”; reviewer confirmation is recorded separately from AI verification.</td></tr>
+    <tr><td>Do not expose confidential information merely because it appeared in a connected source.</td><td>Source-level scoping at connect time, access labels, permission filtering before generation, row-level security, secret/PII redaction, reviewer “mark sensitive”.</td></tr>
+    <tr><td>Allow authorised users to correct, reject and approve the final handover.</td><td>Claim-level approve / edit / reject / redact, version history, publish lock, and an audit log of every action.</td></tr>
+    <tr><td>Use synthetic, public, permissioned or anonymised data for demonstrations.</td><td>The demo runs on our synthetic “CampusKart” project only. The product asks the admin to confirm they are authorised to connect each source.</td></tr>
+  </table>
+
+  <h3>Data handling</h3>
+  <div class="grid2">
+    <ul class="small" style="margin:0">
+      <li>Read-only access to every source; Continuum never writes back to GitHub or chat.</li>
+      <li>Only the excerpts needed for a batch are sent to the AI API, after redaction.</li>
+      <li>Tokens and uploaded files are stored encrypted and scoped to one workspace.</li>
+    </ul>
+    <ul class="small" style="margin:0">
+      <li>Deleting a handover deletes its evidence units, embeddings and files.</li>
+      <li>The leaver can see what the system extracted about their work before it is shared.</li>
+      <li>Accessibility: keyboard navigation and text labels on every status — colour is never the only signal.</li>
+    </ul>
+  </div>
+
+  <div class="note blue keep" style="margin-top:5mm">
+    <h4 style="margin-bottom:1mm">Honest limitations we will state in the product</h4>
+    <p class="small" style="margin:0">Continuum can only reconstruct what was written down somewhere. Knowledge that lives purely in someone’s head reaches the handover only through the Gap Interview,
+    and a reviewer still has to judge whether the answers are right. We would rather show a clear “Missing” than fill the gap with a plausible guess.</p>
+  </div>
+</section>
+
+<!-- ============ 10. TEAM ============ -->
+<section class="section">
+  <div class="kicker">§10 · Team responsibilities</div>
+  <h2>Who builds what</h2>
+  <div class="rule"></div>
+  <p>We are a two-person team, so the split is clean: one of us owns the data and AI pipeline, the other owns everything the user touches.
+  We share the demo dataset, testing and documentation, and both of us will be able to explain the whole system.</p>
+
+  <div class="grid2">
+    <div class="card">
+      <div class="kicker" style="margin-bottom:1mm">Team lead · Backend &amp; AI</div>
+      <h3 style="margin:0 0 2mm">Pawan Singh Bhandari</h3>
+      <h4>Personally builds</h4>
+      <ul class="small">
+        <li>Source connectors: GitHub API, Slack/Discord export and document parsers</li>
+        <li>Evidence store schema, access labels and row-level security policies</li>
+        <li>Claim extraction pipeline with the Claude API and the claim schema</li>
+        <li>Verification layer: citation checks, support check, evidence states</li>
+        <li>Conflict and gap detection; Gap Interview question generator</li>
+        <li>FastAPI endpoints, background worker, backend deployment</li>
+      </ul>
+      <h4>Also owns</h4>
+      <p class="small" style="margin:0">Architecture decisions, AI cost and reliability, technical sections of the round documents.</p>
+    </div>
+    <div class="card">
+      <div class="kicker" style="margin-bottom:1mm">Frontend &amp; Product</div>
+      <h3 style="margin:0 0 2mm">Rahul Bramhankar</h3>
+      <h4>Personally builds</h4>
+      <ul class="small">
+        <li>Next.js app: workspace setup, create-handover and connect-sources screens</li>
+        <li>Claim ledger review interface: approve / edit / reject / redact, readiness score, version history</li>
+        <li>Evidence viewer: click a source chip to see the original text in context</li>
+        <li>Gap Interview page for the leaver</li>
+        <li>Successor “Start here” handover view with acknowledgement and “unclear” flags</li>
+        <li>Auth and role-based routing on the frontend; web deployment</li>
+      </ul>
+      <h4>Also owns</h4>
+      <p class="small" style="margin:0">User interviews, usability testing, demo flow and the final presentation.</p>
+    </div>
+  </div>
+
+  <h3>Shared work</h3>
+  <table>
+    <tr><th>Task</th><th style="width:60mm">Split</th></tr>
+    <tr><td>Synthetic “CampusKart” dataset (repo history, chat export, notes) with planted facts for testing</td><td>Pawan: repo and planted facts · Rahul: chat and notes</td></tr>
+    <tr><td>Test plan, end-to-end testing, failure cases</td><td>Pawan: pipeline tests · Rahul: user journeys</td></tr>
+    <tr><td>Round 2 and Round 3 documentation, README and setup guide</td><td>Both, reviewed by each other</td></tr>
+  </table>
+</section>
+
+<!-- ============ 11. PLAN ============ -->
+<section class="section">
+  <div class="kicker">§11 · Development plan across three rounds</div>
+  <h2>A plan we can actually finish</h2>
+  <div class="rule"></div>
+
+  <table>
+    <tr><th style="width:24mm">Round</th><th>Goal</th><th style="width:66mm">Deliverable</th></tr>
+    <tr><td><strong>1 · The Plan</strong><br><span class="small muted">5–6 Nov</span></td><td>Understand the problem, define users, design a trustworthy workflow and a realistic scope.</td><td>This proposal.</td></tr>
+    <tr><td><strong>2 · The Build</strong><br><span class="small muted">7–10 Nov · 72 h</span></td><td>The full central workflow working end to end on synthetic data: Connect → Reconstruct → Verify → Review → Handover.</td><td>Deployed app, public repo, architecture document, test evidence, three committed improvements.</td></tr>
+    <tr><td><strong>3 · The Finish</strong><br><span class="small muted">13–16 Nov · 72 h</span></td><td>Deliver the three improvements, harden reliability and permissions, polish usability, document limitations.</td><td>Final product, demo, report, testing notes, privacy and accessibility explanation.</td></tr>
+  </table>
+
+  <h3>Round 2 build milestones</h3>
+  <p class="small muted">Round 2 is a 72-hour build (7–10 November, from 10:00). Hours are counted from the start of the window.</p>
+  <table class="gantt">
+    <tr><th style="width:52mm">Milestone</th><th style="width:20mm">Owner</th><th class="c">Hours 0–18</th><th class="c">18–36</th><th class="c">36–54</th><th class="c">54–72</th></tr>
+    <tr><td>M1 · Repo, schema, auth, demo dataset</td><td>Both</td><td class="bar"><div class="b b1"></div></td><td class="bar"></td><td class="bar"></td><td class="bar"></td></tr>
+    <tr><td>M2 · Connectors → evidence units</td><td>Pawan</td><td class="bar"><div class="b b1" style="margin-left:50%"></div></td><td class="bar"><div class="b b1"></div></td><td class="bar"></td><td class="bar"></td></tr>
+    <tr><td>M3 · Extraction + verification + gaps</td><td>Pawan</td><td class="bar"></td><td class="bar"><div class="b b1" style="margin-left:40%"></div></td><td class="bar"><div class="b b1"></div></td><td class="bar"></td></tr>
+    <tr><td>M4 · Review UI, evidence viewer, handover view</td><td>Rahul</td><td class="bar"><div class="b b2" style="margin-left:50%"></div></td><td class="bar"><div class="b b2"></div></td><td class="bar"><div class="b b2"></div></td><td class="bar"></td></tr>
+    <tr><td>M5 · Integrate, deploy, test, document</td><td>Both</td><td class="bar"></td><td class="bar"></td><td class="bar"><div class="b b3" style="margin-left:60%"></div></td><td class="bar"><div class="b b3"></div></td></tr>
+  </table>
+  <p class="small">Rule we will follow: by hour 36 the end-to-end flow is connected with simple versions of every stage, <strong>before</strong> any stage is polished, so a broken central step is never discovered at the end. Before the window opens we will only plan and research, as the rules allow; no code is written outside the window.</p>
+
+  <h3>Three improvements we plan to commit to for Round 3</h3>
+  <div class="grid3">
+    <div class="card"><h4>1. Cross-source conflict resolution</h4><p class="small" style="margin:0">Project-wide contradiction detection with a side-by-side resolution screen.</p></div>
+    <div class="card"><h4>2. Acknowledgement loop + version diff</h4><p class="small" style="margin:0">Successor acknowledges or flags sections; flags route back; reviewers see v1 → v2 changes.</p></div>
+    <div class="card"><h4>3. Sensitive-data protection</h4><p class="small" style="margin:0">Automatic secret/PII detection, redaction queue, extra roles and a full audit log.</p></div>
+  </div>
+
+  <div class="grid2" style="margin-top:4mm">
+    <div>
+      <h3 style="margin-top:0">If we fall behind — the cut list</h3>
+      <ul class="small" style="margin:0">
+        <li>Drop the Trello connector first (GitHub Issues stays).</li>
+        <li>Keep DOCX out; support Markdown and PDF notes only.</li>
+        <li>Use one role view instead of two, keeping the permission filter itself.</li>
+        <li><strong>Never cut:</strong> citations, evidence states, review and approval — they are the product.</li>
+      </ul>
+    </div>
+    <div>
+      <h3 style="margin-top:0">How we will test it</h3>
+      <ul class="small" style="margin:0">
+        <li><strong>Planted-facts test:</strong> the demo project contains known decisions, conflicts and missing owners. We measure how many are found and how many shown claims carry a valid citation.</li>
+        <li><strong>Permission test:</strong> generate a contributor view and check that no text from lead-only sources appears.</li>
+        <li><strong>Failure cases:</strong> empty sources, malformed exports, API timeouts.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 12-13. IMPACT & FUTURE ============ -->
+<section class="section">
+  <div class="kicker">§12 · Expected impact</div>
+  <h2>What changes for each person</h2>
+  <div class="rule"></div>
+  <table>
+    <tr><th style="width:30mm">User</th><th>Before</th><th>With Continuum</th></tr>
+    <tr><td><strong>Leaver</strong></td><td>Writes a long handover document in their last week, from memory.</td><td>Answers a short list of targeted questions; the rest is reconstructed from work already done.</td></tr>
+    <tr><td><strong>Successor</strong></td><td>Spends the first weeks reverse-engineering decisions and finding who to ask.</td><td>Starts from a “Start here” page with a first-week plan, risks and contacts — and can check every line against its source.</td></tr>
+    <tr><td><strong>Reviewer</strong></td><td>Has no way to check the handover or control what is shared.</td><td>Reviews claim by claim, sees exactly what each role will see, and keeps an audit trail.</td></tr>
+    <tr><td><strong>Team / club</strong></td><td>Loses momentum every semester; the same mistakes repeat.</td><td>Keeps a growing, verified decision log that survives each change of people.</td></tr>
+  </table>
+
+  <h3>How we will measure it</h3>
+  <p>We will not claim numbers we have not measured. In Rounds 2 and 3 we will report: share of displayed claims with a valid citation (target: all of them),
+  share of planted facts recovered, number of gap questions per handover, reviewer edit rate, and time for a test successor to answer a fixed set of
+  “can you continue this project?” questions with and without Continuum.</p>
+
+  <div class="kicker" style="margin-top:8mm">§13 · Future scope</div>
+  <h2 style="font-size:16pt">After the event</h2>
+  <div class="rule"></div>
+  <div class="grid2">
+    <div class="card"><h4>Always-on handover readiness</h4><p class="small" style="margin:0">Run continuously, not only at departure. Show each team which modules depend on a single person (the “bus factor”) long before anyone leaves.</p></div>
+    <div class="card"><h4>Live connectors</h4><p class="small" style="margin:0">OAuth sync for Slack, Discord, Notion, Google Drive, Jira and Linear, respecting each tool’s own permissions automatically.</p></div>
+    <div class="card"><h4>Successor Q&amp;A</h4><p class="small" style="margin:0">Let the successor ask questions in plain language, answered only from approved, permitted evidence with citations.</p></div>
+    <div class="card"><h4>Self-hosted and local-model option</h4><p class="small" style="margin:0">For organisations that cannot send data to an external API: on-premise deployment with an open-weight model.</p></div>
+    <div class="card"><h4>Templates by setting</h4><p class="small" style="margin:0">Handover templates for research groups (datasets, experiments), NGOs (donors, volunteers) and startups (customers, infra).</p></div>
+    <div class="card"><h4>Club and college programme</h4><p class="small" style="margin:0">Offer Continuum to college tech clubs as an end-of-semester handover tool — our first real users and a path to adoption.</p></div>
+  </div>
+</section>
+
+<!-- ============ 14. TEAM DETAILS ============ -->
+<section class="section">
+  <div class="kicker">§14 · Team and participant details</div>
+  <h2>Team Binary Builders</h2>
+  <div class="rule"></div>
+
+  <table>
+    <tr><th style="width:40mm">Team name</th><td><strong>Binary Builders</strong></td></tr>
+    <tr><th>Event</th><td>CodeFrontier Hackathon (We Code Coders) — Round 1: The Plan</td></tr>
+    <tr><th>Problem statement</th><td>01 — Prevent Critical Knowledge From Leaving With People</td></tr>
+    <tr><th>Product</th><td>Continuum — evidence-backed project handovers</td></tr>
+    <tr><th>Team size</th><td>2</td></tr>
+  </table>
+
+  <table>
+    <tr><th style="width:8mm" class="c">#</th><th style="width:46mm">Participant</th><th style="width:40mm">Role</th><th>Part they will personally build</th></tr>
+    <tr><td class="c">1</td><td><strong>Pawan Singh Bhandari</strong><br><span class="small muted">Team lead</span></td><td>Backend · AI / ML</td><td>Source connectors, evidence store with row-level security, claim extraction and verification pipeline, conflict and gap detection, Gap Interview generator, API and worker.</td></tr>
+    <tr><td class="c">2</td><td><strong>Rahul Bramhankar</strong></td><td>Frontend · Design / UI-UX</td><td>Web app: connect-sources flow, claim ledger review and approval, evidence viewer, Gap Interview page, successor handover view with acknowledgement, user testing.</td></tr>
+  </table>
+
+  <h3>Disclosures</h3>
+  <table>
+    <tr><th style="width:44mm">Item</th><th>Disclosure</th></tr>
+    <tr><td>Prior work</td><td>No code, template or prototype for this product exists. All development will happen in the official build window, in a public repository with full commit history.</td></tr>
+    <tr><td>Third-party services</td><td>Anthropic Claude API (claim extraction and support checks), Supabase (database, auth), Vercel and Render (hosting), GitHub REST API.</td></tr>
+    <tr><td>Open-source components</td><td>Next.js, Tailwind CSS, shadcn/ui, FastAPI, Pydantic, pgvector, multilingual-e5-small, PyGithub, pypdf, python-docx, rapidfuzz, detect-secrets — used under their licences.</td></tr>
+    <tr><td>AI assistance</td><td>This proposal was drafted with AI assistance (Anthropic Claude) and reviewed and approved by both team members. AI coding assistants may also be used during development; all such use will be listed in the repository README.</td></tr>
+    <tr><td>Data</td><td>Demonstrations use only synthetic data created by the team. No real organisational or personal data will be used.</td></tr>
+  </table>
+
+  <div class="note keep" style="margin-top:6mm">
+    <p style="margin:0"><strong>In one sentence:</strong> Continuum helps a leaving team member hand over a project through a short set of targeted answers instead of a long document written from memory, and gives the
+    successor a handover they can trust — because every line shows where it came from, what is uncertain, and that a human approved it.</p>
+  </div>
+</section>
+
+</body>
+</html>
