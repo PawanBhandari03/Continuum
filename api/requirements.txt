@@ -1,0 +1,7 @@
+fastapi
+uvicorn
+pydantic
+rapidfuzz
+pypdf
+httpx
+pytest
