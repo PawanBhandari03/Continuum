@@ -1,15 +1,13 @@
 """Reconstruct pipeline: permission filter -> extract -> verify -> conflicts/gaps -> readiness."""
 from __future__ import annotations
-from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from .models import EvidenceUnit, Claim, Conflict, Gap, Readiness, Role
-from .llm import Provider
+from .llm import Provider, support_all
 from .visibility import filter_units, claim_label
 from .verify import check_citations, build_claim
 from .analysis import assign_sections, detect_conflicts, detect_gaps, compute_readiness
 
 BATCH_SIZE = 35
-SUPPORT_WORKERS = 6
 
 
 @dataclass
@@ -40,18 +38,14 @@ def run(units: list[EvidenceUnit], provider: Provider, role: Role = "lead",
             continue
         checked = [(raw, *check_citations(raw, by_id, ids)) for raw in raws]
 
-        def _support(item):
-            raw, cites, problems = item
-            if not cites or raw.inferred:
-                return None
-            try:
-                return provider.support(raw.statement, [c.quote for c in cites])
-            except Exception as e:
-                problems.append(f"support check failed: {type(e).__name__}")
-                return None
-
-        with ThreadPoolExecutor(max_workers=SUPPORT_WORKERS) as pool:
-            supports = list(pool.map(_support, checked))
+        need = [i for i, (raw, cites, _) in enumerate(checked) if cites and not raw.inferred]
+        verdicts = support_all(provider, [(checked[i][0].statement, [c.quote for c in checked[i][1]])
+                                          for i in need])
+        supports: list[str | None] = [None] * len(checked)
+        for i, v in zip(need, verdicts):
+            supports[i] = v
+            if v is None:
+                checked[i][2].append("support check failed")
         for (raw, cites, problems), support in zip(checked, supports):
             n += 1
             claim = build_claim(raw, f"cl_{n}", cites, support, problems)

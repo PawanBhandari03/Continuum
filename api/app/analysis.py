@@ -2,7 +2,7 @@
 from __future__ import annotations
 from itertools import combinations
 from .models import Claim, Conflict, Gap, Readiness, EvidenceUnit
-from .llm import Provider
+from .llm import Provider, contradicts_all
 
 # Things a handover needs. A slot is "filled" by a verified/confirmed claim whose
 # entity_key matches. Unfilled slots become Missing claims + interview questions.
@@ -32,22 +32,27 @@ def detect_conflicts(claims: list[Claim], provider: Provider) -> list[Conflict]:
     for c in claims:
         if c.type != "gap" and c.entity_key:
             groups.setdefault(c.entity_key, []).append(c)
-    conflicts: list[Conflict] = []
+    candidates: list[tuple[str, Claim, Claim]] = []
     for key, grp in groups.items():
-        pairs = 0
+        n = 0
         for a, b in combinations(grp, 2):
-            if a.statement == b.statement or pairs >= MAX_PAIRS_PER_GROUP:
+            if a.statement == b.statement or n >= MAX_PAIRS_PER_GROUP:
                 continue
-            pairs += 1
-            if provider.contradicts(a, b):
-                cid = f"cf_{len(conflicts) + 1}"
-                conflicts.append(Conflict(
-                    id=cid, claim_ids=[a.id, b.id],
-                    summary=f"Sources disagree about {key}: \"{a.statement}\" vs \"{b.statement}\""))
-                for c in (a, b):
-                    c.state, c.conflict_id = "conflicting", cid
-                    c.confidence_reason = "Conflicts with another claim; not auto-resolved"
-                    c.section = "unresolved"
+            n += 1
+            candidates.append((key, a, b))
+    verdicts = contradicts_all(provider, [(a, b) for _, a, b in candidates])
+    conflicts: list[Conflict] = []
+    for (key, a, b), contradict in zip(candidates, verdicts):
+        if not contradict:
+            continue
+        cid = f"cf_{len(conflicts) + 1}"
+        conflicts.append(Conflict(
+            id=cid, claim_ids=[a.id, b.id],
+            summary=f"Sources disagree about {key}: \"{a.statement}\" vs \"{b.statement}\""))
+        for c in (a, b):
+            c.state, c.conflict_id = "conflicting", cid
+            c.confidence_reason = "Conflicts with another claim; not auto-resolved"
+            c.section = "unresolved"
     return conflicts
 
 

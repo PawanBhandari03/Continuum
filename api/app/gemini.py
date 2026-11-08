@@ -4,6 +4,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import threading
 import time
 from pathlib import Path
 
@@ -14,6 +15,9 @@ from .llm import safe_text
 
 API = "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
 CACHE_DIR = Path(__file__).resolve().parents[1] / ".cache"
+
+MIN_INTERVAL = float(os.environ.get("GEMINI_MIN_INTERVAL", "2.0"))  # seconds between requests
+CHUNK = 12  # items per batched support/conflict call
 
 CLAIM_TYPES = ["decision", "risk", "dependency", "owner", "next_action", "open_question", "fact"]
 
@@ -47,6 +51,8 @@ class GeminiProvider:
             raise GeminiError("GEMINI_API_KEY not set")
         self.model = model or os.environ.get("GEMINI_MODEL", "gemini-3.5-flash")
         self.calls = {"api": 0, "cache": 0}
+        self._lock = threading.Lock()
+        self._last = 0.0
         CACHE_DIR.mkdir(exist_ok=True)
 
     # ---- low level ----
@@ -62,8 +68,13 @@ class GeminiProvider:
         if cf.exists():
             self.calls["cache"] += 1
             return json.loads(cf.read_text(encoding="utf-8"))
-        delay, last = 4.0, ""
-        for attempt in range(5):
+        delay, last = 6.0, ""
+        for attempt in range(6):
+            with self._lock:  # global pacing: stay under the free-tier request rate
+                wait = MIN_INTERVAL - (time.monotonic() - self._last)
+                if wait > 0:
+                    time.sleep(wait)
+                self._last = time.monotonic()
             try:
                 r = httpx.post(API.format(model=self.model), json=body, timeout=60,
                                headers={"x-goog-api-key": self.key})
@@ -129,6 +140,46 @@ class GeminiProvider:
                   "it needs assumptions; 'does_not' otherwise. Judge only from the quotes.")
         prompt = f"Claim: {statement}\nQuotes:\n" + "\n".join(f"- {q}" for q in quotes)
         return self._generate(system, prompt, schema).get("verdict", "does_not")
+
+    def support_many(self, items: list[tuple[str, list[str]]]) -> list[str]:
+        """One call per CHUNK claims instead of one per claim. Any item the model
+        fails to answer is 'does_not' (never silently upgraded)."""
+        out: list[str] = []
+        system = ("You judge whether quoted source text supports each claim. 'supports' only if the quotes "
+                  "directly state the claim; 'partially' if they cover only part of it or it needs "
+                  "assumptions; 'does_not' otherwise. Judge each item only from its own quotes.")
+        schema = {"type": "OBJECT", "properties": {"verdicts": {"type": "ARRAY", "items": {
+            "type": "OBJECT", "properties": {
+                "index": {"type": "INTEGER"},
+                "verdict": {"type": "STRING", "enum": ["supports", "partially", "does_not"]}},
+            "required": ["index", "verdict"]}}}, "required": ["verdicts"]}
+        for i in range(0, len(items), CHUNK):
+            part = items[i:i + CHUNK]
+            prompt = "\n\n".join(f"Item {j}:\nClaim: {s}\nQuotes:\n" + "\n".join(f"- {q}" for q in qs)
+                                 for j, (s, qs) in enumerate(part))
+            got = {v["index"]: v["verdict"]
+                   for v in self._generate(system, prompt, schema).get("verdicts", [])}
+            out += [got.get(j, "does_not") for j in range(len(part))]
+        return out
+
+    def contradicts_many(self, pairs: list[tuple[Claim, Claim]]) -> list[bool]:
+        out: list[bool] = []
+        system = ("For each pair, decide whether two claims about the same topic contradict each other, "
+                  "i.e. cannot both be true at the same time now. Different aspects or compatible facts do "
+                  "not contradict. Do not assume the newer one is right.")
+        schema = {"type": "OBJECT", "properties": {"results": {"type": "ARRAY", "items": {
+            "type": "OBJECT", "properties": {"index": {"type": "INTEGER"}, "contradict": {"type": "BOOLEAN"}},
+            "required": ["index", "contradict"]}}}, "required": ["results"]}
+
+        def fmt(c): return f"{c.statement} (date {c.date or 'unknown'}; quotes: " + \
+                           "; ".join(x.quote for x in c.citations) + ")"
+        for i in range(0, len(pairs), CHUNK):
+            part = pairs[i:i + CHUNK]
+            prompt = "\n\n".join(f"Pair {j}:\nA: {fmt(a)}\nB: {fmt(b)}" for j, (a, b) in enumerate(part))
+            got = {r["index"]: bool(r["contradict"])
+                   for r in self._generate(system, prompt, schema).get("results", [])}
+            out += [got.get(j, False) for j in range(len(part))]
+        return out
 
     def contradicts(self, a: Claim, b: Claim) -> bool:
         schema = {"type": "OBJECT", "properties": {"contradict": {"type": "BOOLEAN"}},

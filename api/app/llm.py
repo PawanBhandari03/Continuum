@@ -12,6 +12,38 @@ class Provider(Protocol):
     def contradicts(self, a: Claim, b: Claim) -> bool: ...
 
 
+def support_all(provider, items: list[tuple[str, list[str]]]) -> list[str | None]:
+    """Batched when the provider supports it, else one call each. On failure the
+    verdict is None (claim then cannot become Verified)."""
+    if hasattr(provider, "support_many"):
+        try:
+            return list(provider.support_many(items))
+        except Exception:
+            return [None] * len(items)
+    out: list[str | None] = []
+    for s, qs in items:
+        try:
+            out.append(provider.support(s, qs))
+        except Exception:
+            out.append(None)
+    return out
+
+
+def contradicts_all(provider, pairs: list[tuple[Claim, Claim]]) -> list[bool]:
+    if hasattr(provider, "contradicts_many"):
+        try:
+            return list(provider.contradicts_many(pairs))
+        except Exception:
+            return [False] * len(pairs)
+    out = []
+    for a, b in pairs:
+        try:
+            out.append(provider.contradicts(a, b))
+        except Exception:
+            out.append(False)
+    return out
+
+
 def safe_text(u: EvidenceUnit) -> str:
     """What the model is allowed to see: redacted text only."""
     return redact_text(u.text, u.redactions)
