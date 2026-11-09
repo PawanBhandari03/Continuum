@@ -10,6 +10,7 @@ import { HandoverNav, RoleGuard } from "@/components/shell";
 import { ClaimCard } from "@/components/claim-card";
 import { ExportButtons } from "@/components/export";
 import { VersionCompare } from "@/components/version-diff";
+import { ModalShell } from "@/components/modal";
 import { invalidateEvidence } from "@/components/evidence";
 import { EmptyState, LoadError, SkeletonList } from "@/components/feedback";
 import { friendlyError } from "@/lib/status";
@@ -33,6 +34,7 @@ export default function LedgerPage({ params }: { params: Promise<{ id: string }>
   const [blocked, setBlocked] = useState<string[]>([]);
   const [msg, setMsg] = useState<string | null>(null);
   const [f, setF] = useState<{ state: "" | EvidenceState; type: "" | ClaimType; review: "" | ReviewStatus; ws: string }>({ state: "", type: "", review: "", ws: "" });
+  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
   const [editing, setEditing] = useState<{ id: string; text: string } | null>(null);
 
   const load = useCallback(async () => {
@@ -115,8 +117,8 @@ export default function LedgerPage({ params }: { params: Promise<{ id: string }>
             </div>
             <dl className="grid grid-cols-3 gap-6 text-sm">
               <div><dt className="text-slate-500">Slots filled</dt><dd className="font-semibold">{ready.slots_filled} / {ready.slots_total}</dd></div>
-              <div><dt className="text-slate-500">Open conflicts</dt><dd className="font-semibold">{ready.open_conflicts} {ready.open_conflicts > 0 && <Link className="text-xs font-normal text-indigo-700 underline" href={`/handovers/${id}/conflicts`}>resolve</Link>}</dd></div>
-              <div><dt className="text-slate-500">Open gaps</dt><dd className="font-semibold">{ready.open_gaps} {ready.open_gaps > 0 && <Link className="text-xs font-normal text-indigo-700 underline" href={`/handovers/${id}/interview`}>interview</Link>}</dd></div>
+              <div><dt className="text-slate-500">Open conflicts</dt><dd className="font-semibold">{ready.open_conflicts} {ready.open_conflicts > 0 && <Link className="tap text-xs font-normal text-indigo-700 underline" href={`/handovers/${id}/conflicts`}>resolve</Link>}</dd></div>
+              <div><dt className="text-slate-500">Open gaps</dt><dd className="font-semibold">{ready.open_gaps} {ready.open_gaps > 0 && <Link className="tap text-xs font-normal text-indigo-700 underline" href={`/handovers/${id}/interview`}>interview</Link>}</dd></div>
             </dl>
             <div className="ml-auto flex flex-col items-end gap-1">
               {published ? (
@@ -162,8 +164,14 @@ export default function LedgerPage({ params }: { params: Promise<{ id: string }>
 
           <div className="space-y-6">
             {SECTIONS.map(([key, title]) => {
-              const items = shown.filter((c) => c.section === key);
-              if (!items.length) return null;
+              const all = shown.filter((c) => c.section === key);
+              if (!all.length) return null;
+              // needs attention first: conflicting, missing, inferred, then confirmed, then verified (stable within a group)
+              const rank: Record<string, number> = { conflicting: 0, missing: 1, inferred: 2, confirmed: 3, verified: 4 };
+              const sorted = all.map((c, i) => ({ c, i })).sort((a, b) => (rank[a.c.state] ?? 9) - (rank[b.c.state] ?? 9) || a.i - b.i).map((x) => x.c);
+              const LIMIT = 8;
+              const open = !!expandedSections[key];
+              const items = open ? sorted : sorted.slice(0, LIMIT);
               return (
                 <section key={key} aria-labelledby={`sec-${key}`}>
                   <h2 id={`sec-${key}`} className="mb-2 text-lg font-semibold">{title}</h2>
@@ -179,10 +187,15 @@ export default function LedgerPage({ params }: { params: Promise<{ id: string }>
                             <Button onClick={() => act(c, "redact")} disabled={c.review_status === "redacted"}><EyeOff size={14} aria-hidden /> Redact</Button>
                           </>
                         )}
-                        footer={c.conflict_id && <p className="mt-2 text-xs text-rose-800">Part of a conflict. <Link className="underline" href={`/handovers/${id}/conflicts`}>Open side-by-side resolution</Link></p>}
+                        footer={c.conflict_id && <p className="mt-2 text-xs text-rose-800">Part of a conflict. <Link className="tap underline" href={`/handovers/${id}/conflicts`}>Open side-by-side resolution</Link></p>}
                       />
                     ))}
                   </div>
+                  {sorted.length > LIMIT && (
+                    <button className="mt-2 rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-indigo-800 hover:bg-indigo-50" aria-expanded={open} onClick={() => setExpandedSections({ ...expandedSections, [key]: !open })}>
+                      {open ? `Show fewer (first ${LIMIT})` : `Show all ${sorted.length} claims in this section (${sorted.length - LIMIT} more)`}
+                    </button>
+                  )}
                 </section>
               );
             })}
@@ -192,8 +205,8 @@ export default function LedgerPage({ params }: { params: Promise<{ id: string }>
       )}
 
       {editing && (
-        <div className="fixed inset-0 z-50 grid place-items-center bg-slate-900/40 p-4" role="dialog" aria-modal="true" aria-label="Edit claim">
-          <div className="w-full max-w-lg rounded-lg bg-white p-4 shadow-xl">
+        <ModalShell label="Edit claim" onClose={() => setEditing(null)} align="center" panelClassName="w-full max-w-lg rounded-lg bg-white p-4 shadow-xl">
+          <div>
             <h2 className="font-semibold">Edit claim</h2>
             <p className="mt-1 text-xs text-slate-600">Your edit is recorded with your name and the time. The original citations stay attached so reviewers can check the new wording against the sources.</p>
             <textarea className="mt-3 h-32 w-full rounded-md border border-slate-300 p-2 text-sm" value={editing.text} onChange={(e) => setEditing({ ...editing, text: e.target.value })} aria-label="Claim statement" />
@@ -202,13 +215,12 @@ export default function LedgerPage({ params }: { params: Promise<{ id: string }>
               <Button variant="primary" disabled={!editing.text.trim()} onClick={async () => { const c = claims!.find((x) => x.id === editing.id)!; const t = editing.text; setEditing(null); await act(c, "edit", { edited_statement: t }); }}>Save edit</Button>
             </div>
           </div>
-        </div>
+        </ModalShell>
       )}
 
       {showVersions && (
-        <div className="fixed inset-0 z-50 flex justify-end" role="dialog" aria-modal="true" aria-label="Version history">
-          <div className="absolute inset-0 bg-slate-900/40" onClick={() => setShowVersions(false)} />
-          <aside className="relative h-full w-full max-w-xl overflow-y-auto bg-white p-4 shadow-xl">
+        <ModalShell label="Version history" onClose={() => setShowVersions(false)} panelClassName="h-full w-full max-w-xl overflow-y-auto bg-white p-4 shadow-xl">
+          <div>
             <div className="flex items-center justify-between"><h2 className="font-semibold">Version history</h2><button aria-label="Close" onClick={() => setShowVersions(false)} className="rounded p-1 hover:bg-slate-100"><X size={18} /></button></div>
             {!versions && <div className="mt-4"><SkeletonList rows={2} label="Loading versions" /></div>}
             {versions?.length === 0 && <div className="mt-4"><EmptyState title="No versions yet" /></div>}
@@ -219,8 +231,8 @@ export default function LedgerPage({ params }: { params: Promise<{ id: string }>
                 <li key={i}><div className="text-xs text-slate-500">v{v.version} · {fmtDateTime(v.at)} · <b>{v.actor}</b></div><div className="text-sm">{v.summary}</div></li>
               ))}
             </ol>
-          </aside>
-        </div>
+          </div>
+        </ModalShell>
       )}
     </RoleGuard>
   );

@@ -8,6 +8,7 @@ import { useSession } from "@/lib/session";
 import type { Claim, EvidenceDetail, EvidenceUnit } from "@/lib/types";
 import { chipLabel } from "@/lib/chip";
 import { LabelTag, SourceStatusChip, fmtDateTime, sourceIcon } from "./ui";
+import { ModalShell } from "./modal";
 
 const cache = new Map<string, Promise<EvidenceDetail[]>>();
 export function invalidateEvidence() {
@@ -36,18 +37,6 @@ export const useEvidenceDrawer = () => useContext(Ctx);
 export function EvidenceProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<{ claim: Claim; evidenceId?: string } | null>(null);
   const open = useCallback((claim: Claim, evidenceId?: string) => setState({ claim, evidenceId }), []);
-  const isOpen = state !== null;
-  useEffect(() => {
-    if (!isOpen) return;
-    // Esc closes only the drawer (stopImmediatePropagation keeps other Esc handlers, e.g. the tour, from also firing)
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key !== "Escape") return;
-      e.stopImmediatePropagation();
-      setState(null);
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [isOpen]);
   return (
     <Ctx.Provider value={{ open }}>
       {children}
@@ -137,9 +126,8 @@ function Drawer({ claim, evidenceId, onClose }: { claim: Claim; evidenceId?: str
   }, [claim.id, role]);
   const ordered = details ? [...details].sort((a, b) => (a.citation.evidence_id === evidenceId ? -1 : b.citation.evidence_id === evidenceId ? 1 : 0)) : [];
   return (
-    <div className="fixed inset-0 z-50 flex justify-end" role="dialog" aria-modal="true" aria-label="Evidence viewer">
-      <div className="absolute inset-0 bg-slate-900/40" onClick={onClose} />
-      <aside className="relative flex h-full w-full max-w-xl flex-col overflow-y-auto bg-white shadow-xl">
+    <ModalShell label="Evidence viewer" onClose={onClose} panelClassName="flex h-full w-full max-w-xl flex-col overflow-y-auto bg-white shadow-xl">
+      <>
         <header className="sticky top-0 z-10 flex items-start justify-between gap-3 border-b border-slate-200 bg-white p-4">
           <div>
             <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Evidence for this claim</p>
@@ -189,7 +177,7 @@ function Drawer({ claim, evidenceId, onClose }: { claim: Claim; evidenceId?: str
             );
           })}
         </div>
-      </aside>
-    </div>
+      </>
+    </ModalShell>
   );
 }
