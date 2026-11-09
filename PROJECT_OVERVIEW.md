@@ -55,7 +55,7 @@ Sources: GitHub API | Slack/Discord JSON export | notes (MD/PDF) | GitHub Issues
 | Frontend | Next.js (TypeScript), Tailwind CSS, shadcn/ui |
 | Backend | Python, FastAPI, Pydantic |
 | Database/auth | PostgreSQL on Supabase, Supabase Auth, row-level security |
-| AI | Anthropic Claude API (structured output via tool use) |
+| AI | **Google Gemini API** (structured JSON output; model chain `gemini-3.5-flash` → `gemini-3.1-flash-lite` → `gemini-3.5-flash-lite` → `gemma-4-31b-it`). Changed from the Round 1 plan (Claude) because we had no usable Claude API credit. The model sits behind a swappable interface (`api/app/llm.py`), so Claude can be dropped back in. |
 | Libraries | PyGithub, pypdf, python-docx (if time), rapidfuzz, detect-secrets |
 | Embeddings | multilingual-e5-small — optional in Round 2 |
 | Jobs | Python worker + Postgres job table |
@@ -83,8 +83,12 @@ Lead/reviewer (sees everything, approves), Contributor/successor (sees only perm
 - Automated verification reduces but doesn't eliminate wrong claims; human review is required.
 - (Add real measured limitations here as we find them.)
 
-## 12. Current status
-Round 2 build in progress (started 8 Nov 10:00 IST). **Frontend (Rahul + Claude):** all screens exist and work end to end on a built-in mock API: demo login by role, handover list + create, connect sources, reconstruct progress, claim ledger (filters, actions, readiness formula, version history, publish gate), evidence drawer, conflict resolution, Gap Interview, successor Start here with acknowledge / unclear. **Backend (Pawan):** see `api/` and `supabase/`. Not yet connected.
+## 12. Current status (9 Nov, ~hour 23 of 72)
+**Works today (locally, not deployed):**
+- **Frontend (Rahul):** all screens run on a mock API: demo login by role, handover list/create, connect sources, reconstruct progress, claim ledger, evidence drawer, conflicts, Gap Interview, successor "Start here", publish gate.
+- **Backend (Pawan):** a real pipeline and a FastAPI server on Supabase. Verified end to end with the real Gemini model on the CampusKart chat and notes: 339 evidence units in, about 50 claims out, with citation checks, conflict and gap detection, readiness score, review actions, versions, publish gate, role-scoped views, acknowledgements. A smoke test against the live database passes (lead-only data hidden from Contributor, fake secrets masked, publish blocked while unreviewed).
+
+**Not done yet:** frontend not yet connected to the real API; nothing deployed (Render/Vercel); GitHub connector and the CampusKart GitHub repo (so PR #87, the Render-vs-Vercel conflict and PR #91 are not yet in the data); real file upload; verified login (role currently comes from a header); interviews and testing evidence; the updated project PDF; measured planted-facts recall.
 
 ## 13. Build log (Claude appends as we go)
 | When | What was built / decided | Notes |
@@ -93,6 +97,10 @@ Round 2 build in progress (started 8 Nov 10:00 IST). **Frontend (Rahul + Claude)
 | 8 Nov | `web/` scaffolded (Next.js 15, Tailwind v4), typed contracts in `web/lib/types.ts` | Rahul + Claude |
 | 8 Nov | Mock API + CampusKart fixture (`web/mocks`, `web/lib/mock-api.ts`): five evidence states, 1 conflict, 2 gaps, versions, 2 lead-only claims | In-browser, persisted in localStorage; enforces the same permission rule as the real system |
 | 8 Nov | All 8 screens built on the mock API (see section 14) | UI works end to end without keys |
+| 8 Nov | `api/`: ingest, secret/PII masking, permission filter, citation verification, conflicts, gaps, readiness, with 22 tests | Pawan + Claude. Core logic, tested with a fake model first |
+| 8 Nov | Supabase schema + row-level security applied (`0001_init.sql`), verified by reading every table | Live project |
+| 8 Nov | Gemini provider; first real run on CampusKart: 23 model calls, 0 errors, ~50 claims | Switched from Claude plan to Gemini; free-tier quota (20/day/model) shaped the batching design |
+| 8 Nov | FastAPI server + smoke test against live DB; `docs/contracts.md` | All permission/publish checks pass; not yet connected to the web app |
 | 8 Nov | `web/tests/permissions.test.ts`: 17 checks (contributor view has no lead-only text/fake key/fake phone; publish gate) all pass | Tests the **mock** only. The real API/RLS needs its own test |
 
 ## 14. Frontend guide (for teammates)
@@ -111,3 +119,27 @@ Round 2 build in progress (started 8 Nov 10:00 IST). **Frontend (Rahul + Claude)
 **Judge walk-through (about 3 minutes):** Enter as Reviewer → open CampusKart → ledger: click a source chip → Conflicts: mark it or resolve it → switch to Leaver and answer a question → back as Reviewer: "Approve all Verified claims", approve the rest, Publish → switch to Successor: see the handover, note "N items hidden by your access level", acknowledge or flag a section.
 
 **Known limitations (frontend):** mock data lives in the browser, so it is per-browser and "Reset demo" clears it. The successor view shows a draft preview before publish (labelled) so judges can explore without finishing review. File uploads in mock mode register a source but do not parse the file. Tokens typed into the GitHub field are never stored. Accessibility: badges use icon + text, controls are keyboard reachable; not yet audited with a screen reader.
+
+## 15. Backend guide
+**Run it:** `cd api`, create a venv, `pip install -r requirements.txt`, put keys in `api/.env` (never committed; names in `.env.example`), then `uvicorn app.main:app --port 8000`. Seed the demo with `POST /demo/seed`, then `POST /handovers/h_1/reconstruct` with header `X-Demo-Role: lead`. Tests: `pytest` (22 unit tests) and `python smoke_test.py` (live database).
+
+| Path | What |
+|---|---|
+| `api/app/ingest.py` | Parses the Slack-format export and Markdown/PDF notes into evidence units; drops bots and noise; reports ok / partial / failed per source |
+| `api/app/protect.py` | Finds secrets, emails and phone numbers and masks them before any model sees the text |
+| `api/app/visibility.py` | Permission rule: a claim is visible only if the role may read ALL its cited evidence; lead-only evidence is filtered out before generation |
+| `api/app/gemini.py`, `llm.py` | Model provider (batching, pacing, retry, on-disk cache, fallback across models when a free daily quota runs out) |
+| `api/app/verify.py` | Citation checks: evidence id must exist, quote must fuzzy-match the source; only a "supports" verdict can make a claim Verified |
+| `api/app/analysis.py` | Topic normalisation, duplicate merging (never across access labels), conflicts, gaps, readiness score |
+| `api/app/pipeline.py`, `main.py`, `store.py` | The reconstruct pipeline, the API endpoints, and Supabase access |
+| `supabase/migrations/0001_init.sql` | Tables and row-level security (applied to the Supabase project) |
+| `docs/contracts.md` | Endpoint list and auth notes |
+
+**Design points worth knowing:** lead-only evidence is processed in a **separate** model pass so its text can never be blended into claims that cite public evidence. Readiness only counts a required topic (deploy, payments, auth, email, storage) as filled when a decision/dependency/owner/fact whose own text is about that topic is Verified or Confirmed.
+
+## 16. FAQ
+**What is CampusKart?** The fake project the demo is about: a campus marketplace app built by a student club. We invented it so we can show Continuum without using anyone's real data. It has a chat export and notes (made by Rahul) and will have a public GitHub repo (made by Pawan) with commits, PRs and issues that hold known facts we planted (for example, "payments moved to UPI in PR #87", "README says Render but commits configure Vercel", "nobody owns the college SMTP account"). Because we planted the facts, we can measure how many Continuum finds.
+
+**Why Gemini?** Continuum needs a language model to read messy chat and propose claims. Our Claude API key was not usable, and Gemini has a free tier. Free tier limits: about 20 requests per model per day. We stay under it by batching (about 25 calls for a full run), caching answers, and falling back to other models.
+
+**Will judges hit the Gemini limit?** Only if the live site calls Gemini when they click. The plan: the demo handover shows a stored result, so viewing, reviewing, resolving, publishing and acknowledging never call the model. A fresh "Reconstruct" is the only action that does, and it should use the stored result for the demo data.
