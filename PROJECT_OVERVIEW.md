@@ -83,12 +83,12 @@ Lead/reviewer (sees everything, approves), Contributor/successor (sees only perm
 - Automated verification reduces but doesn't eliminate wrong claims; human review is required.
 - (Add real measured limitations here as we find them.)
 
-## 12. Current status (9 Nov, ~hour 23 of 72)
-**Works today (locally, not deployed):**
-- **Frontend (Rahul):** all screens run on a mock API: demo login by role, handover list/create, connect sources, reconstruct progress, claim ledger, evidence drawer, conflicts, Gap Interview, successor "Start here", publish gate.
-- **Backend (Pawan):** a real pipeline and a FastAPI server on Supabase. Verified end to end with the real Gemini model on the CampusKart chat and notes: 339 evidence units in, about 50 claims out, with citation checks, conflict and gap detection, readiness score, review actions, versions, publish gate, role-scoped views, acknowledgements. A smoke test against the live database passes (lead-only data hidden from Contributor, fake secrets masked, publish blocked while unreviewed).
+## 12. Current status (9 Nov, about hour 27 of 72)
+**Live now:** web https://continuum-web-kodb.onrender.com and API https://continuum-api-945j.onrender.com (Render free tier; first visit after idle takes about a minute). A real-browser test (`web/tests/real-e2e.mjs`) passes end to end against the deployed site: ledger with real claims, evidence drawer with the cited chat text, conflicts, Gap Interview answer, approve and publish, successor view (hidden-by-access count, no lead-only text), acknowledge and flag unclear.
 
-**Not done yet:** frontend not yet connected to the real API; nothing deployed (Render/Vercel); GitHub connector and the CampusKart GitHub repo (so PR #87, the Render-vs-Vercel conflict and PR #91 are not yet in the data); real file upload; verified login (role currently comes from a header); interviews and testing evidence; the updated project PDF; measured planted-facts recall.
+**Backend:** pipeline (ingest, secret/PII masking, permission filter, citation verification, conflicts, gaps, readiness), GitHub connector, upload endpoint, audit log, replay/reset for the demo, 25 unit tests. **Measured:** 7 of 8 planted facts found, 94 of 94 claims cited (`docs/evaluation.md`).
+
+**Not done yet:** verified login (the role is sent in a header), Round 3 items (version diff, redaction queue, Guest role, export), real interviews and handover-test results, updated project PDF, pinger for cold starts, Render free-tier hours planning.
 
 ## 13. Build log (Claude appends as we go)
 | When | What was built / decided | Notes |
@@ -103,6 +103,10 @@ Lead/reviewer (sees everything, approves), Contributor/successor (sees only perm
 | 8 Nov | FastAPI server + smoke test against live DB; `docs/contracts.md` | All permission/publish checks pass; not yet connected to the web app |
 | 8 Nov | `web/tests/permissions.test.ts`: 17 checks (contributor view has no lead-only text/fake key/fake phone; publish gate) all pass | Tests the **mock** only. The real API/RLS needs its own test |
 | 9 Nov | Task 1: first-run guided tour (8 steps, Help button, remembered in localStorage) + "Approve all remaining" on the ledger. Playwright e2e `web/tests/e2e/tour.spec.ts` follows only on-screen hints from a fresh browser context to published + acknowledged: 2/2 pass in system Chrome (mock mode) | Test caught a real bug (Esc closing the evidence drawer also closed the tour), fixed |
+
+| 9 Nov | GitHub connector + CampusKart repo (script `demo-data/seed_campuskart_repo.py`; commit dates simulated and disclosed in the repo's NOTICE.md) | PR #87/#91/#94 numbering matches the chat |
+| 9 Nov | Upload (Slack zip, notes) and audit endpoints; stored-run replay and reset for the demo | Replay protects the Gemini free-tier quota (about 20 requests per model per day) |
+| 9 Nov | Deployed to Render (api + web). Fixes found by real-browser testing: role header on every call, evidence caching (94 parallel calls failed before), client request cap and retries, Slack-style locators | `web/tests/real-e2e.mjs` |
 
 ## 14. Frontend guide (for teammates)
 **Run it:** `cd web && npm install && npm run dev`, open http://localhost:3000. No keys needed; it runs on mock data.

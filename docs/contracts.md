@@ -35,7 +35,13 @@ The API derives the actor name from the role. Supabase JWT auth is a later harde
 | POST /handovers/{id}/publish | lead | 400 with the reasons if blocked |
 | GET /handovers/{id}/view | any | role-scoped; `hidden_count` is a count only |
 | POST /handovers/{id}/ack | any | `{section, status: acknowledged|unclear|none, note?}` |
-| POST /demo/seed | any | creates `h_1` with sample sources (idempotent) |
+| POST /handovers/{id}/sources/upload | lead | multipart: `type` (chat_export zip | notes .md/.txt/.pdf), `file`, optional `label`; returns a Source (status ok/partial/failed + reason) |
+| GET /handovers/{id}/audit | lead | `[{at, actor, action, summary, claim_id}]`, newest first |
+| POST /handovers/{id}/reset | lead | demo only: restores the stored reconstruction and clears review work, answers, acknowledgements |
+| POST /demo/snapshot?hid= | lead | saves the current claims/conflicts/gaps as the stored run |
+| POST /demo/seed | any | creates `h_1` with sample sources incl. the CampusKart GitHub repo (idempotent) |
+
+`POST /handovers/{id}/reconstruct`: for a handover that has a stored run (the demo `h_1`) it replays that run (no model call, protects free-tier quota); add `?live=true` to force the live pipeline. Handovers without a stored run always run the live pipeline.
 
 ## Known limitations (kept honest)
 - Role comes from a header, not a verified login yet.

@@ -206,3 +206,26 @@ def test_dedup_never_merges_across_access_labels():
     lead = Claim(id="l", type="risk", statement="Dev misses deadlines often", state="verified", label="lead_only")
     out = dedup_claims([pub, lead])
     assert len(out) == 2 and {c.label for c in out} == {"contributor", "lead_only"}
+
+
+# ---------- github connector (offline parts) and locators ----------
+def test_github_ref_parsing_and_bad_refs():
+    from app.github import parse_repo, GitHubError, fetch_github
+    assert parse_repo("https://github.com/PawanBhandari03/campuskart") == ("PawanBhandari03", "campuskart")
+    assert parse_repo("https://github.com/a/b.git") == ("a", "b")
+    with pytest.raises(GitHubError):
+        parse_repo("not a url")
+    units, rep = fetch_github("not a url", "src_gh")
+    assert units == [] and rep["status"] == "failed" and "parse" in rep["reason"].lower()
+
+
+def test_simulated_date_used_when_present():
+    from app.github import sim_date
+    assert sim_date("body\n\nDate (simulated): 2026-08-14", "2026-11-09T00:00:00Z").startswith("2026-08-14")
+    assert sim_date("no date here", "2026-11-09T00:00:00Z") == "2026-11-09T00:00:00Z"
+
+
+def test_chat_locator_matches_web_chip_format():
+    units, _ = parse_chat_export(DEMO / "chat-export")
+    import re
+    assert all(re.match(r"^slack://[a-z-]+/\d{4}-\d{2}-\d{2}#", u.locator) for u in units)
