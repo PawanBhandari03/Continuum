@@ -146,7 +146,7 @@ class NewHandover(BaseModel):
 
 @app.get("/handovers")
 def list_handovers():
-    return [handover_out(h) for h in db().sel("handovers", order="created_at.asc")]
+    return [handover_out(h) for h in db().sel("handovers", order="created_at.asc") if not h["id"].endswith("_seed")]
 
 
 @app.post("/handovers")
@@ -368,13 +368,94 @@ def _reconstruct(hid: str, job_id: str) -> None:
         _set_job(job_id, status="failed", error=f"{type(e).__name__}: {e}"[:500])
 
 
+# ---------------- stored demo run (snapshot / replay / reset) ----------------
+SEED_PREFIX = "seed__"
+
+
+def seed_id(hid: str) -> str:
+    return f"{hid}_seed"
+
+
+def _copy_set(src_hid: str, dst_hid: str, strip: str = "", add: str = "") -> tuple[int, int, int]:
+    """Copy claims, conflicts and gaps between handovers, renaming ids (add/strip a prefix)."""
+    ren = lambda x: (add + x[len(strip):] if strip and x.startswith(strip) else add + x) if x else x  # noqa: E731
+    claims = db().sel("claims", {"handover_id": src_hid})
+    conflicts = db().sel("conflicts", {"handover_id": src_hid})
+    gaps = db().sel("gaps", {"handover_id": src_hid})
+    for t in ("claims", "conflicts", "gaps"):
+        db().delete(t, {"handover_id": dst_hid})
+    rows = [{**c, "id": ren(c["id"]), "handover_id": dst_hid, "conflict_id": ren(c["conflict_id"])} for c in claims]
+    db().ins("claims", rows)
+    db().ins("conflicts", [{**c, "id": ren(c["id"]), "handover_id": dst_hid,
+                            "claim_ids": [ren(x) for x in c["claim_ids"]]} for c in conflicts])
+    db().ins("gaps", [{**g, "id": ren(g["id"]), "handover_id": dst_hid, "claim_id": ren(g["claim_id"])} for g in gaps])
+    return len(claims), len(conflicts), len(gaps)
+
+
+def has_snapshot(hid: str) -> bool:
+    return bool(db().one("handovers", {"id": seed_id(hid)})) and bool(db().sel("claims", {"handover_id": seed_id(hid)}, select="id")[:1])
+
+
+@app.post("/demo/snapshot")
+def snapshot(hid: str = "h_1", x_demo_role: Optional[str] = Header(None)):
+    """Save the CURRENT claims/conflicts/gaps of a handover as its stored run (used for replay/reset)."""
+    need(role_of(x_demo_role), "lead")
+    h = get_handover_row(hid)
+    sid = seed_id(hid)
+    if not db().one("handovers", {"id": sid}):
+        db().ins("handovers", [{"id": sid, "leaver": h["leaver"], "successor": h["successor"],
+                                "successor_role": h["successor_role"], "target_date": h["target_date"]}])
+    n = _copy_set(hid, sid, add=SEED_PREFIX)
+    return {"ok": True, "claims": n[0], "conflicts": n[1], "gaps": n[2]}
+
+
+def _restore(hid: str) -> tuple[int, int, int]:
+    n = _copy_set(seed_id(hid), hid, strip=SEED_PREFIX)
+    db().upd("handovers", {"id": hid}, {"status": "in_review", "approved_by": None, "published_at": None})
+    return n
+
+
+@app.post("/handovers/{hid}/reset")
+def reset_demo(hid: str, x_demo_role: Optional[str] = Header(None)):
+    """Reset a demo handover to its stored reconstruction (clears review work, answers, acks, history)."""
+    need(role_of(x_demo_role), "lead")
+    get_handover_row(hid)
+    if not has_snapshot(hid):
+        raise HTTPException(400, "No stored snapshot for this handover.")
+    for t in ("acknowledgements", "review_actions"):
+        db().delete(t, {"handover_id": hid})
+    exit_sid = f"{hid}__src_exit_qa"
+    db().delete("evidence_units", {"source_id": exit_sid})
+    db().delete("sources", {"id": exit_sid})
+    n = _restore(hid)
+    db().upd("handovers", {"id": hid}, {"version": 1})
+    log_action(hid, "system", "reset", f"Demo reset to the stored reconstruction ({n[0]} claims).", version=1)
+    return {"ok": True, "claims": n[0]}
+
+
+def _replay(hid: str, job_id: str) -> None:
+    import time
+    try:
+        for stage, pct in (("parse", 10), ("protect", 25), ("extract", 50), ("verify", 75), ("conflicts_gaps", 90)):
+            _set_job(job_id, status="running", stage=stage, progress=pct)
+            time.sleep(0.8)
+        n = _restore(hid)
+        bump(hid, "system", "reconstruct",
+             f"Reconstruction replayed from a stored model run ({n[0]} claims, {n[1]} conflicts, {n[2]} gaps). "
+             "Replayed to protect free-tier model quota; new handovers run the live pipeline.")
+        _set_job(job_id, status="done", stage=None, progress=100, error=None)
+    except Exception as e:
+        _set_job(job_id, status="failed", error=f"{type(e).__name__}: {e}"[:500])
+
+
 @app.post("/handovers/{hid}/reconstruct")
-def reconstruct(hid: str, x_demo_role: Optional[str] = Header(None)):
+def reconstruct(hid: str, live: bool = False, x_demo_role: Optional[str] = Header(None)):
     need(role_of(x_demo_role), "lead")
     get_handover_row(hid)
     job_id = str(uuid.uuid4())
     db().ins("jobs", [{"id": job_id, "handover_id": hid, "status": "queued", "progress": 0}])
-    threading.Thread(target=_reconstruct, args=(hid, job_id), daemon=True).start()
+    target = _replay if (not live and has_snapshot(hid)) else _reconstruct
+    threading.Thread(target=target, args=(hid, job_id), daemon=True).start()
     return {"job_id": job_id}
 
 

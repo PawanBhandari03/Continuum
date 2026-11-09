@@ -3,6 +3,7 @@
 // Mock-first; Supabase Auth replaces this once keys are provided.
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import type { Role } from "./types";
+import { setApiRole } from "./api";
 
 export const ROLE_META: Record<Role, { label: string; actor: string; blurb: string; home: (hid: string) => string }> = {
   lead: { label: "Reviewer (Lead)", actor: "reviewer", blurb: "Connects sources, reviews every claim, approves and publishes. Sees everything.", home: (h) => `/handovers/${h}/ledger` },
@@ -24,12 +25,16 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     try {
       const r = window.localStorage.getItem("continuum-role") as Role | null;
-      if (r && r in ROLE_META) setRoleState(r);
+      if (r && r in ROLE_META) {
+        setRoleState(r);
+        setApiRole(r);
+      }
     } catch {}
     setReady(true);
   }, []);
   const setRole = (r: Role | null) => {
     setRoleState(r);
+    setApiRole(r);
     try {
       if (r) window.localStorage.setItem("continuum-role", r);
       else window.localStorage.removeItem("continuum-role");

@@ -80,9 +80,16 @@ export interface Api {
 }
 
 // ---------- real backend (thin fetch wrapper; shapes are the contracts in types.ts) ----------
+let currentRole: Role | null = null;
+/** Called by the session provider so every API call carries the viewer's role. */
+export function setApiRole(r: Role | null) {
+  currentRole = r;
+}
+
 async function http<T>(path: string, init?: RequestInit & { role?: Role }): Promise<T> {
   const headers: Record<string, string> = { "Content-Type": "application/json" };
-  if (init?.role) headers["X-Demo-Role"] = init.role; // replaced by Supabase JWT once auth is wired
+  const role = init?.role ?? currentRole;
+  if (role) headers["X-Demo-Role"] = role; // replaced by Supabase JWT once auth is wired
   const res = await fetch(`${API_URL}${path}`, { ...init, headers: { ...headers, ...(init?.headers as Record<string, string>) } });
   if (!res.ok) {
     let detail = res.statusText;
@@ -137,7 +144,9 @@ const realApi: Api = {
   },
   getView: (h, role) => http(`/handovers/${h}/view`, { role }),
   ack: (h, b) => http(`/handovers/${h}/ack`, post(b)),
-  resetDemo: async () => {},
+  resetDemo: async () => {
+    await http("/handovers/h_1/reset", { method: "POST", role: "lead", body: "{}" });
+  },
 };
 
 export const api: Api = USE_MOCKS ? mockApi : realApi;
