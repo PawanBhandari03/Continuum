@@ -114,7 +114,8 @@ test("phone width: controls are at least 36px high (tap targets)", async ({ brow
   const small = await page.evaluate(() => {
     const out: string[] = [];
     document.querySelectorAll("button, a, select, input:not([type=file])").forEach((el) => {
-      const b = (el as HTMLElement).getBoundingClientRect();
+      const target = (el as HTMLInputElement).type === "radio" || (el as HTMLInputElement).type === "checkbox" ? (el.closest("label") ?? el) : el;
+      const b = (target as HTMLElement).getBoundingClientRect();
       if (b.width > 0 && b.height > 0 && b.height < 36) out.push((((el as HTMLElement).innerText || el.getAttribute("aria-label") || el.tagName) + "").trim().slice(0, 40) + ` (${Math.round(b.height)}px)`);
     });
     return out;
