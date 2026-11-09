@@ -34,7 +34,7 @@ cd Continuum
 
 **Task 9 — CampusKart chat export + notes** (`demo-data/`): Slack-format export (~300–500 messages, Hinglish lines, bots/noise, lead-only mentor note with FAKE key and FAKE phone), 2–3 notes files, and `demo-data/ANSWER_KEY.md`. Facts to plant are in section 8 of the handoff. Coordinate dates and names with Pawan's repo.
 
-**Task 10 — Wire to the real API** when Pawan confirms it's live (flip `NEXT_PUBLIC_USE_MOCKS=false`, set `NEXT_PUBLIC_API_URL`), then deploy `web/` on Vercel.
+**Task 10 — Wire to the real API** when Pawan confirms it's live (flip `NEXT_PUBLIC_USE_MOCKS=false`, set `NEXT_PUBLIC_API_URL`), the web app is already deployed on Render (https://continuum-web-kodb.onrender.com); do not redeploy.
 
 **Parallel, human work (do early, not at the end):** book and run **5+ interviews** (script in handoff section 10) and log real answers in `docs/user-research.md`; later the with/without-Continuum handover test in `docs/testing.md`.
 
@@ -43,7 +43,7 @@ cd Continuum
 |---|---|---|
 | Supabase URL + anon key (for `NEXT_PUBLIC_*`) | **Pawan** | Send privately (WhatsApp/DM). **Never commit.** Put in `web/.env.local` |
 | API base URL | **Pawan**, once the backend is deployed | Goes in `NEXT_PUBLIC_API_URL` |
-| Vercel account linked to the repo | **You** | Import the repo, root directory `web/` |
+| Hosting | **Done by Pawan** | Render (web + API), no Vercel |
 | Anthropic / GitHub tokens | **Not needed by you** | Backend only |
 
 Until the keys arrive, stay on mocks. You are not blocked.
@@ -56,7 +56,7 @@ Until the keys arrive, stay on mocks. You are not blocked.
 ## 5. Checkpoints
 - **Hour ~12:** Tasks 1–3 done on mocks, pushed.
 - **Hour ~27:** Tasks 5–6 done (ledger + evidence viewer).
-- **★ Hour 36 (= 9 Nov 22:00 IST):** all screens on mocks; first real-API connection attempted; first deploy on Vercel.
+- **★ Hour 36 (= 9 Nov 22:00 IST):** all screens on mocks; first real-API connection attempted; deployed on Render.
 - **Hour 60:** Everything wired, interviews logged, incognito-tested.
 
 Message Pawan when each checkpoint is hit or if anything in the contracts doesn't fit.
