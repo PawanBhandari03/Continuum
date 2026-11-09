@@ -124,9 +124,9 @@ Good news: the permission checks on the live API all passed (section 7).
 <tr><td>3</td><td class="warn">Medium</td><td>Pawan</td><td><b>Duplicate conflict.</b> cf_1 ("Vercel preview" vs Render) and cf_2 (Render vs "configured for Vercel") are the same disagreement; a judge must resolve it twice. The README claim also shows the date "9 Nov 2026" (the ingest date) instead of the README's real date.</td></tr>
 <tr><td>4</td><td class="warn">Medium</td><td>Pawan</td><td><b>Slow writes.</b> Acknowledge 12 to 18 s; answering a gap 10 to 22 s; the audit endpoint took 35 s in one call right after the reset (one sample).</td></tr>
 <tr><td>5</td><td>Low</td><td>Pawan</td><td><b>Version counter inflates</b> (one version per review action; "version 46" after about 45 approvals). Cosmetic but looks odd. Also: <b>version compare returns 404</b> on the live API (endpoint not built), so the Compare button shows an error.</td></tr>
-<tr><td>6</td><td class="warn">Medium</td><td>Rahul</td><td><b>Small tap targets on a phone</b> (logo link, "How is this calculated?", "resolve", "interview", source chips are under 28 px). Being fixed in the accessibility pass.</td></tr>
-<tr><td>7</td><td class="warn">Medium</td><td>Rahul</td><td><b>Export is slow on live data:</b> it fetches evidence claim by claim (about 1.1 s each, average of 8 calls); an estimate for 91 claims is about 100 s. To be parallelised.</td></tr>
-<tr><td>8</td><td>Low</td><td>Rahul</td><td>The 94-claim ledger has no paging or "needs attention first" ordering.</td></tr>
+<tr><td>6</td><td class="warn">Medium</td><td>Rahul</td><td><b>Small tap targets on a phone</b> (logo link, "How is this calculated?", "resolve", "interview", source chips are under 28 px). <b>Fixed on branch <code>rahul/web-upload-a11y</code> (every control now at least 36 px on a phone; tested locally), not deployed yet.</b></td></tr>
+<tr><td>7</td><td class="warn">Medium</td><td>Rahul</td><td><b>Export is slow on live data:</b> it fetches evidence claim by claim (about 1.1 s each, average of 8 calls); an estimate for 91 claims is about 100 s. <b>Fixed on the same branch (evidence fetched 6 at a time); not re-timed on the live API and not deployed yet.</b></td></tr>
+<tr><td>8</td><td>Low</td><td>Rahul</td><td>The 94-claim ledger had no paging or "needs attention first" ordering. <b>Fixed on the branch (conflicting, missing and inferred first; sections over 8 claims collapse); not deployed yet.</b></td></tr>
 </table>
 
 <div class="shots">
@@ -155,7 +155,7 @@ Good news: the permission checks on the live API all passed (section 7).
 <li><b>Version numbers:</b> bump once per publish or per batch, and keep a separate revision counter if needed.</li>
 <li><b>Version diff endpoint</b> <code>GET /handovers/{id}/versions/{a}/diff/{b}</code> returning <code>{added:[Claim], removed:[Claim], changed:[{claim_id, before, after}]}</code>. The UI is ready and accepts <code>before</code>/<code>after</code> as text or partial claim.</li>
 <li><b>Look at the audit endpoint</b> (35 s sample) and write latency in general.</li>
-<li><b>Rahul:</b> parallelise export fetching; enlarge tap targets; add paging or "needs attention" ordering; fix the accessibility items. Web changes redeploy the live site on Render, so Rahul will push them only with Pawan's go-ahead.</li>
+<li><b>Rahul (done on branch <code>rahul/web-upload-a11y</code>, 33 local browser tests pass, axe finds 0 violations on 8 screens and 3 dialogs):</b> parallel export fetching, larger tap targets, attention-first ordering, accessibility fixes, and a real file-upload UI for the Connect screen. Merging that branch into main redeploys the live site on Render, so <b>Pawan decides when.</b> Also: the GitHub token field on the Connect screen was never sent to the server; it is removed on the branch.</li>
 </ol>
 
 <h2>7. Permission checks on the live API (read-only, 9 Nov)</h2>
