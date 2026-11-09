@@ -62,28 +62,42 @@ export function safeQuote(unit: EvidenceUnit, quote: string): string {
   return out;
 }
 
+async function mapPool<T, R>(items: T[], n: number, fn: (x: T) => Promise<R>): Promise<R[]> {
+  const out: R[] = new Array(items.length);
+  let next = 0;
+  await Promise.all(
+    Array.from({ length: Math.min(n, items.length) }, async () => {
+      for (;;) {
+        const k = next++;
+        if (k >= items.length) break;
+        out[k] = await fn(items[k]);
+      }
+    }),
+  );
+  return out;
+}
+
 export async function buildExportModel(api: Pick<Api, "getView" | "getEvidence">, hid: string, role: Role): Promise<ExportModel> {
   const view = await api.getView(hid, role);
-  const sections: ExportSection[] = [];
-  for (const s of view.sections) {
-    const claims: ExportClaim[] = [];
-    for (const c of s.claims) {
-      const details = await api.getEvidence(c.id, role); // throws on failure: never export a claim without its citations
-      const citations: ExportCitation[] = c.citations.map((ci) => {
-        const d = details.find((x) => x.citation.evidence_id === ci.evidence_id);
-        if (!d) throw new Error(`Evidence ${ci.evidence_id} for claim ${c.id} is not available to this role; export stopped.`);
-        return {
-          label: chipLabel(d.unit),
-          source: d.source.name,
-          url: /^https?:\/\//.test(d.unit.locator) ? d.unit.locator : null,
-          quote: safeQuote(d.unit, ci.quote),
-          support: ci.support,
-        };
-      });
-      claims.push({ id: c.id, statement: c.statement, state: c.state, type: c.type, owner: c.owner, date: c.date, review: c.review_status, confirmed_by: c.confirmed_by, confirmed_at: c.confirmed_at, citations });
-    }
-    sections.push({ key: s.key, title: s.title, ack: s.ack, claims });
-  }
+  // evidence for every visible claim, fetched 6 at a time (the live API needs about 1 s per call)
+  const flat = view.sections.flatMap((s) => s.claims);
+  const built = await mapPool(flat, 6, async (c): Promise<ExportClaim> => {
+    const details = await api.getEvidence(c.id, role); // throws on failure: never export a claim without its citations
+    const citations: ExportCitation[] = c.citations.map((ci) => {
+      const d = details.find((x) => x.citation.evidence_id === ci.evidence_id);
+      if (!d) throw new Error(`Evidence ${ci.evidence_id} for claim ${c.id} is not available to this role; export stopped.`);
+      return {
+        label: chipLabel(d.unit),
+        source: d.source.name,
+        url: /^https?:\/\//.test(d.unit.locator) ? d.unit.locator : null,
+        quote: safeQuote(d.unit, ci.quote),
+        support: ci.support,
+      };
+    });
+    return { id: c.id, statement: c.statement, state: c.state, type: c.type, owner: c.owner, date: c.date, review: c.review_status, confirmed_by: c.confirmed_by, confirmed_at: c.confirmed_at, citations };
+  });
+  const byId = new Map(built.map((c) => [c.id, c]));
+  const sections: ExportSection[] = view.sections.map((s) => ({ key: s.key, title: s.title, ack: s.ack, claims: s.claims.map((c) => byId.get(c.id)!) }));
   return { handover: view.handover, role, generated_at: new Date().toISOString(), sections, hidden_count: view.hidden_count };
 }
 
