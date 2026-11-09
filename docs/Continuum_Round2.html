@@ -129,7 +129,7 @@ Team <b>BINARY BUILDERS</b>: Pawan Singh Bhandari (backend, AI/ML, team lead) an
 <h2 class="pb">4. Features: completed vs not yet</h2>
 <table>
 <tr><th style="width:40%">Feature</th><th style="width:14%">Status</th><th>Notes</th></tr>
-<tr><td>Connect GitHub repo (read-only), chat export (.zip), notes (.md/.txt/.pdf) with per-source status and reasons</td><td class="ok">Built</td><td>Backend endpoints exist. The web Connect screen registers the sample sources; a file-upload form for the live site is <b>not yet on the live site</b>.</td></tr>
+<tr><td>Connect GitHub repo (read-only), chat export (.zip), notes (.md/.txt/.pdf) with per-source status and reasons</td><td class="ok">Built</td><td>Backend endpoints exist. The Connect screen has the sample sources, a GitHub URL field and an upload form for chat zips and notes (deployed 9 Nov; the upload form has been tested in mock mode only, not yet against the live endpoint).</td></tr>
 <tr><td>Secret, email and phone masking; access labels</td><td class="ok">Built</td><td>Regex-based scan (not detect-secrets, which was in the Round 1 plan).</td></tr>
 <tr><td>AI claim extraction with citations; deterministic quote check; support check</td><td class="ok">Built</td><td>Output varies between runs (see section 5).</td></tr>
 <tr><td>Five evidence states; conflicts side by side; gaps; readiness score with formula</td><td class="ok">Built</td><td>One extra, arguably duplicate, conflict appears on the demo data.</td></tr>
@@ -138,8 +138,9 @@ Team <b>BINARY BUILDERS</b>: Pawan Singh Bhandari (backend, AI/ML, team lead) an
 <tr><td>Successor "Start here" (7 sections), source chips, hidden count, acknowledge / unclear</td><td class="ok">Built</td><td>"Project in five lines" is currently empty on the demo data.</td></tr>
 <tr><td>Evidence viewer (original text in context, quote highlighted, redactions as blocks)</td><td class="ok">Built</td><td></td></tr>
 <tr><td>Guided first-run tour; "Waking the server" banner; error and empty states</td><td class="ok">Built</td><td></td></tr>
+<tr><td>Accessibility basics: text plus icon badges, keyboard focus, dialogs that trap focus and close on Esc, touch targets on phones</td><td class="ok">Built</td><td>axe-core: 0 WCAG A/AA violations on 8 screens of the live site (9 Nov). No screen-reader audit; no dark mode.</td></tr>
 <tr><td>Review activity (audit log) page</td><td class="ok">Built</td><td>Records review actions, conflict decisions, gap answers, publish, acknowledgements. Does not record views or exports.</td></tr>
-<tr><td>Export approved handover as Markdown and printable PDF with citation links</td><td class="ok">Built</td><td>Uses only what the viewer's role may see. Slow on the full demo data (evidence fetched claim by claim).</td></tr>
+<tr><td>Export approved handover as Markdown and printable PDF with citation links</td><td class="ok">Built</td><td>Uses only what the viewer's role may see. Measured on the live site: 35 s for 91 claims (one run).</td></tr>
 <tr><td>Version compare (before/after text)</td><td class="no">UI built, backend pending</td><td>The diff endpoint does not exist yet, so the button shows an error on the live site.</td></tr>
 <tr><td>Real login (Supabase Auth)</td><td class="no">Not built</td><td>Roles are chosen in the UI and sent in a header.</td></tr>
 <tr><td>Local embeddings; Trello CSV; DOCX</td><td class="no">Not built</td><td>Cut by the plan's cut list.</td></tr>
