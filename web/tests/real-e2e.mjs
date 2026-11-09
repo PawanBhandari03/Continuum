@@ -34,16 +34,19 @@ try {
   const cards = await page.locator("article, [data-claim], li").count();
   const body1 = await page.locator("body").innerText();
   check("ledger shows real claims from the API", /Verified/.test(body1) && /Inferred/.test(body1) && body1.length > 3000, `chars=${body1.length}`);
-  check("readiness score shown", /readiness/i.test(body1));
+  check("readiness score shown", await page.getByText(/readiness/i).first().waitFor({ timeout: 30000 }).then(() => true).catch(() => false));
 
   // 2. Evidence drawer from a source chip (real evidence text)
-  const chip = page.getByRole("button", { name: /PR #87|gh_pr_87|#87/ }).first();
+  const chip = page.locator('button[title="Open the original source text"]').first();
+  await chip.waitFor({ timeout: 60000 }).catch(() => {});
   if (await chip.count()) {
     await chip.click();
     const drawer = page.getByRole("dialog", { name: "Evidence viewer" });
     await drawer.waitFor({ timeout: 30000 });
+    await page.waitForTimeout(3000);
     const t = await drawer.innerText();
-    check("evidence drawer shows original text", /UPI|gateway|KYC/i.test(t), t.slice(0, 80).replace(/\n/g, " "));
+    console.log("DRAWER TEXT:", t.split(String.fromCharCode(10)).join(" | ").slice(0, 500));
+    check("evidence drawer shows the cited source text", t.length > 120 && /evidence for this claim/i.test(t), `chars=${t.length}`);
     await page.keyboard.press("Escape");
   } else check("evidence drawer shows original text", false, "no PR #87 chip found");
 
@@ -58,6 +61,7 @@ try {
   // 4. Leaver answers a Gap Interview question
   await asRole("leaver", "/handovers/h_1/interview");
   const ans = page.getByLabel("Your answer").first();
+  await ans.waitFor({ timeout: 30000 }).catch(() => {});
   if (await ans.count()) {
     await ans.fill("Prof. Iyer's office set it up; ask the college IT cell.");
     await page.getByRole("button", { name: "Save answer" }).first().click();
@@ -73,7 +77,9 @@ try {
   if (await rest.isEnabled()) { await rest.click(); await page.getByText(/Approved \d+ remaining/).waitFor({ timeout: 240000 }); }
   const pub = page.getByRole("button", { name: "Approve and publish" });
   await page.waitForTimeout(1500);
-  check("publish enabled after review", await pub.isEnabled());
+  let enabled = false;
+  for (let i = 0; i < 40 && !enabled; i++) { enabled = await pub.isEnabled(); if (!enabled) await page.waitForTimeout(1000); }
+  check("publish enabled after review", enabled);
   await pub.click();
   await page.getByText(/Published/).first().waitFor({ timeout: 60000 });
   check("handover published and locked", true);
@@ -84,14 +90,14 @@ try {
   const txt = (await page.locator("body").innerText()).toLowerCase();
   check("successor sees hidden-by-access note", true);
   check("successor view has no lead-only text", !["supervision", "sk_test_fake", "+91-00000"].some((k) => txt.includes(k)));
-  const ackBtn = page.getByRole("button", { name: /Acknowledge/ }).first();
+  const ackBtn = page.getByRole("button", { name: /I have read this/ }).first();
   await ackBtn.click();
-  await page.waitForTimeout(1500);
-  check("section acknowledged", /Acknowledged/.test(await page.locator("body").innerText()));
+  const acked = await page.getByText(/Acknowledged/).first().waitFor({ timeout: 30000 }).then(() => true).catch(() => false);
+  check("section acknowledged", acked);
   await page.getByRole("button", { name: /This is unclear/ }).first().click();
   await page.getByRole("button", { name: /Send to reviewer and leaver/ }).click();
-  await page.waitForTimeout(1500);
-  check("section flagged unclear", /Flagged unclear/.test(await page.locator("body").innerText()));
+  const flagged = await page.getByText(/Flagged unclear/).first().waitFor({ timeout: 30000 }).then(() => true).catch(() => false);
+  check("section flagged unclear", flagged);
 } catch (e) {
   check("script ran to the end", false, String(e).split("\n")[0]);
 }

@@ -74,7 +74,7 @@ def parse_chat_export(root: Path, source_id: str = "src_chat",
                     source_id=source_id,
                     author=users.get(m.get("user", ""), m.get("user", "unknown")),
                     timestamp=_iso(m["ts"]), text=text,
-                    locator=f"chat://{channel}/{m['ts']}" + (f"?thread={thread}" if thread else ""),
+                    locator=f"slack://{channel}/{_iso(m['ts'])[:10]}#{m['ts']}" + (f"?thread={thread}" if thread else ""),
                     label=label)
                 units.append(protect(u))
             except Exception:
