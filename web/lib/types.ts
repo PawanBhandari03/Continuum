@@ -193,3 +193,10 @@ export interface AuditEntry {
   summary: string;
   claim_id: string | null;
 }
+
+/** GET /handovers/{id}/versions/{a}/diff/{b}. `before`/`after` may be the claim text or a partial claim; the UI accepts both. */
+export interface VersionDiff {
+  added: Claim[];
+  removed: Claim[];
+  changed: { claim_id: string; before: string | Partial<Claim>; after: string | Partial<Claim> }[];
+}

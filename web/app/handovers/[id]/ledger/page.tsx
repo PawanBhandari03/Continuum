@@ -9,6 +9,7 @@ import { Button, Card, Notice, PageTitle, fmtDateTime } from "@/components/ui";
 import { HandoverNav, RoleGuard } from "@/components/shell";
 import { ClaimCard } from "@/components/claim-card";
 import { ExportButtons } from "@/components/export";
+import { VersionCompare } from "@/components/version-diff";
 import { invalidateEvidence } from "@/components/evidence";
 import { EmptyState, LoadError, SkeletonList } from "@/components/feedback";
 import { friendlyError } from "@/lib/status";
@@ -207,11 +208,13 @@ export default function LedgerPage({ params }: { params: Promise<{ id: string }>
       {showVersions && (
         <div className="fixed inset-0 z-50 flex justify-end" role="dialog" aria-modal="true" aria-label="Version history">
           <div className="absolute inset-0 bg-slate-900/40" onClick={() => setShowVersions(false)} />
-          <aside className="relative h-full w-full max-w-md overflow-y-auto bg-white p-4 shadow-xl">
+          <aside className="relative h-full w-full max-w-xl overflow-y-auto bg-white p-4 shadow-xl">
             <div className="flex items-center justify-between"><h2 className="font-semibold">Version history</h2><button aria-label="Close" onClick={() => setShowVersions(false)} className="rounded p-1 hover:bg-slate-100"><X size={18} /></button></div>
             {!versions && <div className="mt-4"><SkeletonList rows={2} label="Loading versions" /></div>}
             {versions?.length === 0 && <div className="mt-4"><EmptyState title="No versions yet" /></div>}
-            <ol className="mt-4 space-y-3 border-l-2 border-slate-200 pl-4">
+            <div className="mt-4"><VersionCompare hid={id} versions={versions} /></div>
+            <h3 className="mt-5 text-sm font-semibold">All changes</h3>
+            <ol className="mt-2 space-y-3 border-l-2 border-slate-200 pl-4">
               {versions?.map((v, i) => (
                 <li key={i}><div className="text-xs text-slate-500">v{v.version} · {fmtDateTime(v.at)} · <b>{v.actor}</b></div><div className="text-sm">{v.summary}</div></li>
               ))}

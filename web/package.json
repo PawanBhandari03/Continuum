@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "test:permissions": "npx --yes tsx tests/permissions.test.ts",
+    "test:unit": "npx --yes tsx tests/permissions.test.ts && npx --yes tsx tests/diff.test.ts",
     "typecheck": "tsc --noEmit",
     "test:e2e": "playwright test"
   },

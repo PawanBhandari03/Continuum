@@ -21,6 +21,7 @@ import type {
   Source,
   SourceType,
   SuccessorView,
+  VersionDiff,
   VersionEntry,
 } from "./types";
 import { mockApi } from "./mock-api";
@@ -76,6 +77,7 @@ export interface Api {
   getReadiness(hid: string): Promise<Readiness>;
   getVersions(hid: string): Promise<VersionEntry[]>;
   getAudit(hid: string): Promise<AuditEntry[]>;
+  getVersionDiff(hid: string, from: number, to: number): Promise<VersionDiff>;
   publish(hid: string, actor: string): Promise<PublishResult>;
   getView(hid: string, role: Role): Promise<SuccessorView>;
   ack(hid: string, body: { section: string; status: AckStatus; note?: string }, actor: string): Promise<void>;
@@ -177,6 +179,7 @@ const realApi: Api = {
   getReadiness: (h) => http(`/handovers/${h}/readiness`),
   getVersions: (h) => http(`/handovers/${h}/versions`),
   getAudit: (h) => http(`/handovers/${h}/audit`),
+  getVersionDiff: (h, a, b) => http(`/handovers/${h}/versions/${a}/diff/${b}`),
   publish: async (h) => {
     try {
       await http(`/handovers/${h}/publish`, post({}));

@@ -23,7 +23,8 @@ Copy `.env.example` to `.env` (api) and `.env.local` (web) and fill values.
 cd web
 npm install
 npm run dev          # http://localhost:3000
-npm run test:permissions   # permission + publish-gate checks against the mock API
+npm run test:permissions   # permission + publish-gate + export checks against the mock API
+npm run test:unit          # permission/export checks + version-diff checks
 npm run test:e2e           # Playwright judge-walkthrough in mock mode (uses installed Google Chrome)
 ```
 Detailed API run instructions will be added as components land.

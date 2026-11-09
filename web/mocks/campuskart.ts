@@ -140,3 +140,17 @@ export const audit: AuditEntry[] = [
   { at: "2026-11-08T11:00:00Z", actor: "system", action: "reconstruct", summary: "Initial reconstruction: 19 claims extracted from 5 sources; 2 conflicting, 2 missing.", claim_id: null },
   { at: "2026-11-08T10:55:00Z", actor: "reviewer", action: "create", summary: "Handover created.", claim_id: null },
 ];
+
+// Claims as they stood at each seeded version (for the version diff). v3 is the seed above; v1 and v2
+// are the same claims before the reviewer's actions logged at v3 (confirm cl_p2, edit cl_d2, redact cl_r4).
+function before(c: Claim): Claim {
+  if (c.id === "cl_p2") return { ...c, state: "verified", review_status: "pending", confirmed_by: null, confirmed_at: null, version: 1, confidence_reason: "Quote matches PR #87; support check: supports" };
+  if (c.id === "cl_d2") return { ...c, state: "verified", review_status: "pending", statement: "Image uploads now go to a third-party bucket.", confirmed_by: null, confirmed_at: null, version: 1, confidence_reason: "Quote matches the #dev chat; support check: supports" };
+  if (c.id === "cl_r4") return { ...c, review_status: "pending", version: 1 };
+  return { ...c, version: 1 };
+}
+export const snapshots: Record<number, Claim[]> = {
+  1: claims.map(before),
+  2: claims.map(before),
+  3: claims,
+};

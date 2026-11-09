@@ -17,6 +17,7 @@ import type {
   Role,
   SectionKey,
   Source,
+  VersionDiff,
   VersionEntry,
   ViewSection,
 } from "./types";
@@ -31,6 +32,8 @@ interface HandoverBundle {
   gaps: Gap[];
   versions: VersionEntry[];
   audit: AuditEntry[];
+  /** claims as they stood at each handover version (for the diff view) */
+  snapshots: Record<number, Claim[]>;
   acks: Partial<Record<SectionKey, { status: AckStatus; note?: string }>>;
 }
 
@@ -41,7 +44,7 @@ interface Store {
   counter: number;
 }
 
-const KEY = "continuum-mock-v3";
+const KEY = "continuum-mock-v4";
 const clone = <T,>(x: T): T => JSON.parse(JSON.stringify(x));
 // Failure simulation for demos/tests: localStorage "continuum-mock-fail" = "down" (every call fails after a short
 // "waking" phase) or "slow" (calls succeed after a short "waking" phase). Unset in normal use.
@@ -76,6 +79,7 @@ function seedStore(): Store {
         gaps: clone(seed.gaps),
         versions: clone(seed.versions),
         audit: clone(seed.audit),
+        snapshots: clone(seed.snapshots),
         acks: {},
       },
     },
@@ -130,6 +134,7 @@ function logAudit(b: HandoverBundle, actor: string, action: string, summary: str
 function bump(b: HandoverBundle, actor: string, summary: string) {
   b.handover.version += 1;
   b.versions.push({ version: b.handover.version, at: now(), actor, summary });
+  b.snapshots[b.handover.version] = clone(b.claims);
 }
 
 function computeReadiness(b: HandoverBundle): Readiness {
@@ -195,7 +200,7 @@ export const mockApi: Api = {
     const s = store();
     const id = nid("h");
     const h: Handover = { id, ...body, status: "draft", version: 1, approved_by: null, published_at: null };
-    s.bundles[id] = { handover: h, sources: [], claims: [], conflicts: [], gaps: [], versions: [{ version: 1, at: now(), actor: "reviewer", summary: "Handover created." }], audit: [{ at: now(), actor: "reviewer", action: "create", summary: "Handover created.", claim_id: null }], acks: {} };
+    s.bundles[id] = { handover: h, sources: [], claims: [], conflicts: [], gaps: [], versions: [{ version: 1, at: now(), actor: "reviewer", summary: "Handover created." }], audit: [{ at: now(), actor: "reviewer", action: "create", summary: "Handover created.", claim_id: null }], snapshots: {}, acks: {} };
     save();
     return delay(clone(h));
   },
@@ -232,6 +237,7 @@ export const mockApi: Api = {
       b.conflicts = clone(seed.conflicts);
       b.gaps = clone(seed.gaps);
       b.handover.status = "in_review";
+      b.snapshots[b.handover.version] = clone(b.claims);
       b.versions.push({ version: b.handover.version, at: now(), actor: "system", summary: `Initial reconstruction: ${b.claims.length} claims extracted.` });
     }
     save();
@@ -403,6 +409,33 @@ export const mockApi: Api = {
   },
   async getAudit(hid) {
     return delay(clone(bundle(hid).audit));
+  },
+  async getVersionDiff(hid, from, to) {
+    const b = bundle(hid);
+    const snap = (v: number) => {
+      const s = b.snapshots[v];
+      if (!s) throw new Error(`Version ${v} has no stored snapshot.`);
+      return s;
+    };
+    const A = snap(from);
+    const B = snap(to);
+    const aMap = new Map(A.map((c) => [c.id, c]));
+    const bMap = new Map(B.map((c) => [c.id, c]));
+    const diff: VersionDiff = {
+      added: B.filter((c) => !aMap.has(c.id)),
+      removed: A.filter((c) => !bMap.has(c.id)),
+      changed: [],
+    };
+    for (const c of B) {
+      const o = aMap.get(c.id);
+      if (!o) continue;
+      const fields = ["statement", "state", "review_status", "sensitive", "label", "owner"] as const;
+      if (fields.some((k) => o[k] !== c[k])) {
+        const pick = (x: Claim) => ({ statement: x.statement, state: x.state, review_status: x.review_status, sensitive: x.sensitive, label: x.label, owner: x.owner });
+        diff.changed.push({ claim_id: c.id, before: pick(o), after: pick(c) });
+      }
+    }
+    return delay(clone(diff));
   },
   async getVersions(hid) {
     return delay(clone(bundle(hid).versions).reverse());
