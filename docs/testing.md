@@ -45,15 +45,40 @@ Direct calls with header `X-Demo-Role`:
 - Limit: the role is taken from a request header, not a verified login (see `docs/contracts.md`). Anyone who sets the header can act as Lead. This is a known limitation of the demo.
 
 ## 4. Handover test (with vs without Continuum)
-**Not yet run.** Needs two real people who do not know CampusKart. Planned: Person A gets only the repo and chat export, Person B gets only the live site as Successor; same 6 questions; time and correctness checked against `demo-data/ANSWER_KEY.md`.
+Run on 9 Nov by Rahul with two real people who did not know the CampusKart project (names withheld). Both answered the same 6 questions; answers were checked against `demo-data/ANSWER_KEY.md`.
 
 | | Person A (without Continuum) | Person B (with Continuum) |
 |---|---|---|
-| Time taken | not yet run | not yet run |
-| Correct answers (of 6) | not yet run | not yet run |
-| Notes | not yet run | not yet run |
+| Material given | Repo + chat export only (as reported) | Live site as Successor (as reported) |
+| Time taken | about 20 minutes (see note) | about 20 minutes (see note) |
+| Correct answers (of 6) | **6 of 6** | **6 of 6** |
 
-Two people is a very small sample; any result will be reported as an illustration, not proof.
+Per-question marking (both people): UPI decision and reason, image-bucket credential holder (Meera), deployment unclear (Render vs Vercel), PR #94 status, SMTP account owner unknown, login-fix risk, all matched the answer key.
+
+**Notes and limits (stated honestly)**
+- Only **one time figure ("about 20 minutes") was reported**. Rahul did not record separate times per person, so **no speed difference can be claimed**.
+- Both scored 6 of 6, so this test shows **no accuracy difference** between the two conditions. It does not demonstrate that Continuum helps; the repo and chat export are small enough for a careful reader to answer these six questions.
+- Person B's answers also used Continuum's labels (Verified, Conflicting, Missing, "AI inference") and named the Gap Interview for the SMTP question; Person A's answers did not carry such labels. That is a difference in how the answers were expressed, not in correctness.
+- The assignment of the two answer sets to Person A / Person B follows Rahul's message; the exact materials each used are as reported, not independently observed.
+- Two people is a very small sample. This is an illustration, not proof.
+- Not yet done: a repeat with separate timers per person, or with a harder question set (for example questions that need the evidence viewer or the access rules).
+
+### Appendix: answers as received (verbatim, lightly trimmed)
+**Person A**
+1. Payments moved from the card gateway to UPI deep links because the gateway required merchant KYC, which the student club could not obtain (PR #87).
+2. Meera holds the third-party image-bucket credential.
+3. It is unclear: the README says Render, while later commits configure Vercel. Neither source establishes the current authoritative deployment.
+4. PR #94 (seller dashboard) is still open. Changes were requested on 19 October (empty state and price validation) and it has been inactive for about three weeks.
+5. No one is identified as the owner of the college SMTP account. Meera explicitly says she does not have its password and does not know who set it up.
+6. PR #91's login-loop "fix" clears the session cookie on redirect. It is explicitly a temporary hack, with a TODO to replace it after refresh-token rotation is implemented; it may be fragile and regress.
+
+**Person B**
+1. The card payment gateway asked for merchant KYC and the team couldn't get a merchant account, so the app couldn't go live. In #payments on 12 Aug the gateway KYC problem was raised and the reply was that the payment PR was merged and "UPI hi chalega abhi". PR #87 (14 Aug) replaced the card gateway with UPI deep links. State: Verified.
+2. Meera (Meera Nair) alone. In #dev on 25 Aug she said listing images go to a third-party bucket and only she has the credential. Anyone who needs it has to ask her (single point of failure). State: Verified.
+3. No, it isn't clear; the system should show a conflict. The README says Render; a commit on 2 Oct added vercel.json and moved the frontend to a Vercel preview; on 6 Oct someone asked in #general whether anyone would update the README. The system shouldn't pick the newer source; both sides should be shown for a human to decide. State: Conflicting.
+4. The seller dashboard PR: opened 18 Oct, changes requested 19 Oct (empty-state handling and price validation); the 20 Oct meeting notes say it needs another review pass. Still open and stale for about three weeks, so it should be the successor's next action. State: Verified.
+5. Nobody knows. Verification emails go out through it. In #dev on 2 Sep one person said they don't have the password and don't know who set it up; another said it already existed and the team just used it. It should appear as Missing and become a Gap Interview question for the leaver (Aditi); it shouldn't be guessed.
+6. PR #91 is a temporary fix for the login loop: it clears the session cookie on redirect and the proper fix was deferred; a TODO sits in auth/session.ts. Nothing in the sources says it is unsafe, so it is an AI inference and is labelled "AI inference, not stated in any source". It could hide the real cause or log users out unexpectedly. State: Inferred.
 
 ## 5. Real phone and 15-minute cold-start check
 **Not yet run** (needs a person with a real phone). Emulated phone-width results are in section 2.
