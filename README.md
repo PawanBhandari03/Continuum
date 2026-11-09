@@ -30,9 +30,9 @@ Detailed API run instructions will be added as components land.
 
 ## Disclosure (AI use, services, libraries)
 **AI assistance:** Claude (Anthropic) via Claude Code was used for drafting the Round 1 proposal, planning documents, and AI-assisted coding during the build window. All generated code is reviewed by the team, who can explain it.
-**AI inside the product:** Anthropic Claude API for claim extraction and support checks. Outputs are schema-bound, verified by deterministic citation checks, and require human approval before publishing.
-**Services:** Supabase (PostgreSQL, Auth), Vercel, Render, GitHub API.
-**Libraries (to be finalised):** Next.js, React, Tailwind CSS, shadcn/ui, FastAPI, Pydantic, PyGithub, pypdf, rapidfuzz, detect-secrets — each under its own open-source licence.
+**AI inside the product:** Google Gemini API (changed from the Round 1 plan, which named Claude) for claim extraction, support checks and contradiction checks, behind a swappable provider interface (`api/app/llm.py`). Outputs are schema-bound, verified by deterministic citation checks (evidence id must exist, quote must match the source), and require human approval before publishing.
+**Services:** Supabase (PostgreSQL; Supabase Auth is not used yet), Render (API and web hosting), GitHub REST API (read-only connector), Google Gemini API.
+**Libraries:** web: Next.js, React, Tailwind CSS, lucide-react, Playwright. API: FastAPI, Uvicorn, Pydantic, httpx, rapidfuzz, pypdf, python-multipart, reportlab (PDF generation for docs). Each under its own open-source licence. shadcn/ui, PyGithub and detect-secrets from the Round 1 plan are not used (own components, direct GitHub REST calls, and our own regex-based secret/PII scan).
 **Data:** all demo data is synthetic. Any secrets or personal details in it are fake.
 **Templates/boilerplate:** `web/` was generated with `create-next-app@15` (TypeScript, App Router, Tailwind v4); that scaffold is unmodified boilerplate apart from files we wrote. UI components (badges, cards, drawers) are written by us with Tailwind. **shadcn/ui is not used** (changed from the Round 1 plan to save setup time). Icons: `lucide-react` (ISC licence). Tests: `@playwright/test` (Apache-2.0).
 
