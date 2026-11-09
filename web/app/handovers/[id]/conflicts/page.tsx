@@ -59,7 +59,7 @@ export default function ConflictsPage({ params }: { params: Promise<{ id: string
               <div className="mt-3 grid gap-3 md:grid-cols-2">
                 {sides.map((c) => (
                   <div key={c.id}>
-                    <label className="mb-1 flex items-center gap-2 text-xs font-medium text-slate-700">
+                    <label className="mb-1 flex min-h-10 cursor-pointer items-center gap-2 py-1 text-xs font-medium text-slate-700">
                       <input type="radio" name={`keep-${cf.id}`} disabled={done} checked={keep[cf.id] === c.id} onChange={() => setKeep({ ...keep, [cf.id]: c.id })} />
                       Side dated {fmtDate(c.date)} {done && c.review_status === "rejected" ? "(not kept)" : ""}
                     </label>
