@@ -121,7 +121,7 @@ Lead/reviewer (sees everything, approves), Contributor/successor (sees only perm
 **Known limitations (frontend):** mock data lives in the browser, so it is per-browser and "Reset demo" clears it. The successor view shows a draft preview before publish (labelled) so judges can explore without finishing review. File uploads in mock mode register a source but do not parse the file. Tokens typed into the GitHub field are never stored. Accessibility: badges use icon + text, controls are keyboard reachable; not yet audited with a screen reader.
 
 ## 15. Backend guide
-**Run it:** `cd api`, create a venv, `pip install -r requirements.txt`, put keys in `api/.env` (never committed; names in `.env.example`), then `uvicorn app.main:app --port 8000`. Seed the demo with `POST /demo/seed`, then `POST /handovers/h_1/reconstruct` with header `X-Demo-Role: lead`. Tests: `pytest` (22 unit tests) and `python smoke_test.py` (live database).
+**Run it:** `cd api`, create a venv, `pip install -r requirements.txt`, put keys in `api/.env` (never committed; names in `.env.example`), then `uvicorn app.main:app --port 8000`. Seed the demo with `POST /demo/seed`, then `POST /handovers/h_1/reconstruct` with header `X-Demo-Role: lead`. Tests: `pytest` (22 unit tests) and `python smoke.py` (live database).
 
 | Path | What |
 |---|---|

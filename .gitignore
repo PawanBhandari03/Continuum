@@ -16,3 +16,4 @@ dist/
 .cache/
 .cache_result_*.json
 run*.log
+demo-data/seed_run.log

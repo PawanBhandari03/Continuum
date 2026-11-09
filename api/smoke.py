@@ -1,5 +1,5 @@
 """End-to-end smoke test of the API against the live Supabase project (uses the model cache where
-possible). Usage: python smoke_test.py [--no-reconstruct]"""
+possible). Usage: python smoke.py [--no-reconstruct]"""
 import sys
 import time
 import warnings

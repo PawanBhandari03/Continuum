@@ -19,6 +19,7 @@ from .protect import redact_text
 from .store import Store
 from .visibility import can_read, claim_visible, visible_claims
 from .ingest import parse_chat_export, parse_notes
+from .github import fetch_github
 from . import pipeline
 
 app = FastAPI(title="Continuum API")
@@ -182,6 +183,21 @@ def ingest_sample(hid: str) -> None:
                               "status": rep["status"], "status_reason": rep.get("reason"),
                               "default_label": s["default_label"], "unit_count": len(units)}])
         db().ins("evidence_units", [unit_row(u, hid) for u in units])
+    gid = f"{P(hid)}src_github"
+    if gid not in existing:
+        ingest_github(hid, SAMPLE_REPO, "CampusKart repo (README, commits, PRs, issues, TODOs)", gid)
+
+
+SAMPLE_REPO = "https://github.com/PawanBhandari03/campuskart"
+
+
+def ingest_github(hid: str, ref: str, name: str, sid: str) -> None:
+    units, rep = fetch_github(ref, sid, "contributor", id_prefix=P(hid))
+    db().ins("sources", [{"id": sid, "handover_id": hid, "type": "github", "name": name,
+                          "status": rep["status"], "status_reason": rep.get("reason"),
+                          "default_label": "contributor", "unit_count": len(units)}])
+    if units:
+        db().ins("evidence_units", [unit_row(u, hid) for u in units])
 
 
 class NewSource(BaseModel):
@@ -207,6 +223,9 @@ def add_source(hid: str, body: NewSource):
         ingest_sample(hid)
         return {"ok": True}
     sid = f"{hid}__src_{uuid.uuid4().hex[:6]}"
+    if body.type == "github":
+        ingest_github(hid, body.ref or "", body.name or (body.ref or "GitHub repo"), sid)
+        return {"ok": True}
     reason = ("This source type is not wired to the live API in this build. Use the sample sources, "
               "or connect a GitHub repo.")
     db().ins("sources", [{"id": sid, "handover_id": hid, "type": body.type, "name": body.name or body.type,
