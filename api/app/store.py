@@ -67,5 +67,15 @@ class Store:
     def upd(self, table: str, match: dict, patch: dict) -> None:
         self._req("PATCH", table, params=self._eq(match), json=patch, prefer="return=minimal")
 
+    def upd_in(self, table: str, ids: list[str], patch: dict) -> int:
+        """Update many rows by id with one PATCH per chunk (instead of one request per row)."""
+        n = 0
+        for i in range(0, len(ids), 40):
+            chunk = ids[i:i + 40]
+            quoted = ",".join('"' + x.replace('"', "") + '"' for x in chunk)
+            self._req("PATCH", table, params={"id": f"in.({quoted})"}, json=patch, prefer="return=minimal")
+            n += len(chunk)
+        return n
+
     def delete(self, table: str, match: dict) -> None:
         self._req("DELETE", table, params=self._eq(match), prefer="return=minimal")

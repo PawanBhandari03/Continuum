@@ -130,11 +130,24 @@ def log_action(hid: str, actor: str, action: str, summary: str, claim_id: str | 
                                  "before": before, "after": {**(after or {}), "summary": summary, "version": version}}])
 
 
-def bump(hid: str, actor: str, action: str, summary: str, claim_id: str | None = None, before=None, after=None) -> int:
-    h = get_handover_row(hid)
-    v = h["version"] + 1
-    db().upd("handovers", {"id": hid}, {"version": v})
-    log_action(hid, actor, action, summary, claim_id, v, before, after)
+def _par(*fns) -> None:
+    """Run independent database calls at the same time (each is a network round trip)."""
+    from concurrent.futures import ThreadPoolExecutor
+    with ThreadPoolExecutor(max_workers=len(fns)) as ex:
+        for f in [ex.submit(fn) for fn in fns]:
+            f.result()
+
+
+def bump(hid: str, actor: str, action: str, summary: str, claim_id: str | None = None, before=None, after=None,
+         also=()) -> int:
+    """New handover version + audit row. The version number is kept in memory (single API
+    instance) to avoid a read; `also` are extra writes run in parallel with the two bookkeeping writes."""
+    import time
+    key = ("ver", hid)
+    v = cached(key, lambda: get_handover_row(hid)["version"], ttl=3600) + 1
+    _cache[key] = (time.monotonic() + 3600, v)
+    _par(lambda: db().upd("handovers", {"id": hid}, {"version": v}),
+         lambda: log_action(hid, actor, action, summary, claim_id, v, before, after), *also)
     return v
 
 
@@ -542,11 +555,37 @@ def patch_claim(cid: str, body: ClaimPatch, x_demo_role: Optional[str] = Header(
         patch.update(sensitive=not c.sensitive)
     else:
         raise HTTPException(400, f"Unsupported action {body.action}")
-    db().upd("claims", {"id": cid}, patch)
     bump(r["handover_id"], actor, body.action,
          f"{body.action.replace('_', ' ')}: {cid.split('__')[-1]}" + (f" — {body.note}" if body.note else ""),
-         cid, before, patch)
-    return to_claim(claim_row(None, cid)).model_dump()
+         cid, before, patch, also=(lambda: db().upd("claims", {"id": cid}, patch),))
+    return to_claim({**r, **patch}).model_dump()
+
+
+class BulkReview(BaseModel):
+    action: str = "approve"
+    state: Optional[str] = None          # e.g. "verified": only claims in this evidence state
+    ids: Optional[list[str]] = None      # or an explicit list
+
+
+@app.post("/handovers/{hid}/claims/bulk")
+def bulk_review(hid: str, body: BulkReview, x_demo_role: Optional[str] = Header(None)):
+    """Approve many pending claims with a handful of requests (one version, one audit row)."""
+    role = role_of(x_demo_role)
+    need(role, "lead")
+    if body.action != "approve":
+        raise HTTPException(400, "Only bulk approve is supported.")
+    if get_handover_row(hid)["status"] == "published":
+        raise HTTPException(400, "Already published and locked.")
+    actor = ACTORS[role]
+    rows = db().sel("claims", {"handover_id": hid}, select="id,state,review_status")
+    todo = [r["id"] for r in rows if r["review_status"] == "pending"
+            and (not body.state or r["state"] == body.state) and (body.ids is None or r["id"] in set(body.ids))]
+    if todo:
+        patch = {"review_status": "approved", "confirmed_by": actor, "confirmed_at": now()}
+        what = f"{body.state} " if body.state else ""
+        bump(hid, actor, "approve", f"approve: {len(todo)} {what}claims (bulk)", None, None, {"count": len(todo)},
+             also=(lambda: db().upd_in("claims", todo, patch),))
+    return {"approved": len(todo)}
 
 
 @app.get("/claims/{cid}/evidence")
@@ -616,6 +655,13 @@ def resolve_conflict(cfid: str, body: Resolve, x_demo_role: Optional[str] = Head
                                                  "review_status": "approved", "conflict_id": None})
             else:
                 db().upd("claims", {"id": cid}, {"review_status": "rejected"})
+    # The same disagreement can be detected as several pairs (A vs B, B vs C): settle those together.
+    mine = set(cf["claim_ids"])
+    for o in db().sel("conflicts", {"handover_id": cf["handover_id"]}):
+        if o["id"] != cfid and o["resolution"] == "open" and mine & set(o["claim_ids"]):
+            db().upd("conflicts", {"id": o["id"]}, {"resolution": body.resolution, "resolved_by": actor,
+                                                    "note": (body.note + " " if body.note else "")
+                                                    + f"(same disagreement as {cfid.split('__')[-1]})"})
     bump(cf["handover_id"], actor, "resolve_conflict",
          f"Conflict {cfid.split('__')[-1]} → "
          f"{'resolved' if body.resolution == 'resolved' else 'marked unresolved (successor to follow up)'}")
@@ -667,13 +713,15 @@ def answer_gap(gid: str, body: Answer, x_demo_role: Optional[str] = Header(None)
     db().upd("gaps", {"id": gid}, {"status": "answered", "answer": text, "answer_evidence_id": evid})
     c = to_claim(claim_row(None, g["claim_id"]))
     base = c.statement.rstrip(".")
+    new_statement = f'Answered by leaver: {base} — "{text}"'
     db().upd("claims", {"id": c.id}, {
-        "statement": f'Answered by leaver: {base} — "{text}"', "state": "confirmed",
+        "statement": new_statement, "state": "confirmed",
         "type": "fact" if c.type == "gap" else c.type,
         "citations": [x.model_dump() for x in c.citations] + [{"evidence_id": evid, "quote": text[:120], "support": "full"}],
         "confidence_reason": "Leaver's Exit Q&A answer (pending reviewer approval)",
         "confirmed_by": actor, "confirmed_at": now(), "review_status": "pending"})
-    bump(hid, actor, "answer_gap", f"Gap {gid.split('__')[-1]} answered by leaver (new Exit Q&A evidence)")
+    bump(hid, actor, "answer_gap", f"Gap {gid.split('__')[-1]} answered by leaver (new Exit Q&A evidence)",
+         c.id, {"statement": c.statement}, {"statement": new_statement})
     return gap_out(db().one("gaps", {"id": gid}))
 
 
@@ -694,6 +742,38 @@ def versions(hid: str):
     rows = db().sel("review_actions", {"handover_id": hid}, order="at.desc")
     return [{"version": (r["after"] or {}).get("version") or 1, "at": r["at"], "actor": r["actor"],
              "summary": (r["after"] or {}).get("summary") or r["action"]} for r in rows]
+
+
+@app.get("/handovers/{hid}/versions/{a}/diff/{b}")
+def version_diff(hid: str, a: int, b: int, x_demo_role: Optional[str] = Header(None)):
+    """What changed between version a and version b, rebuilt from the recorded review actions
+    (edits, rejections, answered gaps). Approvals do not change text, so they are not listed."""
+    need(role_of(x_demo_role), "lead")
+    if a > b:
+        a, b = b, a
+    h = get_handover_row(hid)
+    if b > h["version"] or a < 1:
+        raise HTTPException(404, f"Version out of range (1 to {h['version']}).")
+    acts = [r for r in db().sel("review_actions", {"handover_id": hid}, order="at.asc")
+            if r.get("claim_id") and a < ((r["after"] or {}).get("version") or 0) <= b
+            and r["action"] in ("edit", "reject", "redact", "answer_gap")]
+    first: dict = {}
+    last: dict = {}
+    for r in acts:
+        first.setdefault(r["claim_id"], r)
+        last[r["claim_id"]] = r
+    claims = {c["id"]: c for c in db().sel("claims", {"handover_id": hid})}
+    removed, changed = [], []
+    for cid, r in last.items():
+        cur = claims.get(cid)
+        if not cur:
+            continue
+        if r["action"] in ("reject", "redact"):
+            removed.append(to_claim(cur).model_dump())
+            continue
+        before = (first[cid]["before"] or {}).get("statement", "")
+        changed.append({"claim_id": cid, "before": before, "after": (r["after"] or {}).get("statement") or cur["statement"]})
+    return {"added": [], "removed": removed, "changed": changed}
 
 
 @app.post("/handovers/{hid}/publish")
@@ -731,6 +811,12 @@ def view(hid: str, x_demo_role: Optional[str] = Header(None)):
     for a in db().sel("acknowledgements", {"handover_id": hid}, order="at.asc"):
         acks[a["section"]] = a["status"]
     hidden, sections = 0, []
+    if not any(c.section == "project" for c in claims):  # stored runs made before this section existed
+        from .analysis import pick_project_claims
+        seen = [c for c in claims if c.review_status != "rejected"
+                and (role == "lead" or claim_visible(role, c, units))]
+        for c in pick_project_claims(seen):
+            c.section = "project"
     for key, title in SECTIONS:
         inside = [c for c in claims if c.section == key and c.review_status != "rejected"]
         vis = [c for c in inside if (role == "lead" and c.review_status != "redacted")

@@ -83,9 +83,29 @@ def dedup_claims(claims: list[Claim], threshold: int = 86) -> list[Claim]:
     return kept
 
 
+def pick_project_claims(claims: list[Claim], n: int = 5) -> list[Claim]:
+    """'Project in five lines': the best-supported Verified/Confirmed facts, decisions and
+    dependencies, at most one per workstream. Nothing is written by the model; these are
+    existing claims with their own citations."""
+    pool = [c for c in claims if c.type in ("fact", "decision", "dependency") and c.state in ("verified", "confirmed")
+            and c.review_status != "rejected"]
+    pool.sort(key=lambda c: (c.state != "confirmed", -len(c.citations), c.id))
+    picked, seen = [], set()
+    for c in pool:
+        if c.workstream in seen:
+            continue
+        seen.add(c.workstream)
+        picked.append(c)
+        if len(picked) == n:
+            break
+    return picked
+
+
 def assign_sections(claims: list[Claim]) -> None:
     for c in claims:
         c.section = _SECTION.get(c.type, "state")
+    for c in pick_project_claims(claims):
+        c.section = "project"
 
 
 def detect_conflicts(claims: list[Claim], provider: Provider) -> list[Conflict]:

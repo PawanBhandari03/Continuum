@@ -352,6 +352,21 @@ export const mockApi: Api = {
     save();
     return delay(targets.length);
   },
+  async bulkApproveRemaining(hid, actor) {
+    const b = bundle(hid);
+    const targets = b.claims.filter((c) => c.review_status === "pending");
+    targets.forEach((c) => {
+      c.review_status = "approved";
+      c.confirmed_by = actor;
+      c.confirmed_at = now();
+    });
+    if (targets.length) {
+      bump(b, actor, `Approved ${targets.length} remaining claims`);
+      targets.forEach((c) => logAudit(b, actor, "approve", `approve: ${c.statement.slice(0, 90)} (bulk: remaining claims)`, c.id));
+    }
+    save();
+    return delay(targets.length);
+  },
   async getEvidence(claimId, role) {
     const { b, c } = bundleOfClaim(claimId);
     if (!claimVisible(c, role, store().evidence) && role !== "lead") throw new Error("Not permitted: you cannot see this claim's evidence.");

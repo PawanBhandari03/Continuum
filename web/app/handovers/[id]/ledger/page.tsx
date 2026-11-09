@@ -78,11 +78,10 @@ export default function LedgerPage({ params }: { params: Promise<{ id: string }>
   }
 
   async function approveRest() {
-    const todo = (claims ?? []).filter((c) => c.review_status === "pending");
     try {
-      for (const c of todo) await api.patchClaim(c.id, { action: "approve" }, actor);
+      const n = await api.bulkApproveRemaining(id, actor);
       invalidateEvidence();
-      setMsg(`Approved ${todo.length} remaining claim${todo.length === 1 ? "" : "s"}. Inferred, conflicting and missing claims keep their labels; approval does not change an evidence state.`);
+      setMsg(`Approved ${n} remaining claim${n === 1 ? "" : "s"}. Inferred, conflicting and missing claims keep their labels; approval does not change an evidence state.`);
       await load();
     } catch (e) { setErr(friendlyError(e)); }
   }

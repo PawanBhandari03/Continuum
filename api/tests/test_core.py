@@ -238,3 +238,17 @@ def test_strongest_keyword_wins_slot_choice():
               statement="Only Priya holds the SMTP password for verification emails.")
     normalize_entities([c])
     assert c.entity_key == "email"
+
+
+def test_project_section_picks_best_supported_verified_claims():
+    from app.analysis import pick_project_claims, assign_sections
+    from app.models import Claim, Citation
+    def mk(i, ws, state, n, typ="fact"):
+        return Claim(id=f"c{i}", type=typ, statement=f"s{i}", state=state, workstream=ws,
+                     citations=[Citation(evidence_id=f"e{k}", quote="q", support="full") for k in range(n)])
+    cs = [mk(1, "deploy", "verified", 1), mk(2, "deploy", "verified", 3), mk(3, "auth", "inferred", 5),
+          mk(4, "payments", "verified", 2, "decision"), mk(5, "risk", "verified", 1, "risk")]
+    picked = pick_project_claims(cs)
+    assert [c.id for c in picked] == ["c2", "c4"]  # one per workstream, verified only, no risks/inferred
+    assign_sections(cs)
+    assert {c.id for c in cs if c.section == "project"} == {"c2", "c4"}

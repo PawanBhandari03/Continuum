@@ -71,6 +71,8 @@ export interface Api {
     actor: string,
   ): Promise<Claim>;
   bulkApproveVerified(hid: string, actor: string): Promise<number>;
+  /** Approve every claim still pending (one request on the live API). Returns how many. */
+  bulkApproveRemaining(hid: string, actor: string): Promise<number>;
   getEvidence(claimId: string, role: Role): Promise<EvidenceDetail[]>;
   getConflicts(hid: string): Promise<Conflict[]>;
   resolveConflict(id: string, body: { resolution: ConflictResolution; note: string; keep_claim_id?: string }, actor: string): Promise<Conflict>;
@@ -185,11 +187,10 @@ const realApi: Api = {
   getJob: (id) => http(`/jobs/${id}`),
   getClaims: (h, f) => http(`/handovers/${h}/claims${q(f)}`),
   patchClaim: (id, b) => http(`/claims/${id}`, { method: "PATCH", body: JSON.stringify(b) }),
-  bulkApproveVerified: async (h) => {
-    const claims = await http<Claim[]>(`/handovers/${h}/claims?state=verified&review_status=pending`);
-    for (const c of claims) await http(`/claims/${c.id}`, { method: "PATCH", body: JSON.stringify({ action: "approve" }) });
-    return claims.length;
-  },
+  bulkApproveVerified: async (h) =>
+    (await http<{ approved: number }>(`/handovers/${h}/claims/bulk`, post({ action: "approve", state: "verified" }))).approved,
+  bulkApproveRemaining: async (h) =>
+    (await http<{ approved: number }>(`/handovers/${h}/claims/bulk`, post({ action: "approve" }))).approved,
   getEvidence: (id, role) => http(`/claims/${id}/evidence`, { role }),
   getConflicts: (h) => http(`/handovers/${h}/conflicts`),
   resolveConflict: (id, b) => http(`/conflicts/${id}/resolve`, post(b)),
