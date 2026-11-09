@@ -283,8 +283,8 @@ async def upload_source(hid: str, type: str = Form(...), file: UploadFile = File
                 fpath = tmp / f"notes{suffix}"
                 fpath.write_bytes(data)
                 units, rep = parse_notes(fpath, sid, label)
-        for u in units:
-            u.id = f"{P(hid)}{u.id}" if not u.id.startswith(P(hid)) else u.id
+        for u in units:  # unique per uploaded source, so two uploads can never collide
+            u.id = f"{sid}__{u.id}"
         db().ins("sources", [{"id": sid, "handover_id": hid, "type": type, "name": name, "status": rep["status"],
                               "status_reason": rep.get("reason"), "default_label": label, "unit_count": len(units)}])
         if units:
