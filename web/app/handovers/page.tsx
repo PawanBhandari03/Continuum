@@ -1,11 +1,13 @@
 "use client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { api } from "@/lib/api";
 import { ROLE_META, useSession } from "@/lib/session";
 import type { Handover } from "@/lib/types";
 import { Button, Card, Notice, PageTitle, fmtDate } from "@/components/ui";
+import { EmptyState, LoadError, SkeletonList } from "@/components/feedback";
+import { friendlyError } from "@/lib/status";
 
 const STATUS: Record<Handover["status"], string> = { draft: "Draft — sources not yet reconstructed", in_review: "In review", published: "Published" };
 
@@ -20,9 +22,14 @@ export default function HandoversPage() {
   useEffect(() => {
     if (ready && !role) router.replace("/");
   }, [ready, role, router]);
-  useEffect(() => {
-    api.listHandovers().then(setList).catch((e) => setErr((e as Error).message));
+  const [loadErr, setLoadErr] = useState<string | null>(null);
+  const load = useCallback(() => {
+    setLoadErr(null);
+    api.listHandovers().then(setList).catch((e) => setLoadErr(friendlyError(e)));
   }, []);
+  useEffect(() => {
+    load();
+  }, [load]);
   if (!role) return null;
 
   async function create(e: React.FormEvent) {
@@ -33,7 +40,7 @@ export default function HandoversPage() {
       const h = await api.createHandover(form);
       router.push(`/handovers/${h.id}/connect`);
     } catch (x) {
-      setErr((x as Error).message);
+      setErr(friendlyError(x));
       setBusy(false);
     }
   }
@@ -45,7 +52,9 @@ export default function HandoversPage() {
       {err && <Notice tone="error">{err}</Notice>}
       <div className="grid gap-4 md:grid-cols-5">
         <div className="space-y-3 md:col-span-3">
-          {!list && <p className="text-sm text-slate-500">Loading…</p>}
+          {loadErr && <LoadError message={loadErr} onRetry={load} />}
+          {!list && !loadErr && <SkeletonList rows={2} label="Loading handovers" />}
+          {list?.length === 0 && <EmptyState title="No handovers yet" hint="Create one with the form to connect sources and start." />}
           {list?.map((h) => (
             <Card key={h.id}>
               <div className="flex flex-wrap items-center justify-between gap-3">

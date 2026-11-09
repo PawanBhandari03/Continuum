@@ -1,10 +1,12 @@
 "use client";
 import Link from "next/link";
-import { use, useEffect, useState } from "react";
+import { use, useCallback, useEffect, useState } from "react";
 import { api } from "@/lib/api";
 import type { Source, SourceType } from "@/lib/types";
 import { Button, Card, LabelTag, Notice, PageTitle, SourceStatusChip, sourceIcon } from "@/components/ui";
 import { HandoverNav, RoleGuard } from "@/components/shell";
+import { EmptyState, LoadError, SkeletonList } from "@/components/feedback";
+import { friendlyError } from "@/lib/status";
 
 const KINDS: { type: SourceType; title: string; hint: string; accept?: string }[] = [
   { type: "chat_export", title: "Chat export", hint: "Slack / Discord JSON export (.zip or .json)", accept: ".json,.zip" },
@@ -19,16 +21,21 @@ export default function ConnectPage({ params }: { params: Promise<{ id: string }
   const [repo, setRepo] = useState("");
   const [token, setToken] = useState("");
 
-  useEffect(() => {
-    api.getSources(id).then(setSources).catch((e) => setErr((e as Error).message));
+  const [loadErr, setLoadErr] = useState<string | null>(null);
+  const load = useCallback(() => {
+    setLoadErr(null);
+    api.getSources(id).then(setSources).catch((e) => setLoadErr(friendlyError(e)));
   }, [id]);
+  useEffect(() => {
+    load();
+  }, [load]);
 
   async function add(body: Parameters<typeof api.addSource>[1]) {
     setErr(null);
     try {
       setSources(await api.addSource(id, body));
     } catch (e) {
-      setErr((e as Error).message);
+      setErr(friendlyError(e));
     }
   }
   const input = "mt-1 w-full rounded-md border border-slate-300 bg-white px-2.5 py-1.5 text-sm";
@@ -76,8 +83,9 @@ export default function ConnectPage({ params }: { params: Promise<{ id: string }
         <aside className="md:col-span-2">
           <Card>
             <h2 className="font-semibold">Connected sources</h2>
-            {!sources && <p className="mt-2 text-sm text-slate-500">Loading…</p>}
-            {sources?.length === 0 && <p className="mt-2 text-sm text-slate-600">Nothing connected yet.</p>}
+            {loadErr && <div className="mt-2"><LoadError message={loadErr} onRetry={load} /></div>}
+            {!sources && !loadErr && <div className="mt-2"><SkeletonList rows={2} label="Loading sources" /></div>}
+            {sources?.length === 0 && <div className="mt-2"><EmptyState title="Nothing connected yet" hint="Add a source, or use the CampusKart sample sources." /></div>}
             <ul className="mt-3 space-y-3">
               {sources?.map((s) => {
                 const Icon = sourceIcon(s.type);

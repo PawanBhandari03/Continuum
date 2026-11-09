@@ -7,23 +7,27 @@ import type { SuccessorView } from "@/lib/types";
 import { Button, Card, Notice, PageTitle, fmtDate } from "@/components/ui";
 import { HandoverNav, RoleGuard } from "@/components/shell";
 import { ClaimCard } from "@/components/claim-card";
+import { LoadError, SkeletonList } from "@/components/feedback";
+import { friendlyError } from "@/lib/status";
 
 export default function StartPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const { role, actor } = useSession();
   const [view, setView] = useState<SuccessorView | null>(null);
   const [err, setErr] = useState<string | null>(null);
+  const [loadErr, setLoadErr] = useState<string | null>(null);
   const [flagging, setFlagging] = useState<string | null>(null);
   const [note, setNote] = useState("");
 
   const load = useCallback(async () => {
     if (!role) return;
-    try { setView(await api.getView(id, role)); } catch (e) { setErr((e as Error).message); }
+    setLoadErr(null);
+    try { setView(await api.getView(id, role)); } catch (e) { setLoadErr(friendlyError(e)); }
   }, [id, role]);
   useEffect(() => { load(); }, [load]);
 
   async function ack(section: string, status: "acknowledged" | "unclear", n?: string) {
-    try { await api.ack(id, { section, status, note: n }, actor); setFlagging(null); setNote(""); await load(); } catch (e) { setErr((e as Error).message); }
+    try { await api.ack(id, { section, status, note: n }, actor); setFlagging(null); setNote(""); await load(); } catch (e) { setErr(friendlyError(e)); }
   }
 
   const h = view?.handover;
@@ -36,6 +40,8 @@ export default function StartPage({ params }: { params: Promise<{ id: string }> 
         title={h ? `Start here, ${h.successor}` : "Start here"}
         sub={h ? `Handover from ${h.leaver} · CampusKart · version ${h.version} · target ${fmtDate(h.target_date)}. Every claim shows its evidence state; click a source to read the original.` : undefined}
       />
+      {loadErr && <div className="mb-3"><LoadError message={loadErr} onRetry={load} /></div>}
+      {!view && !loadErr && <SkeletonList rows={4} label="Loading the handover" />}
       {err && <div className="mb-3"><Notice tone="error">{err}</Notice></div>}
       {h && h.status !== "published" && <div className="mb-4"><Notice tone="warn"><b>Draft preview.</b> The reviewer has not published this handover yet. In production a successor would see nothing until publish; the demo shows the current draft so you can explore this view. Role-based filtering below is real.</Notice></div>}
       {h?.status === "published" && <div className="mb-4"><Notice>Published and approved by <b>{h.approved_by}</b> on {fmtDate(h.published_at)}. This version is locked.</Notice></div>}

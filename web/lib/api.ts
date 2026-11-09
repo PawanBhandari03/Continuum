@@ -23,6 +23,7 @@ import type {
   VersionEntry,
 } from "./types";
 import { mockApi } from "./mock-api";
+import { beginWaking } from "./status";
 
 export const USE_MOCKS = process.env.NEXT_PUBLIC_USE_MOCKS !== "false";
 const API_URL = (process.env.NEXT_PUBLIC_API_URL ?? "").replace(/\/$/, "");
@@ -98,17 +99,24 @@ async function slot<T>(fn: () => Promise<T>): Promise<T> {
 async function limitedFetch(url: string, init: RequestInit): Promise<Response> {
   return slot(async () => {
     let last: unknown;
-    for (let attempt = 0; attempt < 6; attempt++) {
-      try {
-        const r = await fetch(url, init);
-        if (![502, 503, 504].includes(r.status)) return r;
-        last = new Error(`Server not ready (HTTP ${r.status})`);
-      } catch (e) {
-        last = e;
+    let endWaking: (() => void) | null = null;
+    try {
+      for (let attempt = 0; attempt < 6; attempt++) {
+        try {
+          // per-attempt timeout so a hung connection to a sleeping server cannot block the screen forever
+          const r = await fetch(url, { ...init, signal: AbortSignal.timeout(30000) });
+          if (![502, 503, 504].includes(r.status)) return r;
+          last = new Error(`Server not ready (HTTP ${r.status})`);
+        } catch (e) {
+          last = e;
+        }
+        endWaking ??= beginWaking(); // tells the UI to show the "Waking the server" banner
+        await new Promise((r) => setTimeout(r, 2000 * 2 ** attempt > 20000 ? 20000 : 2000 * 2 ** attempt));
       }
-      await new Promise((r) => setTimeout(r, 2000 * 2 ** attempt > 20000 ? 20000 : 2000 * 2 ** attempt));
+      throw new Error(`Could not reach the server. It may be waking up; please retry in a minute. (${(last as Error)?.message ?? "network error"})`);
+    } finally {
+      endWaking?.(); // banner clears on success and on final failure
     }
-    throw new Error(`Could not reach the server. It may be waking up; please retry in a minute. (${(last as Error)?.message ?? "network error"})`);
   });
 }
 

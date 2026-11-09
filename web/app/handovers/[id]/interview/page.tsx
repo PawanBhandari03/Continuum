@@ -7,6 +7,8 @@ import type { EvidenceDetail, Gap } from "@/lib/types";
 import { Button, Card, Notice, PageTitle } from "@/components/ui";
 import { HandoverNav, RoleGuard } from "@/components/shell";
 import { chipLabel } from "@/components/evidence";
+import { EmptyState, LoadError, SkeletonList } from "@/components/feedback";
+import { friendlyError } from "@/lib/status";
 
 export default function InterviewPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -15,8 +17,10 @@ export default function InterviewPage({ params }: { params: Promise<{ id: string
   const [found, setFound] = useState<Record<string, EvidenceDetail[]>>({});
   const [text, setText] = useState<Record<string, string>>({});
   const [err, setErr] = useState<string | null>(null);
+  const [loadErr, setLoadErr] = useState<string | null>(null);
 
   const load = useCallback(async () => {
+    setLoadErr(null);
     try {
       const [g, claims] = await Promise.all([api.getGaps(id), api.getClaims(id)]);
       setGaps(g);
@@ -26,13 +30,13 @@ export default function InterviewPage({ params }: { params: Promise<{ id: string
         if (c) out[gap.id] = await api.getEvidence(c.id, "leaver").catch(() => []);
       }
       setFound(out);
-    } catch (e) { setErr((e as Error).message); }
+    } catch (e) { setLoadErr(friendlyError(e)); }
   }, [id]);
   useEffect(() => { load(); }, [load]);
 
   async function answer(g: Gap) {
     setErr(null);
-    try { await api.answerGap(g.id, { answer: text[g.id] ?? "" }, actor); await load(); } catch (e) { setErr((e as Error).message); }
+    try { await api.answerGap(g.id, { answer: text[g.id] ?? "" }, actor); await load(); } catch (e) { setErr(friendlyError(e)); }
   }
   async function skip(g: Gap) { await api.skipGap(g.id); await load(); }
 
@@ -50,7 +54,9 @@ export default function InterviewPage({ params }: { params: Promise<{ id: string
           <div className="mt-1 h-2 overflow-hidden rounded-full bg-slate-200"><div className="h-full bg-emerald-600" style={{ width: total ? `${(done / total) * 100}%` : "0%" }} /></div>
         </div>
       )}
-      {gaps?.length === 0 && <Notice>No open questions. Run Reconstruct first if you expected some.</Notice>}
+      {loadErr && <LoadError message={loadErr} onRetry={load} />}
+      {!gaps && !loadErr && <SkeletonList rows={2} label="Loading questions" />}
+      {gaps?.length === 0 && <EmptyState title="No open questions" hint="Run Reconstruct first if you expected some." />}
       <div className="space-y-4">
         {gaps?.map((g, i) => (
           <Card key={g.id}>

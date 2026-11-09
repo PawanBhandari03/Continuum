@@ -20,6 +20,7 @@ import type {
   ViewSection,
 } from "./types";
 import * as seed from "@/mocks/campuskart";
+import { beginWaking } from "./status";
 
 interface HandoverBundle {
   handover: Handover;
@@ -40,7 +41,26 @@ interface Store {
 
 const KEY = "continuum-mock-v2";
 const clone = <T,>(x: T): T => JSON.parse(JSON.stringify(x));
-const delay = <T,>(v: T, ms = 120) => new Promise<T>((r) => setTimeout(() => r(v), ms));
+// Failure simulation for demos/tests: localStorage "continuum-mock-fail" = "down" (every call fails after a short
+// "waking" phase) or "slow" (calls succeed after a short "waking" phase). Unset in normal use.
+function failMode(): string | null {
+  try {
+    return typeof window !== "undefined" ? window.localStorage.getItem("continuum-mock-fail") : null;
+  } catch {
+    return null;
+  }
+}
+const delay = async <T,>(v: T, ms = 120): Promise<T> => {
+  const mode = failMode();
+  if (mode === "down" || mode === "slow") {
+    const end = beginWaking();
+    await new Promise((r) => setTimeout(r, mode === "slow" ? 2500 : 1200));
+    end();
+    if (mode === "down") throw new Error("Could not reach the server. It may be waking up; please retry in a minute. (simulated)");
+    return v;
+  }
+  return new Promise<T>((r) => setTimeout(() => r(v), ms));
+};
 
 function seedStore(): Store {
   const h = clone(seed.handover);

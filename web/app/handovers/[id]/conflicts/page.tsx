@@ -7,6 +7,8 @@ import { Button, Card, Notice, PageTitle, fmtDate } from "@/components/ui";
 import { HandoverNav, RoleGuard } from "@/components/shell";
 import { ClaimCard } from "@/components/claim-card";
 import { invalidateEvidence } from "@/components/evidence";
+import { EmptyState, LoadError, SkeletonList } from "@/components/feedback";
+import { friendlyError } from "@/lib/status";
 
 export default function ConflictsPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -16,10 +18,12 @@ export default function ConflictsPage({ params }: { params: Promise<{ id: string
   const [notes, setNotes] = useState<Record<string, string>>({});
   const [keep, setKeep] = useState<Record<string, string>>({});
   const [err, setErr] = useState<string | null>(null);
+  const [loadErr, setLoadErr] = useState<string | null>(null);
 
   const load = useCallback(async () => {
+    setLoadErr(null);
     try { const [cf, cl] = await Promise.all([api.getConflicts(id), api.getClaims(id)]); setConflicts(cf); setClaims(cl); }
-    catch (e) { setErr((e as Error).message); }
+    catch (e) { setLoadErr(friendlyError(e)); }
   }, [id]);
   useEffect(() => { load(); }, [load]);
 
@@ -29,7 +33,7 @@ export default function ConflictsPage({ params }: { params: Promise<{ id: string
       await api.resolveConflict(c.id, { resolution, note: notes[c.id] ?? "", keep_claim_id: keep[c.id] }, actor);
       invalidateEvidence();
       await load();
-    } catch (e) { setErr((e as Error).message); }
+    } catch (e) { setErr(friendlyError(e)); }
   }
 
   return (
@@ -37,7 +41,9 @@ export default function ConflictsPage({ params }: { params: Promise<{ id: string
       <HandoverNav hid={id} />
       <PageTitle title="Conflicts" sub="Sources disagree. Continuum shows both sides with dates and never assumes the newest is correct. You decide, or you mark it for the successor to follow up." />
       {err && <div className="mb-3"><Notice tone="error">{err}</Notice></div>}
-      {conflicts?.length === 0 && <Notice>No conflicts detected.</Notice>}
+      {loadErr && <LoadError message={loadErr} onRetry={load} />}
+      {!conflicts && !loadErr && <SkeletonList rows={1} label="Loading conflicts" />}
+      {conflicts?.length === 0 && <EmptyState title="No conflicts detected" hint="Nothing in the connected sources contradicts anything else." />}
       <div className="space-y-6">
         {conflicts?.map((cf) => {
           const sides = cf.claim_ids.map((cid) => claims.find((c) => c.id === cid)).filter(Boolean) as Claim[];

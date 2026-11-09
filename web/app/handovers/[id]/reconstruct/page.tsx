@@ -6,6 +6,7 @@ import { api } from "@/lib/api";
 import type { JobStatus } from "@/lib/types";
 import { Button, Card, Notice, PageTitle } from "@/components/ui";
 import { HandoverNav, RoleGuard } from "@/components/shell";
+import { friendlyError } from "@/lib/status";
 
 const STAGES: { key: NonNullable<JobStatus["stage"]>; title: string; desc: string }[] = [
   { key: "parse", title: "Parse", desc: "Turn commits, PRs, messages and notes into evidence units; drop bots and noise." },
@@ -33,12 +34,12 @@ export default function ReconstructPage({ params }: { params: Promise<{ id: stri
           if (s.status === "done" || s.status === "failed") clearInterval(timer.current!);
         } catch (e) {
           clearInterval(timer.current!);
-          setErr((e as Error).message);
+          setErr(friendlyError(e));
         }
       }, 700);
     } catch (e) {
       setJob(null);
-      setErr((e as Error).message);
+      setErr(friendlyError(e));
     }
   }
   useEffect(() => () => { if (timer.current) clearInterval(timer.current); }, []);
@@ -50,7 +51,9 @@ export default function ReconstructPage({ params }: { params: Promise<{ id: stri
       <HandoverNav hid={id} />
       <PageTitle title="Reconstruct" sub="Runs the pipeline on the connected sources. Failures are shown with a reason, never hidden." right={<Button variant="primary" onClick={start} disabled={job?.status === "running" || job?.status === "queued"}>{job ? "Run again" : "Start reconstruction"}</Button>} />
       {err && <Notice tone="error">{err}</Notice>}
-      {job?.status === "failed" && <Notice tone="error">Reconstruction failed: {job.error ?? "unknown error"}</Notice>}
+      {err && <div className="mt-2"><Button onClick={start}>Retry</Button></div>}
+      {job?.status === "failed" && <Notice tone="error">Reconstruction failed: {job.error ?? "unknown error"}. Nothing was published; you can run it again.</Notice>}
+      {job?.status === "done" && job.error && <Notice tone="warn"><b>Finished with warnings.</b> Some parts did not complete, so the handover may be missing claims: {job.error}</Notice>}
       <Card className="mt-3">
         <div className="mb-3 h-2 overflow-hidden rounded-full bg-slate-200" role="progressbar" aria-valuenow={job?.progress ?? 0} aria-valuemin={0} aria-valuemax={100} aria-label="Reconstruction progress">
           <div className="h-full bg-indigo-600 transition-all" style={{ width: `${job?.progress ?? 0}%` }} />

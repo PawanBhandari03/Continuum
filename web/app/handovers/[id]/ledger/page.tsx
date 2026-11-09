@@ -9,6 +9,8 @@ import { Button, Card, Notice, PageTitle, fmtDateTime } from "@/components/ui";
 import { HandoverNav, RoleGuard } from "@/components/shell";
 import { ClaimCard } from "@/components/claim-card";
 import { invalidateEvidence } from "@/components/evidence";
+import { EmptyState, LoadError, SkeletonList } from "@/components/feedback";
+import { friendlyError } from "@/lib/status";
 
 const SECTIONS: [SectionKey, string][] = [
   ["project", "1. Project in five lines"], ["state", "2. Current state by workstream"], ["decision_log", "3. Decision log"], ["first_week", "4. Your first week"],
@@ -25,16 +27,18 @@ export default function LedgerPage({ params }: { params: Promise<{ id: string }>
   const [showVersions, setShowVersions] = useState(false);
   const [showFormula, setShowFormula] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  const [loadErr, setLoadErr] = useState<string | null>(null);
   const [blocked, setBlocked] = useState<string[]>([]);
   const [msg, setMsg] = useState<string | null>(null);
   const [f, setF] = useState<{ state: "" | EvidenceState; type: "" | ClaimType; review: "" | ReviewStatus; ws: string }>({ state: "", type: "", review: "", ws: "" });
   const [editing, setEditing] = useState<{ id: string; text: string } | null>(null);
 
   const load = useCallback(async () => {
+    setLoadErr(null);
     try {
       const [hh, cc, rr, vv] = await Promise.all([api.getHandover(id), api.getClaims(id), api.getReadiness(id), api.getVersions(id)]);
       setH(hh); setClaims(cc); setReady(rr); setVersions(vv);
-    } catch (e) { setErr((e as Error).message); }
+    } catch (e) { setLoadErr(friendlyError(e)); }
   }, [id]);
   useEffect(() => { load(); }, [load]);
 
@@ -55,7 +59,7 @@ export default function LedgerPage({ params }: { params: Promise<{ id: string }>
   async function act(c: Claim, action: Parameters<typeof api.patchClaim>[1]["action"], extra: { edited_statement?: string } = {}) {
     setErr(null); setMsg(null);
     try { await api.patchClaim(c.id, { action, ...extra }, actor); invalidateEvidence(); await load(); }
-    catch (e) { setErr((e as Error).message); }
+    catch (e) { setErr(friendlyError(e)); }
   }
   async function publish() {
     setErr(null); setMsg(null);
@@ -76,7 +80,7 @@ export default function LedgerPage({ params }: { params: Promise<{ id: string }>
       invalidateEvidence();
       setMsg(`Approved ${todo.length} remaining claim${todo.length === 1 ? "" : "s"}. Inferred, conflicting and missing claims keep their labels; approval does not change an evidence state.`);
       await load();
-    } catch (e) { setErr((e as Error).message); }
+    } catch (e) { setErr(friendlyError(e)); }
   }
 
   const sel = "rounded-md border border-slate-300 bg-white px-2 py-1 text-sm";
@@ -90,10 +94,12 @@ export default function LedgerPage({ params }: { params: Promise<{ id: string }>
         sub="Every statement below is a claim with an evidence state and clickable sources. Nothing reaches the successor until you approve it and publish."
         right={<Button onClick={() => setShowVersions(true)}><History size={14} aria-hidden /> Version history (v{h?.version ?? "…"})</Button>}
       />
+      {loadErr && <div className="mb-3"><LoadError message={loadErr} onRetry={load} /></div>}
+      {!claims && !loadErr && <SkeletonList rows={4} label="Loading claims" />}
       {err && <div className="mb-3"><Notice tone="error">{err}</Notice></div>}
       {msg && <div className="mb-3"><Notice>{msg}</Notice></div>}
 
-      {emptyState && <Notice tone="warn">No claims yet. <Link className="underline" href={`/handovers/${id}/connect`}>Connect sources</Link> and run Reconstruct first.</Notice>}
+      {emptyState && <EmptyState title="No claims yet" hint={<><Link className="underline" href={`/handovers/${id}/connect`}>Connect sources</Link> and run Reconstruct first.</>} />}
 
       {ready && (
         <Card className="mb-4">
@@ -202,6 +208,8 @@ export default function LedgerPage({ params }: { params: Promise<{ id: string }>
           <div className="absolute inset-0 bg-slate-900/40" onClick={() => setShowVersions(false)} />
           <aside className="relative h-full w-full max-w-md overflow-y-auto bg-white p-4 shadow-xl">
             <div className="flex items-center justify-between"><h2 className="font-semibold">Version history</h2><button aria-label="Close" onClick={() => setShowVersions(false)} className="rounded p-1 hover:bg-slate-100"><X size={18} /></button></div>
+            {!versions && <div className="mt-4"><SkeletonList rows={2} label="Loading versions" /></div>}
+            {versions?.length === 0 && <div className="mt-4"><EmptyState title="No versions yet" /></div>}
             <ol className="mt-4 space-y-3 border-l-2 border-slate-200 pl-4">
               {versions?.map((v, i) => (
                 <li key={i}><div className="text-xs text-slate-500">v{v.version} · {fmtDateTime(v.at)} · <b>{v.actor}</b></div><div className="text-sm">{v.summary}</div></li>

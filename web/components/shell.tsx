@@ -8,6 +8,7 @@ import { ROLE_META, SessionProvider, useSession } from "@/lib/session";
 import type { Role } from "@/lib/types";
 import { EvidenceProvider } from "./evidence";
 import { HelpButton, TourProvider } from "./tour";
+import { ServerBanner } from "./feedback";
 
 export function AppShell({ children }: { children: ReactNode }) {
   return (
@@ -15,6 +16,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       <EvidenceProvider>
         <TourProvider>
           <Header />
+          <ServerBanner />
           <main className="mx-auto w-full max-w-6xl px-4 py-6">{children}</main>
           <footer className="mx-auto max-w-6xl px-4 pb-24 text-xs text-slate-500">
             Continuum · Team BINARY BUILDERS · All demo data is synthetic. Secrets and personal details in it are fake.
