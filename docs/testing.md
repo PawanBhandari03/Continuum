@@ -9,9 +9,9 @@ Run from `web/`. These test the UI and the in-browser mock API, **not** the live
 |---|---|---|
 | `npm run test:unit` → `tests/permissions.test.ts` | Contributor/Leaver view and evidence never contain lead-only text, the fake key or the fake phone; publish is blocked until conflicts and claims are handled; export (Markdown/print model) has no lead-only text and masks redacted quotes | 34 checks pass |
 | `npm run test:unit` → `tests/diff.test.ts` | Version diff and word-level text diff | 13 checks pass |
-| `npm run test:e2e` (Playwright, system Chrome, 33 tests, local only) | Fresh visitor completes tour → publish → acknowledge; outage banner and Retry on 6 screens; Markdown download and print view; audit log; version compare; file upload (ok, failed and partial sources, access label); axe accessibility scan; dialog focus; 375 px layout | 33 of 33 pass (local build; see 1b for what is not yet deployed) |
+| `npm run test:e2e` (Playwright, system Chrome, 33 tests, local mock mode) | Fresh visitor completes tour → publish → acknowledge; outage banner and Retry on 6 screens; Markdown download and print view; audit log; version compare; file upload (ok, failed and partial sources, access label); axe accessibility scan; dialog focus; 375 px layout | 33 of 33 pass |
 
-## 1b. Accessibility and phone-width pass (9 Nov, local build, mock mode, NOT yet on the live site)
+## 1b. Accessibility and phone-width pass (9 Nov, local build, mock mode; deployed 9 Nov in commit 58aec65)
 Automated with axe-core (WCAG 2.0/2.1 A and AA rules) in Chrome, plus focus and layout checks.
 
 | Check | Result |
@@ -23,10 +23,21 @@ Automated with axe-core (WCAG 2.0/2.1 A and AA rules) in Chrome, plus focus and 
 | 375 px wide (phone emulation), all 8 screens | No horizontal scroll: pass |
 | Tap targets on a phone-width ledger | Every button, link and field is at least 36 px high after the fix (before: tab links 32 px, "Handovers" link 28 px, one inline link 16 px) |
 
-**Not done or not covered:** dark mode does not exist (the app is light only, so there is no dark-mode contrast to check); no screen-reader (NVDA/VoiceOver) audit; automated checks catch only part of the problems; colour contrast was checked by axe only on the screens above, with the demo data. These changes are committed locally and are **not deployed**: pushing them under `web/` would rebuild the live site, which Pawan asked us not to do without agreement.
+**Not done or not covered:** dark mode does not exist (the app is light only, so there is no dark-mode contrast to check); no screen-reader (NVDA/VoiceOver) audit; automated checks catch only part of the problems; colour contrast was checked by axe only on the screens above, with the demo data. These changes were pushed to `main` on 9 Nov at Rahul's request (Render rebuilt the site in about 2 minutes); see 1d for the checks on the deployed site.
 
-## 1c. Upload sources UI (9 Nov, local build, NOT yet on the live site)
-The Connect screen now uploads a Slack export (.zip) or notes (.md, .txt, .pdf) to `POST /handovers/{id}/sources/upload` (multipart: `type`, `file`, `label`), with an access label choice. The previous version sent files as JSON, which the live API turns into a failed "not wired" source, and it showed a GitHub token field that was never sent to the server; both are fixed (token field removed; the text now says public repositories only). Tested in mock mode only (4 Playwright tests: readable notes, label stored, failures shown with a reason, bad GitHub URL). **Not yet tested against the live upload endpoint.**
+## 1c. Upload sources UI (9 Nov; deployed 9 Nov in commit 58aec65)
+The Connect screen now uploads a Slack export (.zip) or notes (.md, .txt, .pdf) to `POST /handovers/{id}/sources/upload` (multipart: `type`, `file`, `label`), with an access label choice. The previous version sent files as JSON, which the live API turns into a failed "not wired" source, and it showed a GitHub token field that was never sent to the server; both are fixed (token field removed; the text now says public repositories only). Tested in mock mode only (4 Playwright tests: readable notes, label stored, failures shown with a reason, bad GitHub URL). **Not tested against the live upload endpoint:** the demo reset does not remove uploaded sources, so a test upload would stay in the judges' demo handover. Needs Pawan's decision (for example a separate test handover that is deleted afterwards).
+
+## 1d. Read-only checks on the DEPLOYED site (9 Nov, after the new build went live)
+Script: `web/tests/live/deployed-check.spec.ts` (Chrome, real demo data with 94 claims; no approvals, uploads or resets).
+
+| Check | Result |
+|---|---|
+| axe (WCAG 2.0/2.1 A and AA) on 8 screens | **0 violations on all 8.** The Conflicts page timed out once while loading (no content within 2 minutes) and loaded in 4 s on the re-run; one slow load, not reproduced. |
+| Evidence drawer: Tab stays inside, Esc closes, focus returns to the source chip | Pass |
+| Export as Markdown, Contributor, 91 claims | **35.0 s** (one run). Before the change the estimate was about 100 s (91 × 1.1 s). The file contained no lead-only text, fake key or fake phone. |
+| 375 px phone emulation: horizontal scroll on 8 screens | None |
+| 375 px phone emulation: controls under 36 px | Found: radio buttons on the Conflicts page were 22 px. Fixed (24 px radios inside 40 px tall labels) and pushed; re-check after that deploy is recorded in the build log. |
 
 ## 2. Judge-style run on the LIVE site (automated)
 **What this is:** an automated Chrome run against https://continuum-web-kodb.onrender.com in a fresh browser context (no stored sign-in, equivalent to incognito), on 9 Nov. Desktop 1280×800, then a 375×812 touch viewport. **The "phone" run is Chrome emulation, not a real phone.** Script: `web/tests/live/judge-run.spec.ts`. The shared demo handover was reset afterwards through the API's demo reset.
@@ -107,4 +118,4 @@ See `docs/user-research.md` (6 survey responses recorded; interviews optional, n
 - Role comes from a header, not a verified login.
 - Live approvals and other writes are slow (section 2, problem 1).
 - Tests in sections 1 and 2 are automated; real-device and real-user testing is still open.
-- Accessibility: automated axe checks pass locally (section 1b), but the fixes are not deployed yet; no screen-reader audit; no dark mode.
+- Accessibility: automated axe checks pass locally and on the deployed site (sections 1b and 1d); no screen-reader audit; no dark mode.
