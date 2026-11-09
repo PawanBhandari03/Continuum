@@ -12,3 +12,29 @@ body {
   outline: 2px solid #4f46e5;
   outline-offset: 2px;
 }
+
+/* Print / Save as PDF: only the generated printable handover is printed (see components/export.tsx). */
+.print-portal {
+  display: none;
+}
+@media print {
+  body > *:not(.print-portal) {
+    display: none !important;
+  }
+  .print-portal {
+    display: block;
+    color: #000;
+    background: #fff;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 11pt;
+    line-height: 1.4;
+    padding: 0;
+  }
+  .print-portal h1 { font-size: 18pt; margin: 0 0 6pt; }
+  .print-portal h2 { font-size: 13pt; margin: 14pt 0 4pt; border-bottom: 1px solid #999; }
+  .print-portal ul { margin: 2pt 0 4pt 16pt; padding: 0; list-style: disc; }
+  .print-portal .claim { break-inside: avoid; margin: 6pt 0; }
+  .print-portal .meta { font-size: 9.5pt; color: #333; margin: 0; }
+  .print-portal .claim li { font-size: 9.5pt; word-break: break-word; }
+  .print-portal .foot { margin-top: 14pt; border-top: 1px solid #999; padding-top: 4pt; font-size: 9.5pt; }
+}

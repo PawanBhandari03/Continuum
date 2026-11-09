@@ -8,6 +8,7 @@ import type { Claim, ClaimType, EvidenceState, Handover, Readiness, ReviewStatus
 import { Button, Card, Notice, PageTitle, fmtDateTime } from "@/components/ui";
 import { HandoverNav, RoleGuard } from "@/components/shell";
 import { ClaimCard } from "@/components/claim-card";
+import { ExportButtons } from "@/components/export";
 import { invalidateEvidence } from "@/components/evidence";
 import { EmptyState, LoadError, SkeletonList } from "@/components/feedback";
 import { friendlyError } from "@/lib/status";
@@ -92,7 +93,7 @@ export default function LedgerPage({ params }: { params: Promise<{ id: string }>
       <PageTitle
         title="Claim ledger"
         sub="Every statement below is a claim with an evidence state and clickable sources. Nothing reaches the successor until you approve it and publish."
-        right={<Button onClick={() => setShowVersions(true)}><History size={14} aria-hidden /> Version history (v{h?.version ?? "…"})</Button>}
+        right={<div className="flex flex-col items-end gap-2"><Button onClick={() => setShowVersions(true)}><History size={14} aria-hidden /> Version history (v{h?.version ?? "…"})</Button>{claims && claims.length > 0 && <ExportButtons hid={id} />}</div>}
       />
       {loadErr && <div className="mb-3"><LoadError message={loadErr} onRetry={load} /></div>}
       {!claims && !loadErr && <SkeletonList rows={4} label="Loading claims" />}

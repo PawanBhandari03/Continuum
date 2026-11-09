@@ -2,6 +2,7 @@
 // Asserts the Contributor (successor) view and evidence API never expose lead-only content,
 // the fake key, the fake phone number, or sensitive/redacted claims.
 import { mockApi } from "../lib/mock-api";
+import { GENERATED_LINE, buildExportModel, safeQuote, toMarkdown } from "../lib/export";
 
 const store: Record<string, string> = {};
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -45,6 +46,26 @@ async function main() {
   check("published handover is locked with approver recorded", h.status === "published" && h.approved_by === "reviewer");
   const after = await mockApi.getView("h_1", "contributor");
   check("after publish, contributor still sees no forbidden strings", FORBIDDEN.every((f) => !JSON.stringify(after).includes(f)));
+  // ---- export (Markdown / print share this model) ----
+  for (const role of ["contributor", "leaver"] as const) {
+    const model = await buildExportModel(mockApi, "h_1", role);
+    const md = toMarkdown(model);
+    check(`${role} Markdown export has no forbidden strings`, FORBIDDEN.every((f) => !md.includes(f)));
+    check(`${role} export has no lead-only claims (cl_r3/cl_r4 absent)`, !model.sections.some((s) => s.claims.some((c) => c.id === "cl_r3" || c.id === "cl_r4")));
+    check(`${role} export has the generated-by line and a hidden COUNT only`, md.includes(GENERATED_LINE) && /\d+ items? (were|was) withheld/.test(md));
+    check(`${role} export: every claim lists >= 1 source`, model.sections.every((s) => s.claims.every((c) => c.citations.length > 0)));
+    check(`${role} export shows evidence states`, md.includes("[Verified]") && md.includes("[Inferred]"));
+  }
+  const cmd = toMarkdown(await buildExportModel(mockApi, "h_1", "contributor"));
+  check("export links GitHub PR URLs as Markdown links", /\[PR #87 — [^\]]+\]\(https:\/\/github\.com\/[^)]*\/pull\/87\)/.test(cmd));
+  check("export uses 'source name (label) — quote' where no URL exists", /- [^\n[]+ \(#dev · 08-25\) — “/.test(cmd));
+  check("published export header names approver, version, status", /Approved by: reviewer/.test(cmd) && /Version: v\d+/.test(cmd) && /Status: Published/.test(cmd));
+  const lmd = toMarkdown(await buildExportModel(mockApi, "h_1", "lead"));
+  check("lead export includes the lead-only mentor claim", lmd.includes("misses deadlines"));
+  check("lead export never contains the fake key or fake phone", !lmd.includes("sk_test_FAKE") && !lmd.includes("+91-00000-00000"));
+  const unit = { id: "x", source_id: "s", author: "a", timestamp: "", label: "lead_only" as const, locator: "notes://n", text: "Key sk_test_FAKE_1 here", redactions: [{ start: 4, end: 18, kind: "secret" as const }] };
+  check("safeQuote masks a quote that overlaps a redaction", safeQuote(unit, "Key sk_test_FAKE_1 here") === "Key [redacted] here");
+  check("safeQuote withholds a quote it cannot locate in a redacted source", safeQuote(unit, "something else").startsWith("[quote withheld"));
   console.log(failed ? `\n${failed} FAILED` : "\nALL PASSED");
   process.exit(failed ? 1 : 0);
 }

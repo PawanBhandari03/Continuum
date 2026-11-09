@@ -7,6 +7,7 @@ import type { SuccessorView } from "@/lib/types";
 import { Button, Card, Notice, PageTitle, fmtDate } from "@/components/ui";
 import { HandoverNav, RoleGuard } from "@/components/shell";
 import { ClaimCard } from "@/components/claim-card";
+import { ExportButtons } from "@/components/export";
 import { LoadError, SkeletonList } from "@/components/feedback";
 import { friendlyError } from "@/lib/status";
 
@@ -39,6 +40,7 @@ export default function StartPage({ params }: { params: Promise<{ id: string }> 
       <PageTitle
         title={h ? `Start here, ${h.successor}` : "Start here"}
         sub={h ? `Handover from ${h.leaver} · CampusKart · version ${h.version} · target ${fmtDate(h.target_date)}. Every claim shows its evidence state; click a source to read the original.` : undefined}
+        right={view ? <ExportButtons hid={id} /> : undefined}
       />
       {loadErr && <div className="mb-3"><LoadError message={loadErr} onRetry={load} /></div>}
       {!view && !loadErr && <SkeletonList rows={4} label="Loading the handover" />}
