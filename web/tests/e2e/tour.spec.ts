@@ -72,6 +72,6 @@ test("tour is dismissible, remembered, and re-openable from Help", async ({ page
   await page.reload();
   await expect(page.getByRole("heading", { name: /Project handovers that show their work/ })).toBeVisible();
   await expect(tour).toBeHidden();
-  await page.getByRole("button", { name: "Open the guided tour" }).click();
+  await page.getByRole("button", { name: /open the guided tour/i }).click();
   await expect(tour).toBeVisible();
 });

@@ -34,7 +34,7 @@ function Header() {
     <>
       <header className="border-b border-slate-200 bg-white">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-3">
-          <Link href="/" className="flex items-center gap-2 font-bold text-slate-900">
+          <Link href="/" className="flex items-center gap-2 py-2 font-bold text-slate-900">
             <Waypoints className="text-indigo-700" size={20} aria-hidden /> Continuum
             <span className="hidden text-sm font-normal text-slate-500 sm:inline">Project handovers that show their work</span>
           </Link>
@@ -42,7 +42,7 @@ function Header() {
             <HelpButton />
             {role && (
               <>
-                <Link href="/handovers" className="rounded px-2 py-1 text-slate-700 hover:bg-slate-100">Handovers</Link>
+                <Link href="/handovers" className="rounded px-2 py-2.5 text-slate-700 hover:bg-slate-100 sm:py-1">Handovers</Link>
                 <span className="rounded-full border border-indigo-200 bg-indigo-50 px-2.5 py-1 text-xs font-semibold text-indigo-900">Viewing as: {ROLE_META[role].label}</span>
                 <button
                   className="rounded px-2 py-1 text-slate-700 hover:bg-slate-100"
@@ -109,7 +109,7 @@ export function HandoverNav({ hid }: { hid: string }) {
         const href = `/handovers/${hid}/${t.seg}`;
         const on = path === href;
         return (
-          <Link key={t.seg} href={href} aria-current={on ? "page" : undefined} className={`rounded-md px-3 py-1.5 text-sm font-medium ${on ? "bg-indigo-700 text-white" : "text-slate-700 hover:bg-slate-100"}`}>
+          <Link key={t.seg} href={href} aria-current={on ? "page" : undefined} className={`rounded-md px-3 py-2.5 text-sm font-medium sm:py-1.5 ${on ? "bg-indigo-700 text-white" : "text-slate-700 hover:bg-slate-100"}`}>
             {t.label}
           </Link>
         );

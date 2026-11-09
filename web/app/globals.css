@@ -38,3 +38,22 @@ body {
   .print-portal .claim li { font-size: 9.5pt; word-break: break-word; }
   .print-portal .foot { margin-top: 14pt; border-top: 1px solid #999; padding-top: 4pt; font-size: 9.5pt; }
 }
+
+/* Touch targets: at least 40px high on phones and touch screens (WCAG 2.5.8 asks for 24px; we aim higher). */
+@media (max-width: 640px), (pointer: coarse) {
+  button,
+  select,
+  textarea,
+  input:not([type="radio"]):not([type="checkbox"]):not([type="file"]) {
+    min-height: 40px;
+  }
+  input[type="radio"],
+  input[type="checkbox"] {
+    width: 22px;
+    height: 22px;
+  }
+  .tap {
+    display: inline-block;
+    padding: 10px 6px;
+  }
+}
