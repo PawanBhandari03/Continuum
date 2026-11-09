@@ -49,11 +49,18 @@ export const useEvidenceDrawer = () => useContext(Ctx);
 export function EvidenceProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<{ claim: Claim; evidenceId?: string } | null>(null);
   const open = useCallback((claim: Claim, evidenceId?: string) => setState({ claim, evidenceId }), []);
+  const isOpen = state !== null;
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setState(null);
+    if (!isOpen) return;
+    // Esc closes only the drawer (stopImmediatePropagation keeps other Esc handlers, e.g. the tour, from also firing)
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      e.stopImmediatePropagation();
+      setState(null);
+    };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, []);
+  }, [isOpen]);
   return (
     <Ctx.Provider value={{ open }}>
       {children}
