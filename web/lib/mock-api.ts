@@ -226,6 +226,44 @@ export const mockApi: Api = {
     save();
     return delay(clone(b.sources));
   },
+  async uploadSource(hid, body) {
+    const b = bundle(hid);
+    const name = body.file.name || body.type;
+    const suffix = name.includes(".") ? name.slice(name.lastIndexOf(".")).toLowerCase() : "";
+    let status: Source["status"] = "ok";
+    let reason: string | null = null;
+    let units = 0;
+    if (body.file.size === 0) {
+      status = "failed";
+      reason = "The file is empty.";
+    } else if (body.type === "chat_export") {
+      if (suffix !== ".zip") {
+        status = "failed";
+        reason = `Not a readable Slack export zip: expected a .zip file, got ${suffix || "no extension"}.`;
+      } else {
+        status = "partial";
+        reason = "Mock mode: the zip was registered but not parsed, so it has no evidence units here. The live API parses it.";
+      }
+    } else if (![".md", ".txt", ".pdf"].includes(suffix)) {
+      status = "failed";
+      reason = `Unsupported file type ${suffix || "(none)"}; use .md, .txt or .pdf`;
+    } else if (suffix === ".pdf") {
+      status = "partial";
+      reason = "Mock mode: PDF text is not extracted here. The live API extracts it.";
+    } else {
+      const text = await body.file.text(); // real count of paragraphs for text notes
+      units = text.split(/\n\s*\n/).filter((p) => p.trim().length > 0).length;
+      if (units === 0) {
+        status = "failed";
+        reason = "No readable text found in the file.";
+      }
+    }
+    const src: Source = { id: nid("src"), type: body.type, name, status, status_reason: reason, default_label: body.label, unit_count: units };
+    b.sources.push(src);
+    logAudit(b, "reviewer", "upload", `Uploaded ${name}: ${status}, ${units} evidence units`);
+    save();
+    return delay(clone(src));
+  },
   async reconstruct(hid) {
     const s = store();
     const b = bundle(hid);

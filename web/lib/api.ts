@@ -2,6 +2,7 @@
 // NEXT_PUBLIC_USE_MOCKS=true (default) => in-browser mock store seeded with CampusKart.
 // Flip to false and set NEXT_PUBLIC_API_URL when Pawan's API is live.
 import type {
+  AccessLabel,
   AckStatus,
   AuditEntry,
   Claim,
@@ -59,6 +60,8 @@ export interface Api {
   createHandover(body: NewHandover): Promise<Handover>;
   getSources(hid: string): Promise<Source[]>;
   addSource(hid: string, body: NewSource): Promise<Source[]>;
+  /** Upload a Slack export (.zip) or notes (.md/.txt/.pdf). Bad files come back as a visible failed/partial source, not an exception. */
+  uploadSource(hid: string, body: { type: "chat_export" | "notes"; file: File; label: AccessLabel }): Promise<Source>;
   reconstruct(hid: string): Promise<{ job_id: string }>;
   getJob(jobId: string): Promise<JobStatus>;
   getClaims(hid: string, filters?: ClaimFilters): Promise<Claim[]>;
@@ -100,7 +103,7 @@ async function slot<T>(fn: () => Promise<T>): Promise<T> {
     waiting.shift()?.();
   }
 }
-async function limitedFetch(url: string, init: RequestInit): Promise<Response> {
+async function limitedFetch(url: string, init: RequestInit, timeoutMs = 30000): Promise<Response> {
   return slot(async () => {
     let last: unknown;
     let endWaking: (() => void) | null = null;
@@ -108,7 +111,7 @@ async function limitedFetch(url: string, init: RequestInit): Promise<Response> {
       for (let attempt = 0; attempt < 6; attempt++) {
         try {
           // per-attempt timeout so a hung connection to a sleeping server cannot block the screen forever
-          const r = await fetch(url, { ...init, signal: AbortSignal.timeout(30000) });
+          const r = await fetch(url, { ...init, signal: AbortSignal.timeout(timeoutMs) });
           if (![502, 503, 504].includes(r.status)) return r;
           last = new Error(`Server not ready (HTTP ${r.status})`);
         } catch (e) {
@@ -160,6 +163,23 @@ const realApi: Api = {
   addSource: async (h, b) => {
     await http(`/handovers/${h}/sources`, post(b));
     return http(`/handovers/${h}/sources`);
+  },
+  uploadSource: async (h, b) => {
+    const fd = new FormData();
+    fd.append("type", b.type);
+    fd.append("label", b.label);
+    fd.append("file", b.file);
+    const headers: Record<string, string> = {};
+    if (currentRole) headers["X-Demo-Role"] = currentRole; // no Content-Type: the browser sets the multipart boundary
+    const res = await limitedFetch(`${API_URL}/handovers/${h}/sources/upload`, { method: "POST", body: fd, headers }, 120000);
+    if (!res.ok) {
+      let detail = res.statusText;
+      try {
+        detail = (await res.json()).detail ?? detail;
+      } catch {}
+      throw new Error(typeof detail === "string" ? detail : JSON.stringify(detail));
+    }
+    return (await res.json()) as Source;
   },
   reconstruct: (h) => http(`/handovers/${h}/reconstruct`, post({})),
   getJob: (id) => http(`/jobs/${id}`),
