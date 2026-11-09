@@ -229,3 +229,12 @@ def test_chat_locator_matches_web_chip_format():
     units, _ = parse_chat_export(DEMO / "chat-export")
     import re
     assert all(re.match(r"^slack://[a-z-]+/\d{4}-\d{2}-\d{2}#", u.locator) for u in units)
+
+
+def test_strongest_keyword_wins_slot_choice():
+    from app.models import Claim
+    from app.analysis import normalize_entities
+    c = Claim(id="x", type="dependency", state="verified", entity_key="auth",
+              statement="Only Priya holds the SMTP password for verification emails.")
+    normalize_entities([c])
+    assert c.entity_key == "email"

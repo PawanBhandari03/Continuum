@@ -41,7 +41,9 @@ def normalize_entities(claims: list[Claim]) -> None:
         if c.type == "gap":
             continue
         for text in (c.statement.lower() + " ", f"{c.entity_key} {c.workstream}".lower() + " "):
-            hit = next((slot for slot, kws in SLOT_KEYWORDS.items() if any(k in text for k in kws)), None)
+            scores = {slot: sum(k in text for k in kws) for slot, kws in SLOT_KEYWORDS.items()}
+            best = max(scores.values())
+            hit = next((slot for slot, n in scores.items() if n == best), None) if best else None  # strongest match wins
             if hit:
                 c.entity_key = c.workstream = hit
                 break
