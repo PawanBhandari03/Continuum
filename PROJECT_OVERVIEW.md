@@ -83,12 +83,14 @@ Lead/reviewer (sees everything, approves), Contributor/successor (sees only perm
 - Automated verification reduces but doesn't eliminate wrong claims; human review is required.
 - (Add real measured limitations here as we find them.)
 
-## 12. Current status (9 Nov, about hour 27 of 72)
-**Live now:** web https://continuum-web-kodb.onrender.com and API https://continuum-api-945j.onrender.com (Render free tier; first visit after idle takes about a minute). A real-browser test (`web/tests/real-e2e.mjs`) passes end to end against the deployed site: ledger with real claims, evidence drawer with the cited chat text, conflicts, Gap Interview answer, approve and publish, successor view (hidden-by-access count, no lead-only text), acknowledge and flag unclear.
+## 12. Current status (9 Nov evening, about hour 36 of 72)
+**Live now:** web https://continuum-web-kodb.onrender.com and API https://continuum-api-945j.onrender.com (Render free tier; first visit after idle takes about a minute). The whole workflow runs on the live site: connect (sample sources, GitHub, Slack zip and notes upload), reconstruct, verify, review (approve / edit / reject / redact, bulk approve), Gap Interview, publish lock, role-scoped successor view, acknowledge / flag unclear, audit page, export (Markdown / print), version compare.
 
-**Backend:** pipeline (ingest, secret/PII masking, permission filter, citation verification, conflicts, gaps, readiness), GitHub connector, upload endpoint, audit log, replay/reset for the demo, 25 unit tests. **Measured:** 7 of 8 planted facts found, 94 of 94 claims cited (`docs/evaluation.md`).
+**Backend:** pipeline (ingest, secret/PII masking, permission filter, citation verification, conflicts, gaps, readiness), GitHub connector, upload, audit, bulk approve, version diff, replay/reset for the demo, 27 unit tests. **Measured:** 7 of 8 planted facts found, 94 of 94 claims cited (`docs/evaluation.md`).
 
-**Not done yet:** verified login (the role is sent in a header), Round 3 items (version diff, redaction queue, Guest role, export), real interviews and handover-test results, updated project PDF, pinger for cold starts, Render free-tier hours planning.
+**Fixed after Rahul's live-site test (9 Nov):** approvals were 6-10 s each so a judge could not reach Publish; now one bulk request (about 3 s for all 94 claims) and about 1 s per single action. "Project in five lines" was empty; now filled from the best-supported Verified claims. One disagreement appeared as two conflicts; resolving one now settles both. Version diff endpoint added.
+
+**Not done yet:** verified login (role is sent in a header), Guest role, redaction review queue, audit of views/exports, real-phone and 15-minute cold-start checks, interviews (survey of 6 done), live re-test after the fixes, pinger on 10 Nov evening, filling the [TODO]s in `docs/ROUND2_SUBMISSION.md`, submission (by about 04:00 IST 11 Nov).
 
 ## 13. Build log (Claude appends as we go)
 | When | What was built / decided | Notes |
@@ -158,3 +160,4 @@ Lead/reviewer (sees everything, approves), Contributor/successor (sees only perm
 **Why Gemini?** Continuum needs a language model to read messy chat and propose claims. Our Claude API key was not usable, and Gemini has a free tier. Free tier limits: about 20 requests per model per day. We stay under it by batching (about 25 calls for a full run), caching answers, and falling back to other models.
 
 **Will judges hit the Gemini limit?** Only if the live site calls Gemini when they click. The plan: the demo handover shows a stored result, so viewing, reviewing, resolving, publishing and acknowledging never call the model. A fresh "Reconstruct" is the only action that does, and it should use the stored result for the demo data.
+| 9 Nov | Pawan: fixes for the problems in Rahul's live test. `POST /handovers/{id}/claims/bulk` (approve pending claims, optionally only one evidence state; one request per 40 claims, one version, one audit row); single review actions run their database writes in parallel and keep the version number in memory (6 round trips down to 2); `GET /handovers/{id}/versions/{a}/diff/{b}` rebuilt from recorded review actions; "Project in five lines" picked by `pick_project_claims` (at most one Verified fact/decision/dependency per workstream, existing claims only); resolving a conflict also settles open conflicts that share a claim. Web ledger buttons call the bulk endpoint. | Measured locally against the real database: single action 0.6-1.3 s (was 6-10 s), bulk approve of all pending claims about 3 s. Not yet re-measured on Render; live end-to-end re-test pending. |
