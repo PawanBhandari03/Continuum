@@ -57,4 +57,4 @@ Note: the form export does not link each answer to a role. One free-text answer 
 Not yet run. If AI personas are ever used to rehearse the questions, they are listed here clearly as **AI-generated, not user research**, and are never counted in the numbers above.
 
 ## Limits
-Six responses from a non-random sample (friends and club contacts), so it shows reactions, not statistical proof. Respondent independence was not verified: some respondents may personally know the team. The demo-feedback question gave mostly one-word answers, so it tells us little about *what* was confusing. No in-person interviews have been run yet.
+Six responses from a non-random sample (friends and club contacts), so it shows reactions, not statistical proof. Respondents are people outside the team (confirmed by Rahul; two share first names with team members but are different people), though they are friends and contacts. The demo-feedback question gave mostly one-word answers, so it tells us little about *what* was confusing. No in-person interviews have been run yet.

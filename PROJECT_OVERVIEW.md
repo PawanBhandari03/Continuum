@@ -107,7 +107,7 @@ Lead/reviewer (sees everything, approves), Contributor/successor (sees only perm
 | 9 Nov | GitHub connector + CampusKart repo (script `demo-data/seed_campuskart_repo.py`; commit dates simulated and disclosed in the repo's NOTICE.md) | PR #87/#91/#94 numbering matches the chat |
 | 9 Nov | Upload (Slack zip, notes) and audit endpoints; stored-run replay and reset for the demo | Replay protects the Gemini free-tier quota (about 20 requests per model per day) |
 | 9 Nov | Deployed to Render (api + web). Fixes found by real-browser testing: role header on every call, evidence caching (94 parallel calls failed before), client request cap and retries, Slack-style locators | `web/tests/real-e2e.mjs` |
-| 9 Nov | `docs/user-research.md`: Google Form results recorded (6 real responses, names withheld) | Interviews not yet run; independence of respondents unverified; limitations stated |
+| 9 Nov | `docs/user-research.md`: Google Form results recorded (6 real responses, names withheld) | Interviews not yet run; respondents are outside the team but are friends/contacts; limitations stated |
 
 ## 14. Frontend guide (for teammates)
 **Run it:** `cd web && npm install && npm run dev`, open http://localhost:3000. No keys needed; it runs on mock data.
