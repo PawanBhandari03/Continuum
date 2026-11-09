@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Continuum: manual testing report for Pawan</title>
+<style>
+  @page { size: A4; margin: 16mm 14mm; }
+  * { box-sizing: border-box; }
+  body { font-family: "Segoe UI", Arial, sans-serif; color: #1b2133; font-size: 10.5pt; line-height: 1.45; margin: 0; }
+  h1 { font-size: 22pt; margin: 0 0 4pt; color: #1e2a55; }
+  h2 { font-size: 14pt; margin: 18pt 0 6pt; color: #1e2a55; border-bottom: 2px solid #d9def0; padding-bottom: 3pt; break-after: avoid; }
+  h3 { font-size: 11.5pt; margin: 12pt 0 4pt; color: #2b3a74; break-after: avoid; }
+  p { margin: 4pt 0 6pt; }
+  .sub { color: #555d78; margin-bottom: 10pt; }
+  table { width: 100%; border-collapse: collapse; margin: 6pt 0 10pt; font-size: 9.5pt; break-inside: auto; }
+  th, td { border: 1px solid #cfd5e8; padding: 4pt 6pt; text-align: left; vertical-align: top; }
+  th { background: #eef1fb; }
+  tr { break-inside: avoid; }
+  .ok { color: #0b6b3a; font-weight: 600; }
+  .bad { color: #a1162b; font-weight: 600; }
+  .warn { color: #8a5a00; font-weight: 600; }
+  .box { border: 1px solid #cfd5e8; background: #f7f8fd; padding: 8pt 10pt; border-radius: 4pt; margin: 8pt 0; }
+  .box.red { border-color: #e3a5ae; background: #fdf3f4; }
+  ul, ol { margin: 4pt 0 6pt 16pt; padding: 0; }
+  li { margin: 2pt 0; }
+  .shots { display: flex; gap: 8pt; align-items: flex-start; margin: 6pt 0; }
+  .shots figure { margin: 0; flex: 1; break-inside: avoid; }
+  .shots img { width: 100%; border: 1px solid #cfd5e8; }
+  figcaption { font-size: 8.5pt; color: #555d78; margin-top: 2pt; }
+  .small { font-size: 9pt; color: #555d78; }
+  code { background: #eef1fb; padding: 0 2pt; border-radius: 2pt; font-size: 9pt; }
+  .pb { break-before: page; }
+</style>
+</head>
+<body>
+
+<h1>Manual testing report</h1>
+<p class="sub">Continuum · Team BINARY BUILDERS · prepared for Pawan Singh Bhandari by Rahul Bramhankar · 9 Nov 2026<br>
+Live site tested: continuum-web-kodb.onrender.com · API: continuum-api-945j.onrender.com · Round 2 closes Wed 11 Nov, 10:00 IST</p>
+
+<div class="box">
+<b>How to read this.</b> Everything below is a real result with the date and method stated. Where something was not done, it says <b>not yet run</b>. Please note one thing up front: the live-site click-through was run <b>automatically by Claude (Chrome, fresh browser context) on Rahul's behalf</b>, not by hand on a real phone. The real-phone test and the 15-minute cold-start test are still open and are Rahul's to do.
+</div>
+
+<h2>1. Summary</h2>
+<table>
+<tr><th style="width:30%">Manual task (from "Rahul: your manual tasks")</th><th style="width:16%">Status</th><th>Result in one line</th></tr>
+<tr><td>1. User interviews (5 or more)</td><td class="ok">Survey done<br><span class="warn">Interviews not run</span></td><td>6 real survey responses recorded. No in-person interviews yet (optional, would add richer quotes).</td></tr>
+<tr><td>2. Handover test with vs without Continuum</td><td class="ok">Done</td><td>2 real people, same 6 questions, both 6 of 6. About 20 minutes (one combined figure). No speed or accuracy difference can be claimed.</td></tr>
+<tr><td>3. Click through the live site like a judge</td><td class="warn">Partly</td><td>Automated run on desktop and 375 px phone emulation done, with real findings (section 4). Full path to Publish <b>not completed</b> on the live site. Real phone and 15-minute cold-start check: <b>not yet run</b>.</td></tr>
+<tr><td>4. Fill in the placeholders</td><td class="ok">Mostly</td><td><code>docs/user-research.md</code> and <code>docs/testing.md</code> filled with real results; README and the Round 2 project PDF updated.</td></tr>
+</table>
+
+<div class="box red">
+<b>What Pawan most needs to know (ranked).</b>
+<ol>
+<li><b>A judge cannot reach "Publish" on the live site.</b> Each approve call takes 6 to 10 seconds, and the live data has 94 claims to review. One-by-one approval would take 8 to 15 minutes. We need a single bulk-approve endpoint (section 6, fix 1).</li>
+<li><b>"Project in five lines" is empty</b> for the Successor ("Nothing visible to your role in this section"). That is the first section a judge reads.</li>
+<li><b>The same Render-vs-Vercel disagreement shows up as 2 conflicts</b> that must both be resolved before publishing.</li>
+<li><b>Version compare returns 404 on the live API</b> (endpoint not built yet), so that button shows an error on the live site.</li>
+<li>Writes and some reads are slow in general (acknowledge 12 to 18 s; the audit endpoint took 35 s once).</li>
+</ol>
+Good news: the permission checks on the live API all passed (section 7).
+</div>
+
+<h2>2. Task 1: user research (survey)</h2>
+<p>Method: Google Form shared with friends and club contacts; 6 responses collected on 9 Nov. Respondents are outside the team (two share first names with team members but are different people). Names are withheld. Full detail: <code>docs/user-research.md</code>.</p>
+<table>
+<tr><th style="width:36%">Question</th><th>Result (6 responses)</th></tr>
+<tr><td>Role</td><td>Club/team lead 2 · Developer/member 3 · Handed over a project before 1</td></tr>
+<tr><td>Team size</td><td>1 to 5: 3 · 6 to 15: 2 · 16 to 30: 1</td></tr>
+<tr><td>How often people leave or join</td><td>Every semester 2 · Rarely 3 · Not sure 1</td></tr>
+<tr><td>How handover happens today</td><td>Nothing formal 3 · Call/meeting 3 · Shared drive/README 2 · Document 1 · Chat 1 · Other 1</td></tr>
+<tr><td>Knowledge lost most</td><td>Why decisions were made 4 · Who owns what 4 · Unfinished work 3 · Recurring bugs 3 · Passwords/access 2 · Who to ask 2</td></tr>
+<tr><td>Trust in a software-written handover (1 to 5)</td><td>3: two people · 4: four people · nobody chose 5. Average 3.7.</td></tr>
+<tr><td>Needed before trusting</td><td>Links to sources 3 · Uncertain parts marked 3 · Ability to correct 3 · Who approved it 2</td></tr>
+<tr><td>Approve each statement first?</td><td>"Yes, if it takes under 10 minutes" 5 · "Yes" 1 · "No, too slow" 0</td></tr>
+<tr><td>May we quote you anonymously</td><td>Yes 6</td></tr>
+</table>
+<p><b>Real quotes (verbatim):</b> "The person was working on backend of a website as he left everything got stuck" · "we lost Multiple Files and we charge extra to last employee for Continue these work and then leave" · "Any sensitive information that needs to be restricted as per user access" · "Our Password and Ids ,also database access" · "yes , make it easy".</p>
+<p><b>What it means for us (small sample, not proof):</b> people lose the <i>reasons</i> for decisions and <i>ownership</i> most, which is what the decision log and gap questions target. Nobody gave full trust; most want sources, flagged uncertainty and the ability to correct. Reviewing was acceptable to everyone <i>if it is quick</i>, which makes the slow approval (section 1, item 1) a direct conflict with what respondents asked for.</p>
+<p class="small">Limits: 6 responses from friends and contacts; the demo-feedback question mostly got one-word answers ("No", "confusing", "Missing", "no", "yes, make it easy"), so it does not tell us what was confusing. One automatic Gemini summary line in the form export was not a respondent and was not used.</p>
+
+<h2>3. Task 2: handover test (with vs without Continuum)</h2>
+<p>Run by Rahul on 9 Nov with two real people who did not know CampusKart. Same 6 questions; answers checked against <code>demo-data/ANSWER_KEY.md</code>.</p>
+<table>
+<tr><th></th><th>Person A (repo + chat export only)</th><th>Person B (live site as Successor)</th></tr>
+<tr><td>Time</td><td>about 20 minutes (single figure reported)</td><td>about 20 minutes (single figure reported)</td></tr>
+<tr><td>Correct (of 6)</td><td class="ok">6 of 6</td><td class="ok">6 of 6</td></tr>
+</table>
+<ul>
+<li>All six matched the answer key: UPI move and KYC reason, Meera holds the bucket credential, deployment unclear (Render vs Vercel), PR #94 open and stale, SMTP owner unknown, login fix is a temporary hack.</li>
+<li>Person B also used Continuum's labels (Verified, Conflicting, Missing, "AI inference") and named the Gap Interview for the SMTP question. Person A's answers carried no such labels.</li>
+<li><b>Honest limits:</b> individual times were not recorded, so no speed difference can be claimed; both scored perfectly, so no accuracy difference either. The repo and chat are small enough for a careful reader to answer these questions. Two people is an illustration, not proof. Verbatim answers are in <code>docs/testing.md</code>.</li>
+<li><b>Suggested follow-up:</b> repeat with separate timers per person, or with harder questions that need the evidence viewer or the access rules.</li>
+</ul>
+
+<h2 class="pb">4. Task 3: judge-style click-through on the live site</h2>
+<p><b>Method.</b> Playwright driving Google Chrome in a fresh browser context (no stored sign-in, equivalent to incognito), on 9 Nov: first at 1280×800 desktop, then at 375×812 with touch (<b>emulation, not a real phone</b>). Script: <code>web/tests/live/judge-run.spec.ts</code>. The shared demo handover was reset through the API's demo reset afterwards (confirmed: 94 claims, version 1, in review). Intended path: Reviewer, ledger, source chip, conflict, gap, approve, publish, Successor, acknowledge.</p>
+<table>
+<tr><th style="width:34%">Step</th><th style="width:12%">Desktop</th><th style="width:12%">Phone (emul.)</th><th>Notes</th></tr>
+<tr><td>Open site; tour appears and closes</td><td class="ok">OK</td><td class="ok">OK</td><td>Page loaded in about 2 s (API had just been woken: its first call took 22 s)</td></tr>
+<tr><td>Enter as Reviewer; open ledger</td><td class="ok">OK 8.1 s</td><td class="ok">OK 6.4 s</td><td>94 claims, readiness 67 to 70</td></tr>
+<tr><td>Source chip opens original text, quote highlighted</td><td class="ok">OK 2.6 s</td><td class="ok">OK 1.6 s</td><td>Esc closes the drawer</td></tr>
+<tr><td>Resolve the conflict</td><td class="warn">Not completed</td><td class="warn">Not completed</td><td>My test script expected 1 conflict; the live data has <b>2</b> (script bug, but see problem 3)</td></tr>
+<tr><td>Leaver answers a gap question</td><td class="ok">OK 9.6 s</td><td class="ok">OK 21.8 s</td><td>Saved as Exit Q&amp;A evidence</td></tr>
+<tr><td>Approve all Verified / remaining</td><td class="bad">Did not finish in 120 s</td><td class="bad">Did not finish in 120 s</td><td>Problem 1</td></tr>
+<tr><td>Publish</td><td class="warn">Not reached</td><td class="warn">Not reached</td><td>Button correctly disabled and listed the reasons (2 conflicts unresolved, 94 claims not reviewed)</td></tr>
+<tr><td>Successor sees hidden count, state badges, source chips</td><td class="ok">OK</td><td class="ok">OK</td><td>"3 items hidden by your access level"; every claim had a source chip; shown as a labelled draft preview because nothing was published</td></tr>
+<tr><td>Acknowledge a section / flag unclear</td><td class="ok">OK 18.4 s / 3.1 s</td><td class="ok">OK 12.4 s / 3.3 s</td><td>Slow (problem 4)</td></tr>
+<tr><td>Layout at 375 px</td><td>n/a</td><td class="ok">No horizontal scroll</td><td>Small tap targets (problem 6, mine)</td></tr>
+</table>
+
+<div class="shots">
+<figure><img src="{{img:desktop-11-fail-switch-back-to-reviewer-approve-all.png}}"><figcaption>Ledger after "Approve all Verified claims" was clicked: still 94 not reviewed, Publish disabled.</figcaption></figure>
+<figure><img src="{{img:desktop-08-fail-conflict-resolve-with-a-note.png}}"><figcaption>Conflicts: the same Render-vs-Vercel disagreement appears twice (two cards).</figcaption></figure>
+</div>
+
+<h3>Problems found</h3>
+<table>
+<tr><th style="width:4%">#</th><th style="width:11%">Severity</th><th style="width:11%">Owner</th><th>Problem and evidence</th></tr>
+<tr><td>1</td><td class="bad">Blocker</td><td>Pawan</td><td><b>Approvals are too slow for a judge to finish.</b> 3 timed single approvals: 9.8 s, 6.0 s, 7.7 s. Listing the 81 pending Verified claims took 6.6 s. Approving 81 to 94 claims one by one is roughly 8 to 15 minutes.</td></tr>
+<tr><td>2</td><td class="bad">High</td><td>Pawan</td><td><b>"Project in five lines" is empty.</b> Live Successor view: project 0 claims, state 29, decision log 11, first week 20, risks 18, dependencies 3, unresolved 10. The pipeline never emits section <code>project</code>.</td></tr>
+<tr><td>3</td><td class="warn">Medium</td><td>Pawan</td><td><b>Duplicate conflict.</b> cf_1 ("Vercel preview" vs Render) and cf_2 (Render vs "configured for Vercel") are the same disagreement; a judge must resolve it twice. The README claim also shows the date "9 Nov 2026" (the ingest date) instead of the README's real date.</td></tr>
+<tr><td>4</td><td class="warn">Medium</td><td>Pawan</td><td><b>Slow writes.</b> Acknowledge 12 to 18 s; answering a gap 10 to 22 s; the audit endpoint took 35 s in one call right after the reset (one sample).</td></tr>
+<tr><td>5</td><td>Low</td><td>Pawan</td><td><b>Version counter inflates</b> (one version per review action; "version 46" after about 45 approvals). Cosmetic but looks odd. Also: <b>version compare returns 404</b> on the live API (endpoint not built), so the Compare button shows an error.</td></tr>
+<tr><td>6</td><td class="warn">Medium</td><td>Rahul</td><td><b>Small tap targets on a phone</b> (logo link, "How is this calculated?", "resolve", "interview", source chips are under 28 px). Being fixed in the accessibility pass.</td></tr>
+<tr><td>7</td><td class="warn">Medium</td><td>Rahul</td><td><b>Export is slow on live data:</b> it fetches evidence claim by claim (about 1.1 s each, average of 8 calls); an estimate for 91 claims is about 100 s. To be parallelised.</td></tr>
+<tr><td>8</td><td>Low</td><td>Rahul</td><td>The 94-claim ledger has no paging or "needs attention first" ordering.</td></tr>
+</table>
+
+<div class="shots">
+<figure><img src="{{img:phone-13-switch-to-successor.png}}" style="max-width:62%"><figcaption>Successor on a 375 px screen: "3 items hidden by your access level" works; section 1 "Project in five lines" is empty (problem 2); "version 46" (problem 5).</figcaption></figure>
+<figure><img src="{{img:phone-05-open-campuskart-ledger-.png}}" style="max-width:62%"><figcaption>Reviewer ledger on a 375 px screen: no horizontal scroll; readiness 67, 2 open conflicts, 1 open gap.</figcaption></figure>
+</div>
+
+<h2>5. Timings measured directly against the live API (read-only, 9 Nov)</h2>
+<table>
+<tr><th>Call</th><th>Result</th><th>Samples</th></tr>
+<tr><td>API first call after idle (health check)</td><td>22.1 s</td><td>1</td></tr>
+<tr><td>PATCH approve one claim</td><td>9.8 s, 6.0 s, 7.7 s</td><td>3</td></tr>
+<tr><td>GET claims (verified and pending, 81 rows)</td><td>6.6 s</td><td>1</td></tr>
+<tr><td>GET evidence for one claim</td><td>0.8 to 1.7 s, average 1.1 s</td><td>8</td></tr>
+<tr><td>GET audit log</td><td>35.4 s (1 row)</td><td>1 (cold? after reset)</td></tr>
+<tr><td>GET versions</td><td>1.8 s</td><td>1</td></tr>
+<tr><td>GET version diff</td><td>HTTP 404 (not built)</td><td>1</td></tr>
+</table>
+<p class="small">These are small samples taken on the free Render and Supabase tiers; they show the order of magnitude, not an average. I approved 3 claims while timing and then reset the demo (confirmed back to 94 pending, version 1).</p>
+
+<h2>6. Suggested fixes (for Pawan; Rahul's side is listed too)</h2>
+<ol>
+<li><b>Bulk approve.</b> Add <code>POST /handovers/{id}/claims/bulk</code> with <code>{action:"approve", state?:"verified", ids?:[...]}</code>: one database write, one version bump, one audit row. The UI buttons "Approve all Verified" and "Approve all remaining" would call it (Rahul changes the client once it exists). Also worth checking why a single write takes 6 to 10 s (number of database round trips; Render and Supabase regions).</li>
+<li><b>Emit the <code>project</code> section</b> (five-line summary) in the pipeline, or tell Rahul to hide empty sections.</li>
+<li><b>Merge conflicts that share a claim</b> into one group; use the source's real date (commit or file timestamp), not the ingest date.</li>
+<li><b>Version numbers:</b> bump once per publish or per batch, and keep a separate revision counter if needed.</li>
+<li><b>Version diff endpoint</b> <code>GET /handovers/{id}/versions/{a}/diff/{b}</code> returning <code>{added:[Claim], removed:[Claim], changed:[{claim_id, before, after}]}</code>. The UI is ready and accepts <code>before</code>/<code>after</code> as text or partial claim.</li>
+<li><b>Look at the audit endpoint</b> (35 s sample) and write latency in general.</li>
+<li><b>Rahul:</b> parallelise export fetching; enlarge tap targets; add paging or "needs attention" ordering; fix the accessibility items. Web changes redeploy the live site on Render, so Rahul will push them only with Pawan's go-ahead.</li>
+</ol>
+
+<h2>7. Permission checks on the live API (read-only, 9 Nov)</h2>
+<table>
+<tr><th>Check</th><th>Result</th></tr>
+<tr><td>Contributor and Leaver responses from /view, /claims, /sources, /conflicts, /gaps: any of the fake key, fake phone, mentor's candid feedback?</td><td class="ok">None found</td></tr>
+<tr><td>Mentor-notes source listed for Contributor/Leaver?</td><td class="ok">No (the Lead sees it)</td></tr>
+<tr><td>Evidence of the 3 lead-only claims as Contributor and as Leaver</td><td class="ok">HTTP 403 for all 3</td></tr>
+<tr><td>Raw key or phone visible to the Lead in evidence?</td><td class="ok">No (masked)</td></tr>
+<tr><td>Successor page text and API output contain "Prof. Iyer"?</td><td>Yes, in claim <code>cl_105</code> ("Prof. Iyer has shared mentor notes on a shared sheet for the lead"). It comes from a public chat message, not the confidential note, so it is <b>not a leak</b>; it does reveal that mentor notes exist.</td></tr>
+</table>
+<p><b>Known weakness (already in our docs):</b> the role comes from a request header, not a verified login, so anyone who sets the header acts as Lead. Row-level-security policies exist in the database but the demo relies on the API's role checks.</p>
+
+<h2>8. What is still open (and whose job)</h2>
+<table>
+<tr><th>Item</th><th>Owner</th><th>When</th></tr>
+<tr><td>Real phone run of the full path (Reviewer to Successor), screenshots of anything wrong</td><td>Rahul</td><td>Send problems to Pawan by Tue 10 Nov, noon</td></tr>
+<tr><td>Open the site again after 15 minutes idle; check the "Waking the server" message and how long it takes</td><td>Rahul</td><td>Tue 10 Nov</td></tr>
+<tr><td>Optional: 2 or 3 short interviews (ask what was confusing in the demo)</td><td>Rahul</td><td>Tue evening</td></tr>
+<tr><td>Optional: repeat the handover test with separate timers or harder questions</td><td>Rahul</td><td>Tue evening</td></tr>
+<tr><td>Bulk approve, project section, duplicate conflict, diff endpoint</td><td>Pawan</td><td>As early as possible, so Rahul can re-test</td></tr>
+<tr><td>Re-run the live judge test after fixes (script is ready)</td><td>Rahul and Claude</td><td>After Pawan's fixes</td></tr>
+<tr><td>Open every submission link in incognito</td><td>Rahul and Pawan</td><td>Tue night</td></tr>
+</table>
+
+<h2>9. Limits of this report</h2>
+<ul>
+<li>The click-through was automated, not a human on a real device. Emulated phone results do not replace a real phone.</li>
+<li>Survey and handover test are small samples (6 and 2 people), mostly friends and contacts. They are illustrations, not proof.</li>
+<li>API timings are few samples on free hosting.</li>
+<li>Nothing here was measured at scale, on other repositories, or with a screen reader.</li>
+</ul>
+<p class="small">Sources in the repo: <code>docs/testing.md</code>, <code>docs/user-research.md</code>, <code>web/tests/live/judge-run.spec.ts</code>.</p>
+
+</body>
+</html>

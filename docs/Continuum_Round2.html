@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Continuum: Round 2 project document</title>
+<style>
+  @page { size: A4; margin: 16mm 14mm; }
+  * { box-sizing: border-box; }
+  body { font-family: "Segoe UI", Arial, sans-serif; color: #1b2133; font-size: 10.3pt; line-height: 1.45; margin: 0; }
+  h1 { font-size: 26pt; margin: 0 0 2pt; color: #1e2a55; }
+  h2 { font-size: 14pt; margin: 16pt 0 6pt; color: #1e2a55; border-bottom: 2px solid #d9def0; padding-bottom: 3pt; break-after: avoid; }
+  h3 { font-size: 11.3pt; margin: 10pt 0 3pt; color: #2b3a74; break-after: avoid; }
+  p { margin: 4pt 0 6pt; }
+  .tag { font-size: 12.5pt; color: #4a5688; margin-bottom: 8pt; }
+  table { width: 100%; border-collapse: collapse; margin: 6pt 0 10pt; font-size: 9.4pt; }
+  th, td { border: 1px solid #cfd5e8; padding: 4pt 6pt; text-align: left; vertical-align: top; }
+  th { background: #eef1fb; }
+  tr { break-inside: avoid; }
+  .ok { color: #0b6b3a; font-weight: 600; }
+  .no { color: #8a5a00; font-weight: 600; }
+  .box { border: 1px solid #cfd5e8; background: #f7f8fd; padding: 8pt 10pt; border-radius: 4pt; margin: 8pt 0; }
+  ul, ol { margin: 4pt 0 6pt 16pt; padding: 0; }
+  li { margin: 2pt 0; }
+  code { background: #eef1fb; padding: 0 2pt; border-radius: 2pt; font-size: 9pt; }
+  .small { font-size: 9pt; color: #555d78; }
+  .flow { break-inside: avoid; display: flex; flex-wrap: wrap; gap: 5pt; align-items: stretch; margin: 6pt 0; }
+  .node { border: 1.5px solid #8fa0dd; background: #eef1fb; border-radius: 5pt; padding: 5pt 7pt; font-size: 8.8pt; flex: 1 1 28%; }
+  .node b { display: block; color: #1e2a55; margin-bottom: 1pt; }
+  .arrow { align-self: center; font-size: 13pt; color: #6a78b8; }
+  .node.lock { border-color: #c98ad6; background: #faf0fd; }
+  .node.human { border-color: #86c79b; background: #eef9f1; }
+  .shots { display: flex; flex-wrap: wrap; gap: 6pt; margin: 6pt 0; }
+  .shots figure { margin: 0; flex: 0 0 48.8%; break-inside: avoid; }
+  .shots img { width: 100%; border: 1px solid #cfd5e8; }
+  figcaption { font-size: 8.4pt; color: #555d78; margin-top: 2pt; }
+  .pb { break-before: page; }
+</style>
+</head>
+<body>
+
+<h1>Continuum</h1>
+<p class="tag">Project handovers that show their work.</p>
+<p><b>Round 2 project document</b> · CodeFrontier, Problem 01: <i>Prevent Critical Knowledge From Leaving With People</i><br>
+Team <b>BINARY BUILDERS</b>: Pawan Singh Bhandari (backend, AI/ML, team lead) and Rahul Bramhankar (frontend, design, user research, testing) · written 9 Nov 2026</p>
+
+<table>
+<tr><th style="width:26%">Working product (no sign-in)</th><td>https://continuum-web-kodb.onrender.com — click "Enter as Reviewer". Free hosting sleeps when idle; the first load can take about a minute ("Waking the server" message).</td></tr>
+<tr><th>API</th><td>https://continuum-api-945j.onrender.com (health check: <code>/health</code>)</td></tr>
+<tr><th>Source code</th><td>https://github.com/PawanBhandari03/Continuum</td></tr>
+<tr><th>Demo project the product reads</th><td>https://github.com/PawanBhandari03/campuskart (fictional "CampusKart"; commit dates are simulated; see its NOTICE.md)</td></tr>
+</table>
+
+<h2>1. What Continuum does</h2>
+<p>When a team member leaves, their knowledge is scattered across a repository, chat, notes and a task board. Continuum rebuilds the project's current state from those sources and produces a handover in which <b>every statement points to its source</b> and carries an <b>evidence state</b>. It asks the leaver only the questions the evidence cannot answer, a reviewer approves exactly what goes out, and the successor sees only what their role may read.</p>
+<p><b>Users:</b> reviewer (team lead or mentor), leaver, successor, plus a workspace admin planned for Round 3. <b>Setting:</b> small software teams (3 to 25 people), mainly student clubs where members rotate every semester.</p>
+
+<h3>Evidence states (shown as an icon plus text on every claim, never colour alone)</h3>
+<table>
+<tr><th style="width:15%">State</th><th>Meaning</th></tr>
+<tr><td>Verified</td><td>A source states it directly and an automated check confirmed the source supports it.</td></tr>
+<tr><td>Inferred</td><td>Reasonable conclusion not stated in any source; the text carries "AI inference, not stated in any source".</td></tr>
+<tr><td>Conflicting</td><td>Sources disagree; both sides are shown; never auto-resolved and the newest is not assumed correct.</td></tr>
+<tr><td>Missing</td><td>Something a handover needs has no evidence; becomes a Gap Interview question.</td></tr>
+<tr><td>Confirmed</td><td>A person (reviewer or leaver) confirmed or corrected it; who and when are recorded.</td></tr>
+</table>
+
+<h3>The five-step workflow (as it runs today)</h3>
+<ol>
+<li><b>Connect:</b> a reviewer creates a handover (leaver, successor, successor role, date) and connects sources. Each source reports ok, partial or failed, with a reason.</li>
+<li><b>Reconstruct:</b> a background job parses evidence, masks secrets and personal data, and has the AI extract atomic claims that must cite evidence.</li>
+<li><b>Verify:</b> code checks every citation; a second narrow AI check decides support; conflicts and gaps are detected; a readiness score is computed with its formula visible. The leaver answers the Gap Interview and the answers become new citable evidence.</li>
+<li><b>Review:</b> the reviewer approves, edits, rejects, redacts or marks claims sensitive. Publishing is blocked until conflicts are resolved (or marked "unresolved, successor to follow up") and every claim is reviewed. Publishing locks the version.</li>
+<li><b>Handover:</b> the successor opens "Start here" (7 sections), clicks source chips to read the original text, and acknowledges each section or flags it unclear.</li>
+</ol>
+
+<div class="shots">
+<figure><img src="{{img:desktop-05-open-campuskart-ledger-.png}}"><figcaption>Reviewer's claim ledger: readiness score, open conflicts and gaps, review actions, filters.</figcaption></figure>
+<figure><img src="{{img:desktop-06-source-chip-opens-the-original-text.png}}"><figcaption>A source chip opens the original text with the cited quote highlighted.</figcaption></figure>
+<figure><img src="{{img:desktop-15-successor-every-claim-shows-a-state-badge-and-sources.png}}"><figcaption>Successor's "Start here": state badges, source chips, "N items hidden by your access level".</figcaption></figure>
+</div>
+<p class="small">Screenshots: live site, 9 Nov 2026, automated Chrome run.</p>
+
+<h2>2. Architecture and data flow</h2>
+<div class="flow">
+  <div class="node"><b>1. Sources</b>GitHub (README, commits, PRs and comments, issues, TODO scan) · Slack-format chat export (.zip) · notes (.md, .txt, .pdf) · Exit Q&amp;A from the leaver</div>
+  <div class="arrow">→</div>
+  <div class="node"><b>2. Ingest and protect</b>Parse into evidence units; drop bots and one-word noise; thread chat; detect and mask secrets, emails and phone numbers; attach an access label (public / contributor / lead_only)</div>
+  <div class="arrow">→</div>
+  <div class="node lock"><b>3. Evidence store</b>PostgreSQL on Supabase; each unit keeps its label; row-level-security policies in the migration</div>
+</div>
+<div class="flow">
+  <div class="node lock"><b>4. Permission before generation</b>Contributor-level evidence and lead-only evidence are processed in <i>separate passes</i>, so lead-only text cannot leak into other claims</div>
+  <div class="arrow">→</div>
+  <div class="node"><b>5. Extract (AI)</b>Gemini, batches with stable evidence ids; output only through a JSON schema: type, statement, workstream, topic key, citations (evidence id plus exact quote)</div>
+  <div class="arrow">→</div>
+  <div class="node"><b>6. Verify</b>Code: ids exist, quote matches the source (fuzzy, rapidfuzz). AI: "supports / partially / does not". Only "supports" can be Verified; others are dropped or labelled Inferred</div>
+</div>
+<div class="flow">
+  <div class="node"><b>7. Merge, conflicts, gaps</b>Group by topic; contradiction check; required topics (deploy, payments, auth, email, storage) become Gap Interview questions; readiness score</div>
+  <div class="arrow">→</div>
+  <div class="node human"><b>8. Human review</b>Approve, edit, reject, redact, mark sensitive; resolve or defer conflicts; version history; publish locks the version</div>
+  <div class="arrow">→</div>
+  <div class="node human"><b>9. Role-scoped handover</b>A claim is shown only if the viewer's role may read <i>all</i> of its cited evidence; hidden items appear as a count only; acknowledge or flag unclear</div>
+</div>
+
+<h3>Key design decisions</h3>
+<ul>
+<li><b>Claims, not summaries.</b> The handover is built from atomic claims, each with a state and citations, so it can be checked line by line.</li>
+<li><b>Trust by construction.</b> Free text from the model is rejected; only schema-bound claims that cite real evidence ids survive, and "Verified" requires both the deterministic quote check and the support check.</li>
+<li><b>Most restrictive label wins.</b> A claim takes the most restrictive access label among its evidence; if the viewer cannot see all of it, the claim is hidden.</li>
+<li><b>Small explicit pipeline.</b> No agent framework: plain steps that can each be tested.</li>
+<li><b>Failure handling.</b> Every source shows ok/partial/failed with a reason; the web client retries with back-off on network errors and 502/503/504, shows a "Waking the server" banner, and shows a friendly error with Retry on every screen.</li>
+<li><b>Frontend structure.</b> One API facade (<code>web/lib/api.ts</code>) serves either a real backend or an in-browser mock seeded with the demo project; the same UI code runs both, which is how the UI was built and tested before the backend was live. The live site runs against the real API.</li>
+</ul>
+
+<h2>3. Technology, AI models and external services</h2>
+<table>
+<tr><th style="width:20%">Layer</th><th>What we use</th></tr>
+<tr><td>Frontend</td><td>Next.js 15 (TypeScript, App Router), React 19, Tailwind CSS v4, lucide-react icons. Our own components (shadcn/ui was dropped). Tests with Playwright.</td></tr>
+<tr><td>Backend</td><td>Python 3.11, FastAPI, Pydantic, httpx, rapidfuzz, pypdf, python-multipart; reportlab for PDF generation in docs. Background thread plus a jobs table.</td></tr>
+<tr><td>Database</td><td>PostgreSQL on Supabase; schema and row-level-security policies in <code>supabase/migrations/0001_init.sql</code>.</td></tr>
+<tr><td>AI model</td><td><b>Google Gemini API</b> (structured JSON output) behind a swappable provider interface (<code>api/app/llm.py</code>), with batching, request pacing, retries, a response cache and a fallback chain across models when a free-tier daily quota runs out. Used for claim extraction, the support check and the contradiction check.</td></tr>
+<tr><td>Hosting</td><td>Render (API and web), Supabase (database). GitHub REST API (read-only) for the repo connector.</td></tr>
+<tr><td>Datasets</td><td>Only synthetic data: the fictional "CampusKart" repo and a generated Slack-format chat export and notes (<code>demo-data/</code>), including fake secrets and a fake phone number to test masking. Answer key: <code>demo-data/ANSWER_KEY.md</code>.</td></tr>
+<tr><td>AI coding assistance</td><td>Claude (Anthropic) via Claude Code assisted with planning, code and documents; the team reviews it and can explain it. Disclosed in <code>README.md</code>.</td></tr>
+<tr><td>Licences</td><td>All libraries are used under their own open-source licences (listed in README). The <code>web/</code> scaffold came from <code>create-next-app</code>.</td></tr>
+</table>
+
+<h2 class="pb">4. Features: completed vs not yet</h2>
+<table>
+<tr><th style="width:40%">Feature</th><th style="width:14%">Status</th><th>Notes</th></tr>
+<tr><td>Connect GitHub repo (read-only), chat export (.zip), notes (.md/.txt/.pdf) with per-source status and reasons</td><td class="ok">Built</td><td>Backend endpoints exist. The web Connect screen registers the sample sources; a file-upload form for the live site is <b>not yet on the live site</b>.</td></tr>
+<tr><td>Secret, email and phone masking; access labels</td><td class="ok">Built</td><td>Regex-based scan (not detect-secrets, which was in the Round 1 plan).</td></tr>
+<tr><td>AI claim extraction with citations; deterministic quote check; support check</td><td class="ok">Built</td><td>Output varies between runs (see section 5).</td></tr>
+<tr><td>Five evidence states; conflicts side by side; gaps; readiness score with formula</td><td class="ok">Built</td><td>One extra, arguably duplicate, conflict appears on the demo data.</td></tr>
+<tr><td>Review: approve, edit, reject, redact, mark sensitive; version history; publish lock</td><td class="ok">Built</td><td>Approving many claims one by one is slow on the live API (section 5).</td></tr>
+<tr><td>Gap Interview; answers become Exit Q&amp;A evidence</td><td class="ok">Built</td><td></td></tr>
+<tr><td>Successor "Start here" (7 sections), source chips, hidden count, acknowledge / unclear</td><td class="ok">Built</td><td>"Project in five lines" is currently empty on the demo data.</td></tr>
+<tr><td>Evidence viewer (original text in context, quote highlighted, redactions as blocks)</td><td class="ok">Built</td><td></td></tr>
+<tr><td>Guided first-run tour; "Waking the server" banner; error and empty states</td><td class="ok">Built</td><td></td></tr>
+<tr><td>Review activity (audit log) page</td><td class="ok">Built</td><td>Records review actions, conflict decisions, gap answers, publish, acknowledgements. Does not record views or exports.</td></tr>
+<tr><td>Export approved handover as Markdown and printable PDF with citation links</td><td class="ok">Built</td><td>Uses only what the viewer's role may see. Slow on the full demo data (evidence fetched claim by claim).</td></tr>
+<tr><td>Version compare (before/after text)</td><td class="no">UI built, backend pending</td><td>The diff endpoint does not exist yet, so the button shows an error on the live site.</td></tr>
+<tr><td>Real login (Supabase Auth)</td><td class="no">Not built</td><td>Roles are chosen in the UI and sent in a header.</td></tr>
+<tr><td>Local embeddings; Trello CSV; DOCX</td><td class="no">Not built</td><td>Cut by the plan's cut list.</td></tr>
+<tr><td>Guest role; redaction review queue; audit of views and exports</td><td class="no">Not built</td><td>Round 3.</td></tr>
+</table>
+
+<h2>5. Testing, results and honest limitations</h2>
+<h3>Measured results</h3>
+<table>
+<tr><th style="width:38%">What</th><th>Result (real numbers; source file)</th></tr>
+<tr><td>Planted facts found (strict keyword scorer, one run)</td><td><b>7 of 8</b>. The miss: the UPI decision is extracted as an Inferred claim citing the chat, not as a Verified claim citing PR #87. Earlier runs scored differently (6/8 and about 8/8), so this is one run, not an average. (<code>docs/evaluation.md</code>)</td></tr>
+<tr><td>Claims shown with a valid citation</td><td><b>94 of 94</b> (claims without a surviving citation are dropped or labelled Inferred)</td></tr>
+<tr><td>Permission test, live API, Contributor and Leaver</td><td>No fake key, fake phone or mentor feedback in /view, /claims, /sources, /conflicts, /gaps; evidence of all 3 lead-only claims returns HTTP 403; the Lead's evidence masks the key and phone. (<code>docs/testing.md</code>, 9 Nov)</td></tr>
+<tr><td>Automated tests</td><td>API: 26 unit tests, a live smoke test and a planted-facts scorer. Web: 47 permission, export and diff checks on the mock API; 17 Playwright tests on the mock UI; a real-browser test against the deployed site.</td></tr>
+<tr><td>User survey</td><td>6 real responses (club leads, developers, someone who had handed over a project). Most lost "why decisions were made" and "who owns what"; average trust in a software-written handover 3.7 of 5 (nobody chose 5); 5 of 6 would approve claims one by one "if it takes under 10 minutes". (<code>docs/user-research.md</code>)</td></tr>
+<tr><td>Handover test (with vs without Continuum)</td><td>2 real people who did not know the project; same 6 questions; both 6 of 6; about 20 minutes (one combined figure). <b>No speed or accuracy difference can be claimed.</b> (<code>docs/testing.md</code>)</td></tr>
+<tr><td>Judge-style run on the live site (automated Chrome, desktop and 375 px emulation)</td><td>Worked: entry, ledger, evidence drawer, Gap Interview, Successor view with hidden count, acknowledge and flag. <b>Not completed:</b> the path to Publish, because approving 94 claims one by one took longer than the 2-minute wait (about 6 to 10 s per approval). (<code>docs/testing.md</code>)</td></tr>
+</table>
+
+<h3>Known limitations (stated on purpose)</h3>
+<ul>
+<li><b>Approval speed on free hosting.</b> A single approval takes about 6 to 10 seconds on the live API, so reviewing every claim of the full demo handover takes many minutes. A bulk-approve endpoint is the planned fix.</li>
+<li><b>Role is not a verified login.</b> The role is chosen in the UI and sent in a header, so anyone who sets the header acts as that role. Row-level-security policies exist in the database but the demo relies on the API's role checks.</li>
+<li><b>Model variability.</b> Gemini output differs between runs; the free tier allows about 20 requests per model per day, so the demo handover replays a stored real run and new handovers run the live pipeline.</li>
+<li><b>Demo-data quirks.</b> "Project in five lines" is empty; the same Render-vs-Vercel disagreement appears as two conflicts; some dates show the ingest date.</li>
+<li><b>Scope.</b> Built for small software teams and the demo project; not tested at scale, on other repositories, or with a screen reader. Real-phone testing has not been done yet.</li>
+</ul>
+
+<h2 class="pb">6. Changes from the Round 1 plan</h2>
+<table>
+<tr><th style="width:28%">Round 1 plan</th><th style="width:34%">What happened</th><th>Why</th></tr>
+<tr><td>Claude API for extraction</td><td>Gemini API behind a swappable interface</td><td>No usable Claude API credit; Gemini has a free tier</td></tr>
+<tr><td>shadcn/ui</td><td>Our own Tailwind components</td><td>Saved setup time</td></tr>
+<tr><td>Local embeddings (multilingual-e5)</td><td>Skipped; topic keys, fuzzy matching and a model contradiction check instead</td><td>Memory limits on free hosting; time</td></tr>
+<tr><td>Supabase Auth login</td><td>One-click demo roles</td><td>Judges must use the link without signing in; real auth is later hardening</td></tr>
+<tr><td>Vercel for the web app</td><td>Render for web and API</td><td>One place, existing account</td></tr>
+<tr><td>Python worker with a jobs table</td><td>Background thread plus a jobs table</td><td>Simpler on free hosting</td></tr>
+<tr><td>PyGithub, detect-secrets</td><td>Direct GitHub REST calls; our own regex secret and PII scan</td><td>Fewer dependencies</td></tr>
+<tr><td>Trello CSV, DOCX</td><td>Not built</td><td>Cut list</td></tr>
+<tr><td>Live reconstruction of the demo</td><td>Demo handover replays a stored real run</td><td>Free-tier model quota</td></tr>
+<tr><td>(not in plan)</td><td>Added: guided tour, audit page, export, version-compare UI, failure banners</td><td>Judges must use the product unaided; early start on Round 3 items</td></tr>
+</table>
+
+<h2>7. Three improvements committed for Round 3</h2>
+<ol>
+<li><b>Cross-source conflict resolution.</b> Round 2 detects conflicts per topic and lets a reviewer resolve or defer each one. Round 3: project-wide contradiction detection across sources and time, merging duplicates of the same disagreement, a side-by-side resolution screen with the evidence on both sides, and a resolution history.</li>
+<li><b>Acknowledgement loop with version diff.</b> Round 2 records acknowledge/unclear per section. Round 3: "unclear" flags routed back to the reviewer and leaver as tasks, and a working version diff (claims added, edited, rejected, with before and after text). <i>Already started:</i> the diff screen and mock are built; the backend endpoint is still to do.</li>
+<li><b>Sensitive-data protection.</b> Round 2 masks secrets and PII and hides lead-only claims. Round 3: a redaction review queue, a Guest role, a full audit log that also covers views and exports, and export of the approved handover with citations as links. <i>Already started:</i> the audit page and the Markdown/print export exist; views and exports are not yet logged.</li>
+</ol>
+
+<h2>8. Team and contributions</h2>
+<table>
+<tr><th style="width:26%">Pawan Singh Bhandari</th><td>Backend and AI: source connectors, evidence store schema and access labels, secret/PII masking, extraction, verification, conflict and gap detection, readiness, FastAPI endpoints, Render deployment, the CampusKart repository and its planted facts, API tests and the planted-facts evaluation.</td></tr>
+<tr><th>Rahul Bramhankar</th><td>Frontend and research: the Next.js app and every screen, evidence viewer, guided tour and failure handling, export, audit page, version-compare UI, the CampusKart chat export and notes, Playwright and permission tests, the user survey, the handover test, the live-site test and these documents.</td></tr>
+</table>
+<p class="small">Both members can explain the whole system. Both used Claude Code for assistance, as disclosed in the README.</p>
+
+</body>
+</html>

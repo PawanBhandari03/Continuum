@@ -37,4 +37,13 @@ Detailed API run instructions will be added as components land.
 **Data:** all demo data is synthetic. Any secrets or personal details in it are fake.
 **Templates/boilerplate:** `web/` was generated with `create-next-app@15` (TypeScript, App Router, Tailwind v4); that scaffold is unmodified boilerplate apart from files we wrote. UI components (badges, cards, drawers) are written by us with Tailwind. **shadcn/ui is not used** (changed from the Round 1 plan to save setup time). Icons: `lucide-react` (ISC licence). Tests: `@playwright/test` (Apache-2.0).
 
-**Frontend status:** `web/` runs on a built-in mock API (`NEXT_PUBLIC_USE_MOCKS=true`) that mimics the contracts in `docs/contracts.md`. Live backend wiring is not done yet.
+**Frontend status:** `web/` talks to the real API when `NEXT_PUBLIC_USE_MOCKS=false` (the deployed site) and to a built-in, in-browser mock of the same contracts (`docs/contracts.md`) when it is `true` (local default, no keys needed; used for fast UI tests).
+
+## Live demo, deployment and docs
+- **Live site (no sign-in; click "Enter as Reviewer"):** https://continuum-web-kodb.onrender.com. A small in-app guided tour explains each step. Free hosting sleeps when idle, so the first load can take about a minute ("Waking the server" banner).
+- **API:** https://continuum-api-945j.onrender.com (`/health`). Both services are deployed on Render from `render.yaml` (API: `rootDir api`, web: `rootDir web`, `NEXT_PUBLIC_USE_MOCKS=false`, `NEXT_PUBLIC_API_URL` set to the API). Secrets are entered in the Render dashboard and are never committed.
+- **Web environment variables** (`web/.env.local`, names in `.env.example`): `NEXT_PUBLIC_USE_MOCKS`, `NEXT_PUBLIC_API_URL`.
+- **Docs:** [docs/demo-script.md](docs/demo-script.md) (3-minute and 1-minute walkthrough), [docs/testing.md](docs/testing.md) (test evidence and known problems), [docs/user-research.md](docs/user-research.md) (survey), [docs/evaluation.md](docs/evaluation.md) (backend measurements), [docs/contracts.md](docs/contracts.md), [docs/ROUND2_SUBMISSION.md](docs/ROUND2_SUBMISSION.md), [docs/Continuum_Round2.pdf](docs/Continuum_Round2.pdf) (project document), [docs/Rahul_Manual_Testing_Report.pdf](docs/Rahul_Manual_Testing_Report.pdf) (manual testing report).
+
+## Tests (web)
+`npm run test:unit` (permission, export and version-diff checks on the mock API), `npm run test:e2e` (Playwright, mock mode, system Chrome). Results of the judge-style run on the live site and open problems are in `docs/testing.md`.
