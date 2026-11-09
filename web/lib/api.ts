@@ -3,6 +3,7 @@
 // Flip to false and set NEXT_PUBLIC_API_URL when Pawan's API is live.
 import type {
   AckStatus,
+  AuditEntry,
   Claim,
   ClaimType,
   Conflict,
@@ -74,6 +75,7 @@ export interface Api {
   skipGap(id: string): Promise<Gap>;
   getReadiness(hid: string): Promise<Readiness>;
   getVersions(hid: string): Promise<VersionEntry[]>;
+  getAudit(hid: string): Promise<AuditEntry[]>;
   publish(hid: string, actor: string): Promise<PublishResult>;
   getView(hid: string, role: Role): Promise<SuccessorView>;
   ack(hid: string, body: { section: string; status: AckStatus; note?: string }, actor: string): Promise<void>;
@@ -174,6 +176,7 @@ const realApi: Api = {
   skipGap: (id) => http(`/gaps/${id}/answer`, post({ answer: "", skip: true })),
   getReadiness: (h) => http(`/handovers/${h}/readiness`),
   getVersions: (h) => http(`/handovers/${h}/versions`),
+  getAudit: (h) => http(`/handovers/${h}/audit`),
   publish: async (h) => {
     try {
       await http(`/handovers/${h}/publish`, post({}));

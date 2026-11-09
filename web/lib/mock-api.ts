@@ -6,6 +6,7 @@ import type { Api, ClaimFilters } from "./api";
 import type {
   AccessLabel,
   AckStatus,
+  AuditEntry,
   Claim,
   Conflict,
   EvidenceDetail,
@@ -29,6 +30,7 @@ interface HandoverBundle {
   conflicts: Conflict[];
   gaps: Gap[];
   versions: VersionEntry[];
+  audit: AuditEntry[];
   acks: Partial<Record<SectionKey, { status: AckStatus; note?: string }>>;
 }
 
@@ -39,7 +41,7 @@ interface Store {
   counter: number;
 }
 
-const KEY = "continuum-mock-v2";
+const KEY = "continuum-mock-v3";
 const clone = <T,>(x: T): T => JSON.parse(JSON.stringify(x));
 // Failure simulation for demos/tests: localStorage "continuum-mock-fail" = "down" (every call fails after a short
 // "waking" phase) or "slow" (calls succeed after a short "waking" phase). Unset in normal use.
@@ -73,6 +75,7 @@ function seedStore(): Store {
         conflicts: clone(seed.conflicts),
         gaps: clone(seed.gaps),
         versions: clone(seed.versions),
+        audit: clone(seed.audit),
         acks: {},
       },
     },
@@ -118,6 +121,11 @@ const now = () => new Date().toISOString();
 const RANK: Record<AccessLabel, number> = { public: 0, contributor: 1, lead_only: 2 };
 const ROLE_MAX: Record<Role, number> = { lead: 2, contributor: 1, leaver: 1 };
 const canRead = (role: Role, label: AccessLabel) => RANK[label] <= ROLE_MAX[role];
+
+// Audit log (newest first), same action names as the real API's review_actions.
+function logAudit(b: HandoverBundle, actor: string, action: string, summary: string, claim_id: string | null = null) {
+  b.audit.unshift({ at: now(), actor, action, summary, claim_id });
+}
 
 function bump(b: HandoverBundle, actor: string, summary: string) {
   b.handover.version += 1;
@@ -187,7 +195,7 @@ export const mockApi: Api = {
     const s = store();
     const id = nid("h");
     const h: Handover = { id, ...body, status: "draft", version: 1, approved_by: null, published_at: null };
-    s.bundles[id] = { handover: h, sources: [], claims: [], conflicts: [], gaps: [], versions: [{ version: 1, at: now(), actor: "reviewer", summary: "Handover created." }], acks: {} };
+    s.bundles[id] = { handover: h, sources: [], claims: [], conflicts: [], gaps: [], versions: [{ version: 1, at: now(), actor: "reviewer", summary: "Handover created." }], audit: [{ at: now(), actor: "reviewer", action: "create", summary: "Handover created.", claim_id: null }], acks: {} };
     save();
     return delay(clone(h));
   },
@@ -281,6 +289,7 @@ export const mockApi: Api = {
     }
     c.version += 1;
     bump(b, actor, `${body.action.replace("_", " ")}: ${c.id}${body.note ? ` — ${body.note}` : ""}`);
+    logAudit(b, actor, body.action, `${body.action.replace("_", " ")}: ${c.statement.slice(0, 90)}${body.note ? ` — ${body.note}` : ""}`, c.id);
     save();
     return delay(clone(c));
   },
@@ -292,7 +301,10 @@ export const mockApi: Api = {
       c.confirmed_by = actor;
       c.confirmed_at = now();
     });
-    if (targets.length) bump(b, actor, `Approved ${targets.length} verified claims`);
+    if (targets.length) {
+      bump(b, actor, `Approved ${targets.length} verified claims`);
+      targets.forEach((c) => logAudit(b, actor, "approve", `approve: ${c.statement.slice(0, 90)} (bulk: verified claims)`, c.id));
+    }
     save();
     return delay(targets.length);
   },
@@ -340,6 +352,7 @@ export const mockApi: Api = {
         // unresolved_followup: both claims stay "conflicting" and go to the successor as an open item
       }
       bump(b, actor, `Conflict ${cf.id} → ${body.resolution === "resolved" ? "resolved" : "marked unresolved (successor to follow up)"}`);
+      logAudit(b, actor, "resolve_conflict", `Conflict ${cf.id}: ${body.resolution === "resolved" ? "resolved" : "marked unresolved (successor to follow up)"}${body.note ? ` — ${body.note}` : ""}`, cf.claim_ids[0] ?? null);
       save();
       return delay(clone(cf));
     }
@@ -369,6 +382,7 @@ export const mockApi: Api = {
         c.review_status = "pending";
       }
       bump(b, actor, `Gap ${g.id} answered by leaver (new Exit Q&A evidence ${evId})`);
+      logAudit(b, actor, "answer_gap", `Gap ${g.id} answered (new Exit Q&A evidence ${evId})`, g.claim_id);
       save();
       return delay(clone(g));
     }
@@ -387,6 +401,9 @@ export const mockApi: Api = {
   async getReadiness(hid) {
     return delay(computeReadiness(bundle(hid)));
   },
+  async getAudit(hid) {
+    return delay(clone(bundle(hid).audit));
+  },
   async getVersions(hid) {
     return delay(clone(bundle(hid).versions).reverse());
   },
@@ -402,6 +419,7 @@ export const mockApi: Api = {
     b.handover.approved_by = actor;
     b.handover.published_at = now();
     bump(b, actor, "Published and locked this version.");
+    logAudit(b, actor, "publish", "Published and locked this version.");
     save();
     return delay({ ok: true, reasons: [] });
   },
@@ -423,6 +441,7 @@ export const mockApi: Api = {
     const b = bundle(hid);
     b.acks[body.section as SectionKey] = { status: body.status, note: body.note };
     // acknowledgements are logged but do not create a new handover version
+    logAudit(b, actor, body.status === "acknowledged" ? "ack" : "flag_unclear", `${body.status === "acknowledged" ? "Acknowledged" : "Flagged unclear"}: ${body.section}${body.note ? ` — ${body.note}` : ""}`);
     b.versions.push({ version: b.handover.version, at: now(), actor, summary: `${body.status === "acknowledged" ? "Acknowledged" : "Flagged unclear"}: ${body.section}${body.note ? ` — ${body.note}` : ""}` });
     save();
     return delay(undefined);

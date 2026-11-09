@@ -82,6 +82,7 @@ const TABS: { seg: string; label: string; roles: Role[] }[] = [
   { seg: "ledger", label: "3-4 · Verify & review", roles: ["lead"] },
   { seg: "conflicts", label: "Conflicts", roles: ["lead"] },
   { seg: "interview", label: "Gap Interview", roles: ["leaver", "lead"] },
+  { seg: "activity", label: "Review activity", roles: ["lead"] },
   { seg: "start", label: "5 · Start here", roles: ["contributor", "lead"] },
 ];
 

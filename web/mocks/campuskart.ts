@@ -4,6 +4,7 @@ import type {
   Claim,
   Conflict,
   EvidenceUnit,
+  AuditEntry,
   Gap,
   Handover,
   Source,
@@ -129,4 +130,13 @@ export const versions: VersionEntry[] = [
   { version: 1, at: "2026-11-08T11:00:00Z", actor: "system", summary: "Initial reconstruction: 19 claims extracted from 5 sources; 2 conflicting, 2 missing." },
   { version: 2, at: "2026-11-08T11:40:00Z", actor: "aditi", summary: "Leaver reviewed the Gap Interview list (0 of 2 answered)." },
   { version: 3, at: "2026-11-08T12:20:00Z", actor: "reviewer", summary: "Reviewer confirmed 2 claims and redacted the mentor-note secrets." },
+];
+
+// Newest first. Mirrors what the seeded claims already show (confirmed_by, redacted status).
+export const audit: AuditEntry[] = [
+  { at: "2026-11-08T12:20:00Z", actor: "reviewer", action: "redact", summary: "redact: A test API key and a personal phone number appear in the mentor note (both redacted).", claim_id: "cl_r4" },
+  { at: "2026-11-08T12:20:00Z", actor: "reviewer", action: "edit", summary: "edit: Image uploads were moved to a third-party storage bucket in late August.", claim_id: "cl_d2" },
+  { at: "2026-11-08T12:10:00Z", actor: "reviewer", action: "approve", summary: "approve: Payments are taken through UPI deep links (no card gateway).", claim_id: "cl_p2" },
+  { at: "2026-11-08T11:00:00Z", actor: "system", action: "reconstruct", summary: "Initial reconstruction: 19 claims extracted from 5 sources; 2 conflicting, 2 missing.", claim_id: null },
+  { at: "2026-11-08T10:55:00Z", actor: "reviewer", action: "create", summary: "Handover created.", claim_id: null },
 ];

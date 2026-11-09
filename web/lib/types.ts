@@ -184,3 +184,12 @@ export interface PublishResult {
   ok: boolean;
   reasons: string[];
 }
+
+/** One row of the review/audit log (GET /handovers/{id}/audit, newest first). */
+export interface AuditEntry {
+  at: string;
+  actor: string;
+  action: string; // approve | edit | reject | redact | mark_sensitive | resolve_conflict | answer_gap | publish | ack | flag_unclear | create | upload | reconstruct | reset | ...
+  summary: string;
+  claim_id: string | null;
+}
