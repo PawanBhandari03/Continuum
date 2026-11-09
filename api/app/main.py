@@ -55,6 +55,33 @@ def provider():
     return _provider
 
 
+_cache: dict = {}
+CACHE_TTL = 30.0
+
+
+def cached(key, fn, ttl: float = CACHE_TTL):
+    import time
+    hit = _cache.get(key)
+    if hit and hit[0] > time.monotonic():
+        return hit[1]
+    val = fn()
+    _cache[key] = (time.monotonic() + ttl, val)
+    return val
+
+
+def cache_clear() -> None:
+    """Call after any write to evidence/sources (ingest, upload, answers, reset)."""
+    _cache.clear()
+
+
+def units_all(hid: str) -> list[dict]:
+    return cached(("units", hid), lambda: db().sel("evidence_units", {"handover_id": hid}))
+
+
+def sources_all(hid: str) -> dict[str, dict]:
+    return cached(("sources", hid), lambda: {r["id"]: r for r in db().sel("sources", {"handover_id": hid})})
+
+
 def P(hid: str) -> str:
     """ID prefix keeping ids unique across handovers. The seeded demo handover h_1 is unprefixed."""
     return "" if hid == "h_1" else f"{hid}__"
@@ -94,8 +121,7 @@ def to_claim(r: dict) -> Claim:
 
 
 def labels_of(hid: str) -> dict[str, EvidenceUnit]:
-    rows = db().sel("evidence_units", {"handover_id": hid}, select="id,source_id,author,ts,text,locator,label")
-    return {r["id"]: to_unit({**r, "redactions": []}) for r in rows}
+    return {r["id"]: to_unit({**r, "redactions": []}) for r in units_all(hid)}
 
 
 def log_action(hid: str, actor: str, action: str, summary: str, claim_id: str | None = None,
@@ -169,6 +195,7 @@ SAMPLE_NAMES = {"chat-export/": "Team chat export (#general, #dev, #payments)"}
 def ingest_sample(hid: str) -> None:
     manifest = json.loads((config.DEMO_DIR / "manifest.json").read_text(encoding="utf-8"))
     existing = {s["id"] for s in db().sel("sources", {"handover_id": hid}, select="id")}
+    cache_clear()
     for s in manifest["sources"]:
         stem = "chat" if s["type"] == "chat_export" else Path(s["path"]).stem
         sid = f"{P(hid)}src_{stem}"
@@ -195,6 +222,7 @@ SAMPLE_REPO = "https://github.com/PawanBhandari03/campuskart"
 
 
 def ingest_github(hid: str, ref: str, name: str, sid: str) -> None:
+    cache_clear()
     units, rep = fetch_github(ref, sid, "contributor", id_prefix=P(hid))
     db().ins("sources", [{"id": sid, "handover_id": hid, "type": "github", "name": name,
                           "status": rep["status"], "status_reason": rep.get("reason"),
@@ -252,6 +280,7 @@ async def upload_source(hid: str, type: str = Form(...), file: UploadFile = File
         raise HTTPException(400, "type must be chat_export or notes")
     if label not in ("public", "contributor", "lead_only"):
         raise HTTPException(400, "bad label")
+    cache_clear()
     data = await file.read()
     if len(data) > MAX_UPLOAD:
         raise HTTPException(413, "File too large (25 MB max)")
@@ -427,6 +456,7 @@ def reset_demo(hid: str, x_demo_role: Optional[str] = Header(None)):
     exit_sid = f"{hid}__src_exit_qa"
     db().delete("evidence_units", {"source_id": exit_sid})
     db().delete("sources", {"id": exit_sid})
+    cache_clear()
     n = _restore(hid)
     db().upd("handovers", {"id": hid}, {"version": 1})
     log_action(hid, "system", "reset", f"Demo reset to the stored reconstruction ({n[0]} claims).", version=1)
@@ -523,24 +553,28 @@ def patch_claim(cid: str, body: ClaimPatch, x_demo_role: Optional[str] = Header(
 def claim_evidence(cid: str, x_demo_role: Optional[str] = Header(None)):
     role = role_of(x_demo_role)
     c = to_claim(claim_row(None, cid))
-    units = labels_of(c.handover_id)
-    if role != "lead" and not claim_visible(role, c, units):
+    rows = units_all(c.handover_id)
+    by_id = {r["id"]: r for r in rows}
+    if role != "lead" and not claim_visible(role, c, {k: to_unit({**v, "redactions": []}) for k, v in by_id.items()}):
         raise HTTPException(403, "Not permitted: you cannot see this claim's evidence.")
+    srcs = sources_all(c.handover_id)
+
+    def safe(e: EvidenceUnit) -> dict:  # secrets/PII never leave the API
+        d = e.model_dump()
+        d["text"], d["redactions"] = redact_text(e.text, e.redactions), []
+        return d
     out = []
     for ci in c.citations:
-        row = db().one("evidence_units", {"id": ci.evidence_id})
+        row = by_id.get(ci.evidence_id)
         if not row or not can_read(role, row["label"]):
             continue
         u = to_unit(row)
-        src = db().one("sources", {"id": u.source_id})
-        peers = sorted((to_unit(x) for x in db().sel("evidence_units", {"source_id": u.source_id}, order="ts.asc")
-                        if can_read(role, x["label"])), key=lambda e: e.timestamp)
+        src = srcs.get(u.source_id)
+        if not src:
+            continue
+        peers = sorted((to_unit(x) for x in rows if x["source_id"] == u.source_id and can_read(role, x["label"])),
+                       key=lambda e: e.timestamp)
         i = next((k for k, e in enumerate(peers) if e.id == u.id), 0)
-
-        def safe(e: EvidenceUnit) -> dict:  # secrets/PII never leave the API
-            d = e.model_dump()
-            d["text"], d["redactions"] = redact_text(e.text, e.redactions), []
-            return d
         out.append({"citation": ci.model_dump(), "unit": safe(u),
                     "source": {"id": src["id"], "type": src["type"], "name": src["name"], "status": src["status"],
                                "status_reason": src["status_reason"], "default_label": src["default_label"],
@@ -629,6 +663,7 @@ def answer_gap(gid: str, body: Answer, x_demo_role: Optional[str] = Header(None)
                                  "text": text, "locator": f"exit-qa://{evid}", "label": "contributor",
                                  "redactions": []}])
     db().upd("sources", {"id": sid}, {"unit_count": n})
+    cache_clear()
     db().upd("gaps", {"id": gid}, {"status": "answered", "answer": text, "answer_evidence_id": evid})
     c = to_claim(claim_row(None, g["claim_id"]))
     base = c.statement.rstrip(".")

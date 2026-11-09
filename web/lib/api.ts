@@ -80,6 +80,38 @@ export interface Api {
 }
 
 // ---------- real backend (thin fetch wrapper; shapes are the contracts in types.ts) ----------
+// At most MAX_INFLIGHT requests at once (the free-tier API is small), with retries on network errors and
+// 502/503/504 so a sleeping Render instance (about a minute to wake) does not surface as an error.
+const MAX_INFLIGHT = 6;
+let inflight = 0;
+const waiting: Array<() => void> = [];
+async function slot<T>(fn: () => Promise<T>): Promise<T> {
+  if (inflight >= MAX_INFLIGHT) await new Promise<void>((r) => waiting.push(r));
+  inflight++;
+  try {
+    return await fn();
+  } finally {
+    inflight--;
+    waiting.shift()?.();
+  }
+}
+async function limitedFetch(url: string, init: RequestInit): Promise<Response> {
+  return slot(async () => {
+    let last: unknown;
+    for (let attempt = 0; attempt < 6; attempt++) {
+      try {
+        const r = await fetch(url, init);
+        if (![502, 503, 504].includes(r.status)) return r;
+        last = new Error(`Server not ready (HTTP ${r.status})`);
+      } catch (e) {
+        last = e;
+      }
+      await new Promise((r) => setTimeout(r, 2000 * 2 ** attempt > 20000 ? 20000 : 2000 * 2 ** attempt));
+    }
+    throw new Error(`Could not reach the server. It may be waking up; please retry in a minute. (${(last as Error)?.message ?? "network error"})`);
+  });
+}
+
 let currentRole: Role | null = null;
 /** Called by the session provider so every API call carries the viewer's role. */
 export function setApiRole(r: Role | null) {
@@ -90,7 +122,7 @@ async function http<T>(path: string, init?: RequestInit & { role?: Role }): Prom
   const headers: Record<string, string> = { "Content-Type": "application/json" };
   const role = init?.role ?? currentRole;
   if (role) headers["X-Demo-Role"] = role; // replaced by Supabase JWT once auth is wired
-  const res = await fetch(`${API_URL}${path}`, { ...init, headers: { ...headers, ...(init?.headers as Record<string, string>) } });
+  const res = await limitedFetch(`${API_URL}${path}`, { ...init, headers: { ...headers, ...(init?.headers as Record<string, string>) } });
   if (!res.ok) {
     let detail = res.statusText;
     try {
