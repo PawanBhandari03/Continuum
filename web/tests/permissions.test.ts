@@ -4,6 +4,7 @@
 import { mockApi } from "../lib/mock-api";
 
 const store: Record<string, string> = {};
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 (globalThis as any).window = { localStorage: { getItem: (k: string) => store[k] ?? null, setItem: (k: string, v: string) => (store[k] = v), removeItem: (k: string) => delete store[k] } };
 
 const FORBIDDEN = ["sk_test_FAKE", "+91-00000-00000", "misses deadlines", "closer supervision", "Prof. Iyer", "mentor", "Mentor"];

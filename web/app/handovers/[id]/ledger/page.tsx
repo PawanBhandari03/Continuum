@@ -69,6 +69,16 @@ export default function LedgerPage({ params }: { params: Promise<{ id: string }>
     await load();
   }
 
+  async function approveRest() {
+    const todo = (claims ?? []).filter((c) => c.review_status === "pending");
+    try {
+      for (const c of todo) await api.patchClaim(c.id, { action: "approve" }, actor);
+      invalidateEvidence();
+      setMsg(`Approved ${todo.length} remaining claim${todo.length === 1 ? "" : "s"}. Inferred, conflicting and missing claims keep their labels; approval does not change an evidence state.`);
+      await load();
+    } catch (e) { setErr((e as Error).message); }
+  }
+
   const sel = "rounded-md border border-slate-300 bg-white px-2 py-1 text-sm";
   const emptyState = claims && claims.length === 0;
 
@@ -107,6 +117,7 @@ export default function LedgerPage({ params }: { params: Promise<{ id: string }>
                 <>
                   <Button variant="primary" disabled={reasons.length > 0} onClick={publish}>Approve and publish</Button>
                   <Button variant="ghost" onClick={bulk} className="text-xs">Approve all Verified claims</Button>
+                  <Button variant="ghost" onClick={approveRest} disabled={pending === 0} className="text-xs">Approve all remaining ({pending})</Button>
                 </>
               )}
             </div>

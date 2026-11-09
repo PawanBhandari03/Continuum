@@ -7,16 +7,19 @@ import { api, USE_MOCKS } from "@/lib/api";
 import { ROLE_META, SessionProvider, useSession } from "@/lib/session";
 import type { Role } from "@/lib/types";
 import { EvidenceProvider } from "./evidence";
+import { HelpButton, TourProvider } from "./tour";
 
 export function AppShell({ children }: { children: ReactNode }) {
   return (
     <SessionProvider>
       <EvidenceProvider>
-        <Header />
-        <main className="mx-auto w-full max-w-6xl px-4 py-6">{children}</main>
-        <footer className="mx-auto max-w-6xl px-4 pb-8 text-xs text-slate-500">
-          Continuum · Team BINARY BUILDERS · All demo data is synthetic. Secrets and personal details in it are fake.
-        </footer>
+        <TourProvider>
+          <Header />
+          <main className="mx-auto w-full max-w-6xl px-4 py-6">{children}</main>
+          <footer className="mx-auto max-w-6xl px-4 pb-24 text-xs text-slate-500">
+            Continuum · Team BINARY BUILDERS · All demo data is synthetic. Secrets and personal details in it are fake.
+          </footer>
+        </TourProvider>
       </EvidenceProvider>
     </SessionProvider>
   );
@@ -33,7 +36,8 @@ function Header() {
             <Waypoints className="text-indigo-700" size={20} aria-hidden /> Continuum
             <span className="hidden text-sm font-normal text-slate-500 sm:inline">Project handovers that show their work</span>
           </Link>
-          <nav className="flex items-center gap-2 text-sm">
+          <nav className="flex flex-wrap items-center gap-2 text-sm">
+            <HelpButton />
             {role && (
               <>
                 <Link href="/handovers" className="rounded px-2 py-1 text-slate-700 hover:bg-slate-100">Handovers</Link>

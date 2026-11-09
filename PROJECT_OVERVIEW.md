@@ -102,6 +102,7 @@ Lead/reviewer (sees everything, approves), Contributor/successor (sees only perm
 | 8 Nov | Gemini provider; first real run on CampusKart: 23 model calls, 0 errors, ~50 claims | Switched from Claude plan to Gemini; free-tier quota (20/day/model) shaped the batching design |
 | 8 Nov | FastAPI server + smoke test against live DB; `docs/contracts.md` | All permission/publish checks pass; not yet connected to the web app |
 | 8 Nov | `web/tests/permissions.test.ts`: 17 checks (contributor view has no lead-only text/fake key/fake phone; publish gate) all pass | Tests the **mock** only. The real API/RLS needs its own test |
+| 9 Nov | Task 1: first-run guided tour (8 steps, Help button, remembered in localStorage) + "Approve all remaining" on the ledger. Playwright e2e `web/tests/e2e/tour.spec.ts` follows only on-screen hints from a fresh browser context to published + acknowledged: 2/2 pass in system Chrome (mock mode) | Test caught a real bug (Esc closing the evidence drawer also closed the tour), fixed |
 
 ## 14. Frontend guide (for teammates)
 **Run it:** `cd web && npm install && npm run dev`, open http://localhost:3000. No keys needed; it runs on mock data.

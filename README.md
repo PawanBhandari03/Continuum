@@ -24,6 +24,7 @@ cd web
 npm install
 npm run dev          # http://localhost:3000
 npm run test:permissions   # permission + publish-gate checks against the mock API
+npm run test:e2e           # Playwright judge-walkthrough in mock mode (uses installed Google Chrome)
 ```
 Detailed API run instructions will be added as components land.
 
@@ -33,6 +34,6 @@ Detailed API run instructions will be added as components land.
 **Services:** Supabase (PostgreSQL, Auth), Vercel, Render, GitHub API.
 **Libraries (to be finalised):** Next.js, React, Tailwind CSS, shadcn/ui, FastAPI, Pydantic, PyGithub, pypdf, rapidfuzz, detect-secrets — each under its own open-source licence.
 **Data:** all demo data is synthetic. Any secrets or personal details in it are fake.
-**Templates/boilerplate:** `web/` was generated with `create-next-app@15` (TypeScript, App Router, Tailwind v4); that scaffold is unmodified boilerplate apart from files we wrote. UI components (badges, cards, drawers) are written by us with Tailwind. **shadcn/ui is not used** (changed from the Round 1 plan to save setup time). Icons: `lucide-react` (ISC licence).
+**Templates/boilerplate:** `web/` was generated with `create-next-app@15` (TypeScript, App Router, Tailwind v4); that scaffold is unmodified boilerplate apart from files we wrote. UI components (badges, cards, drawers) are written by us with Tailwind. **shadcn/ui is not used** (changed from the Round 1 plan to save setup time). Icons: `lucide-react` (ISC licence). Tests: `@playwright/test` (Apache-2.0).
 
 **Frontend status:** `web/` runs on a built-in mock API (`NEXT_PUBLIC_USE_MOCKS=true`) that mimics the contracts in `docs/contracts.md`. Live backend wiring is not done yet.
