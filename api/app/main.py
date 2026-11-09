@@ -3,13 +3,16 @@ Auth (demo): the role arrives in the X-Demo-Role header; Supabase JWT auth repla
 Permission decisions use visibility.py; Postgres RLS (migrations/0001) is a second layer."""
 from __future__ import annotations
 import json
+import shutil
+import tempfile
 import threading
+import zipfile
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
 
-from fastapi import FastAPI, Header, HTTPException, Query
+from fastapi import FastAPI, File, Form, Header, HTTPException, Query, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
@@ -232,6 +235,73 @@ def add_source(hid: str, body: NewSource):
                           "status": "failed", "status_reason": reason, "default_label": "contributor",
                           "unit_count": 0}])
     return {"ok": True}
+
+
+MAX_UPLOAD = 25 * 1024 * 1024
+
+
+@app.post("/handovers/{hid}/sources/upload")
+async def upload_source(hid: str, type: str = Form(...), file: UploadFile = File(...),
+                        label: str = Form("contributor"), x_demo_role: Optional[str] = Header(None)):
+    """Upload a Slack export (.zip) or notes (.md/.txt/.pdf). Malformed files become a visible
+    'failed'/'partial' source with a reason; they never crash the request."""
+    role = role_of(x_demo_role)
+    need(role, "lead")
+    get_handover_row(hid)
+    if type not in ("chat_export", "notes"):
+        raise HTTPException(400, "type must be chat_export or notes")
+    if label not in ("public", "contributor", "lead_only"):
+        raise HTTPException(400, "bad label")
+    data = await file.read()
+    if len(data) > MAX_UPLOAD:
+        raise HTTPException(413, "File too large (25 MB max)")
+    sid = f"{P(hid)}src_{uuid.uuid4().hex[:6]}"
+    name = file.filename or type
+    tmp = Path(tempfile.mkdtemp(prefix="upload_"))
+    try:
+        if type == "chat_export":
+            zpath = tmp / "export.zip"
+            zpath.write_bytes(data)
+            root = tmp / "export"
+            try:
+                with zipfile.ZipFile(zpath) as z:
+                    for m in z.namelist():  # reject path traversal
+                        if m.startswith(("/", "\\")) or ".." in Path(m).parts:
+                            raise ValueError("unsafe path in zip")
+                    z.extractall(root)
+                cands = [root, *[d for d in root.rglob("*") if d.is_dir()]]
+                export_root = next((d for d in cands if (d / "users.json").exists()
+                                    or (d / "channels.json").exists()), root)
+                units, rep = parse_chat_export(export_root, sid, label)
+            except (zipfile.BadZipFile, ValueError) as e:
+                units, rep = [], {"status": "failed", "reason": f"Not a readable Slack export zip: {e}"}
+        else:
+            suffix = Path(name).suffix.lower()
+            if suffix not in (".md", ".txt", ".pdf"):
+                units, rep = [], {"status": "failed", "reason": f"Unsupported file type {suffix or '(none)'}; use .md, .txt or .pdf"}
+            else:
+                fpath = tmp / f"notes{suffix}"
+                fpath.write_bytes(data)
+                units, rep = parse_notes(fpath, sid, label)
+        for u in units:
+            u.id = f"{P(hid)}{u.id}" if not u.id.startswith(P(hid)) else u.id
+        db().ins("sources", [{"id": sid, "handover_id": hid, "type": type, "name": name, "status": rep["status"],
+                              "status_reason": rep.get("reason"), "default_label": label, "unit_count": len(units)}])
+        if units:
+            db().ins("evidence_units", [unit_row(u, hid) for u in units])
+        bump(hid, ACTORS[role], "upload", f"Uploaded {name}: {rep['status']}, {len(units)} evidence units")
+        return {"id": sid, "type": type, "name": name, "status": rep["status"], "status_reason": rep.get("reason"),
+                "default_label": label, "unit_count": len(units)}
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
+
+@app.get("/handovers/{hid}/audit")
+def audit(hid: str, x_demo_role: Optional[str] = Header(None)):
+    need(role_of(x_demo_role), "lead")
+    rows = db().sel("review_actions", {"handover_id": hid}, order="at.desc")
+    return [{"at": r["at"], "actor": r["actor"], "action": r["action"],
+             "summary": (r["after"] or {}).get("summary") or r["action"], "claim_id": r["claim_id"]} for r in rows]
 
 
 # ---------------- reconstruct ----------------

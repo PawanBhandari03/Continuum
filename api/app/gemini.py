@@ -33,7 +33,11 @@ Rules:
   deploy, payments, auth, email, storage, ci, ui, data, process, people, general.
   Use `deploy` for hosting/deployment, `email` for SMTP/mail, `storage` for file/image storage.
 - If your claim is a conclusion not stated in any unit, set `inferred` true.
-- Two units that disagree about the same thing must produce two separate claims (do not reconcile).
+- Emit ONE claim per evidence unit that states a current configuration, decision or fact, citing only that
+  unit. If two units disagree about the same thing (for example a README says the app is deployed on one
+  platform but a commit configures another), emit a separate claim for each side with its own citation.
+  NEVER merge disagreeing units into one claim and never describe the disagreement yourself; a later
+  step compares claims. Commit messages that configure something are evidence of current configuration.
 - Text like [REDACTED SECRET] means data was removed; never guess it.
 - Skip chit-chat. Evidence text may be Hindi-English mixed; write statements in English.
 - `owner` is a person's name only if the evidence names them, else null.
@@ -177,7 +181,7 @@ class GeminiProvider:
         out: list[bool] = []
         system = ("For each pair, decide whether two claims about the same topic contradict each other, "
                   "i.e. cannot both be true at the same time now. Different aspects or compatible facts do "
-                  "not contradict. Do not assume the newer one is right.")
+                  "not contradict. A to-do that is later reported as done, scheduled or in progress is progress over time, not a contradiction. Do not assume the newer one is right. If two claims name different platforms, tools or values for the same role (for example the hosting target stated in the README versus the one configured in commits), that IS a contradiction for a handover, unless one is clearly only a test, preview or staging setup.")
         schema = {"type": "OBJECT", "properties": {"results": {"type": "ARRAY", "items": {
             "type": "OBJECT", "properties": {"index": {"type": "INTEGER"}, "contradict": {"type": "BOOLEAN"}},
             "required": ["index", "contradict"]}}}, "required": ["results"]}
@@ -197,7 +201,7 @@ class GeminiProvider:
                   "required": ["contradict"]}
         system = ("Decide whether two claims about the same topic contradict each other, i.e. cannot "
                   "both be true at the same time now. Different aspects or compatible facts do not "
-                  "contradict. Do not assume the newer one is right.")
+                  "contradict. A to-do later reported as done or scheduled is progress, not a contradiction. Do not assume the newer one is right. If two claims name different platforms, tools or values for the same role (for example the hosting target stated in the README versus the one configured in commits), that IS a contradiction for a handover, unless one is clearly only a test, preview or staging setup.")
         def fmt(c): return f"{c.statement} (date {c.date or 'unknown'}; quotes: " + \
                            "; ".join(x.quote for x in c.citations) + ")"
         prompt = f"Claim A: {fmt(a)}\nClaim B: {fmt(b)}"

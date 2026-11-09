@@ -14,7 +14,10 @@ REQUIRED_SLOTS = {
     "email": "Which email/SMTP account sends verification emails and who owns it?",
     "storage": "Where are uploaded images stored and who holds the credentials?",
 }
-MAX_PAIRS_PER_GROUP = 6
+MAX_PAIRS_PER_GROUP = 45
+# Only claims that assert a current state can contradict each other; risks, to-dos and
+# questions are not compared (keeps model calls few and avoids false conflicts).
+CONFLICT_TYPES = {"fact", "decision", "dependency", "owner"}
 
 _SECTION = {"decision": "decision_log", "risk": "risks", "dependency": "dependencies",
             "owner": "dependencies", "next_action": "first_week",
@@ -88,7 +91,10 @@ def detect_conflicts(claims: list[Claim], provider: Provider) -> list[Conflict]:
     Both sides are kept; nothing is auto-resolved and newest is NOT preferred."""
     groups: dict[str, list[Claim]] = {}
     for c in claims:
-        if c.type != "gap" and c.entity_key:
+        if c.type in CONFLICT_TYPES and c.entity_key:
+            kws = SLOT_KEYWORDS.get(c.entity_key)
+            if kws and not any(k in c.statement.lower() + ' ' for k in kws):
+                continue  # tagged with a topic, but its own text is not about it
             groups.setdefault(c.entity_key, []).append(c)
     candidates: list[tuple[str, Claim, Claim]] = []
     for key, grp in groups.items():
