@@ -27,8 +27,12 @@ export default function StartPage({ params }: { params: Promise<{ id: string }> 
   }, [id, role]);
   useEffect(() => { load(); }, [load]);
 
+  // while a request is running, the section's buttons are disabled so repeated taps cannot log the same action many times
+  const [busyKey, setBusyKey] = useState<string | null>(null);
   async function ack(section: string, status: "acknowledged" | "unclear", n?: string) {
-    try { await api.ack(id, { section, status, note: n }, actor); setFlagging(null); setNote(""); await load(); } catch (e) { setErr(friendlyError(e)); }
+    if (busyKey) return;
+    setBusyKey(section);
+    try { await api.ack(id, { section, status, note: n }, actor); setFlagging(null); setNote(""); await load(); } catch (e) { setErr(friendlyError(e)); } finally { setBusyKey(null); }
   }
 
   const h = view?.handover;
@@ -77,12 +81,12 @@ export default function StartPage({ params }: { params: Promise<{ id: string }> 
                     <label className="block text-sm font-medium">What is unclear? (optional)
                       <textarea className="mt-1 w-full rounded-md border border-slate-300 p-2 text-sm font-normal" rows={2} value={note} onChange={(e) => setNote(e.target.value)} />
                     </label>
-                    <div className="mt-2 flex gap-2"><Button variant="primary" onClick={() => ack(s.key, "unclear", note)}>Send to reviewer and leaver</Button><Button onClick={() => setFlagging(null)}>Cancel</Button></div>
+                    <div className="mt-2 flex gap-2"><Button variant="primary" disabled={busyKey === s.key} onClick={() => ack(s.key, "unclear", note)}>Send to reviewer and leaver</Button><Button onClick={() => setFlagging(null)}>Cancel</Button></div>
                   </Card>
                 ) : (
                   <div className="flex gap-2">
-                    <Button onClick={() => ack(s.key, "acknowledged")} disabled={s.ack === "acknowledged"}><CheckCircle2 size={14} aria-hidden /> I have read this</Button>
-                    <Button onClick={() => setFlagging(s.key)}><Flag size={14} aria-hidden /> This is unclear</Button>
+                    <Button onClick={() => ack(s.key, "acknowledged")} disabled={s.ack === "acknowledged" || busyKey === s.key}><CheckCircle2 size={14} aria-hidden /> I have read this</Button>
+                    <Button onClick={() => setFlagging(s.key)} disabled={busyKey === s.key}><Flag size={14} aria-hidden /> This is unclear</Button>
                   </div>
                 )}
               </div>
