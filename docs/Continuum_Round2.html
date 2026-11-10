@@ -41,7 +41,7 @@
 <h1>Continuum</h1>
 <p class="tag">Project handovers that show their work.</p>
 <p><b>Round 2 project document</b> · CodeFrontier, Problem 01: <i>Prevent Critical Knowledge From Leaving With People</i><br>
-Team <b>BINARY BUILDERS</b>: Pawan Singh Bhandari (backend, AI/ML, team lead) and Rahul Bramhankar (frontend, design, user research, testing) · written 9 Nov 2026</p>
+Team <b>BINARY BUILDERS</b>: Pawan Singh Bhandari (backend, AI/ML, team lead) and Rahul Bramhankar (frontend, design, user research, testing) · updated 10 Nov 2026</p>
 
 <table>
 <tr><th style="width:26%">Working product (no sign-in)</th><td>https://continuum-web-kodb.onrender.com — click "Enter as Reviewer". Free hosting sleeps when idle; the first load can take about a minute ("Waking the server" message).</td></tr>
@@ -74,9 +74,9 @@ Team <b>BINARY BUILDERS</b>: Pawan Singh Bhandari (backend, AI/ML, team lead) an
 </ol>
 
 <div class="shots">
-<figure><img src="{{img:desktop-05-open-campuskart-ledger-.png}}"><figcaption>Reviewer's claim ledger: readiness score, open conflicts and gaps, review actions, filters.</figcaption></figure>
-<figure><img src="{{img:desktop-06-source-chip-opens-the-original-text.png}}"><figcaption>A source chip opens the original text with the cited quote highlighted.</figcaption></figure>
-<figure><img src="{{img:desktop-15-successor-every-claim-shows-a-state-badge-and-sources.png}}"><figcaption>Successor's "Start here": state badges, source chips, "N items hidden by your access level".</figcaption></figure>
+<figure><img src="img/img1.png"><figcaption>Reviewer's claim ledger: readiness score, open conflicts and gaps, review actions, filters.</figcaption></figure>
+<figure><img src="img/img2.png"><figcaption>A source chip opens the original text with the cited quote highlighted.</figcaption></figure>
+<figure><img src="img/img3.png"><figcaption>Successor's "Start here": state badges, source chips, "N items hidden by your access level".</figcaption></figure>
 </div>
 <p class="small">Screenshots: live site, 9 Nov 2026, automated Chrome run.</p>
 
@@ -119,7 +119,7 @@ Team <b>BINARY BUILDERS</b>: Pawan Singh Bhandari (backend, AI/ML, team lead) an
 <tr><td>Frontend</td><td>Next.js 15 (TypeScript, App Router), React 19, Tailwind CSS v4, lucide-react icons. Our own components (shadcn/ui was dropped). Tests with Playwright.</td></tr>
 <tr><td>Backend</td><td>Python 3.11, FastAPI, Pydantic, httpx, rapidfuzz, pypdf, python-multipart; reportlab for PDF generation in docs. Background thread plus a jobs table.</td></tr>
 <tr><td>Database</td><td>PostgreSQL on Supabase; schema and row-level-security policies in <code>supabase/migrations/0001_init.sql</code>.</td></tr>
-<tr><td>AI model</td><td><b>Google Gemini API</b> (structured JSON output) behind a swappable provider interface (<code>api/app/llm.py</code>), with batching, request pacing, retries, a response cache and a fallback chain across models when a free-tier daily quota runs out. Used for claim extraction, the support check and the contradiction check.</td></tr>
+<tr><td>AI model</td><td><b>Google Gemini API</b> (structured JSON output) behind a swappable provider interface (<code>api/app/llm.py</code>), with batching, request pacing, retries, a response cache and a fallback chain across models when a free-tier daily quota runs out. Used for claim extraction, the support check and the contradiction check. On 10 Nov we reworded the contradiction prompt so earlier events (such as a replaced module) are not flagged against the current state; it could not be re-measured because the free quota returned errors that day.</td></tr>
 <tr><td>Hosting</td><td>Render (API and web), Supabase (database). GitHub REST API (read-only) for the repo connector.</td></tr>
 <tr><td>Datasets</td><td>Only synthetic data: the fictional "CampusKart" repo and a generated Slack-format chat export and notes (<code>demo-data/</code>), including fake secrets and a fake phone number to test masking. Answer key: <code>demo-data/ANSWER_KEY.md</code>.</td></tr>
 <tr><td>AI coding assistance</td><td>Claude (Anthropic) via Claude Code assisted with planning, code and documents; the team reviews it and can explain it. Disclosed in <code>README.md</code>.</td></tr>
@@ -135,7 +135,7 @@ Team <b>BINARY BUILDERS</b>: Pawan Singh Bhandari (backend, AI/ML, team lead) an
 <tr><td>Five evidence states; conflicts side by side; gaps; readiness score with formula</td><td class="ok">Built</td><td>One extra, arguably duplicate, conflict appears on the demo data.</td></tr>
 <tr><td>Review: approve, edit, reject, redact, mark sensitive; version history; publish lock</td><td class="ok">Built</td><td>Bulk approve (one request) and faster single actions; measured 10 Nov: single approval 1.4 to 1.9 s, bulk about 2 s (section 5).</td></tr>
 <tr><td>Gap Interview; answers become Exit Q&amp;A evidence</td><td class="ok">Built</td><td></td></tr>
-<tr><td>Successor "Start here" (7 sections), source chips, hidden count, acknowledge / unclear</td><td class="ok">Built</td><td>"Project in five lines" is currently empty on the demo data.</td></tr>
+<tr><td>Successor "Start here" (7 sections), source chips, hidden count, acknowledge / unclear</td><td class="ok">Built</td><td>"Project in five lines" shows 4 claims on the demo data (it was empty on 9 Nov); one of them is minor payments detail from chat rather than a core decision.</td></tr>
 <tr><td>Evidence viewer (original text in context, quote highlighted, redactions as blocks)</td><td class="ok">Built</td><td></td></tr>
 <tr><td>Guided first-run tour; "Waking the server" banner; error and empty states</td><td class="ok">Built</td><td></td></tr>
 <tr><td>Accessibility basics: text plus icon badges, keyboard focus, dialogs that trap focus and close on Esc, touch targets on phones</td><td class="ok">Built</td><td>axe-core: 0 WCAG A/AA violations on 8 screens of the live site (9 Nov). No screen-reader audit; no dark mode.</td></tr>
@@ -155,7 +155,7 @@ Team <b>BINARY BUILDERS</b>: Pawan Singh Bhandari (backend, AI/ML, team lead) an
 <tr><td>Planted facts found (strict keyword scorer, one run)</td><td><b>7 of 8</b>. The miss: the UPI decision is extracted as an Inferred claim citing the chat, not as a Verified claim citing PR #87. Earlier runs scored differently (6/8 and about 8/8), so this is one run, not an average. (<code>docs/evaluation.md</code>)</td></tr>
 <tr><td>Claims shown with a valid citation</td><td><b>94 of 94</b> (claims without a surviving citation are dropped or labelled Inferred)</td></tr>
 <tr><td>Permission test, live API, Contributor and Leaver</td><td>No fake key, fake phone or mentor feedback in /view, /claims, /sources, /conflicts, /gaps; evidence of all 3 lead-only claims returns HTTP 403; the Lead's evidence masks the key and phone. (<code>docs/testing.md</code>, 9 Nov)</td></tr>
-<tr><td>Automated tests</td><td>API: 26 unit tests, a live smoke test and a planted-facts scorer. Web: 47 permission, export and diff checks on the mock API; 17 Playwright tests on the mock UI; a real-browser test against the deployed site.</td></tr>
+<tr><td>Automated tests</td><td>API: 27 unit tests, a live smoke test and a planted-facts scorer. Web: 47 permission, export and diff checks on the mock API; 17 Playwright tests on the mock UI; a real-browser test against the deployed site.</td></tr>
 <tr><td>User survey</td><td>6 real responses (club leads, developers, someone who had handed over a project). Most lost "why decisions were made" and "who owns what"; average trust in a software-written handover 3.7 of 5 (nobody chose 5); 5 of 6 would approve claims one by one "if it takes under 10 minutes". (<code>docs/user-research.md</code>)</td></tr>
 <tr><td>Handover test (with vs without Continuum)</td><td>2 real people who did not know the project; same 6 questions; both 6 of 6; about 20 minutes (one combined figure). <b>No speed or accuracy difference can be claimed.</b> (<code>docs/testing.md</code>)</td></tr>
 <tr><td>Judge-style run on the live site (automated Chrome, desktop and 375 px emulation)</td><td>Worked: entry, ledger, evidence drawer, Gap Interview, Successor view with hidden count, acknowledge and flag. On 9 Nov the path to Publish could not be completed (about 6 to 10 s per approval). After the backend fixes, the run on 10 Nov reached <b>Publish, Successor, acknowledge and flag</b> on desktop and phone emulation with no failed step; axe found 0 violations on 8 live screens. (<code>docs/testing.md</code>, section 2b)</td></tr>
@@ -166,7 +166,7 @@ Team <b>BINARY BUILDERS</b>: Pawan Singh Bhandari (backend, AI/ML, team lead) an
 <li><b>Free-tier speed.</b> On 9 Nov a single approval took 6 to 10 s, which blocked reaching Publish. After a bulk endpoint and faster writes, measured on 10 Nov: single approval 1.4 to 1.9 s, bulk about 2 s (single samples). The free tier can still be slow after idle: the API took 33 s to answer its first request after a long idle, and the web shows a "Waking the server" message.</li>
 <li><b>Role is not a verified login.</b> The role is chosen in the UI and sent in a header, so anyone who sets the header acts as that role. Row-level-security policies exist in the database but the demo relies on the API's role checks.</li>
 <li><b>Model variability.</b> Gemini output differs between runs; the free tier allows about 20 requests per model per day, so the demo handover replays a stored real run and new handovers run the live pipeline.</li>
-<li><b>Demo-data quirks.</b> "Project in five lines" now has 5 claims (it was empty on 9 Nov). The same Render-vs-Vercel disagreement still appears as two conflict cards, although resolving one settles both. Some dates may show the ingest date (not re-checked).</li>
+<li><b>Demo-data quirks.</b> "Project in five lines" shows 4 claims, and the payments one is minor chat detail. The same Render-vs-Vercel disagreement still appears as two conflict cards, although resolving one settles both. Some dates may show the ingest date (not re-checked).</li>
 <li><b>Scope.</b> Built for small software teams and the demo project; not tested at scale, on other repositories, or with a screen reader. A real-phone run was done on 10 Nov for create, reconstruct, view, export, publish, the Successor view and acknowledging a section; the 15-minute cold start and the "unclear" flag on a phone are not evidenced.</li>
 </ul>
 
