@@ -24,7 +24,9 @@ evidence cannot answer; a reviewer approves exactly what the successor may see; 
 6. **Review:** approve, edit, reject, mark sensitive, redact; version history; publish is blocked until conflicts are resolved or marked "unresolved, successor to follow up" and claims are reviewed; publishing locks the version.
 7. **Gap Interview:** the leaver's answers become new citable evidence ("Exit Q&A").
 8. **Handover:** role-scoped successor view ("Start here", seven sections), source chips that open the original text in context, "N items hidden by your access level" (count only), acknowledge or flag unclear per section.
-9. **Audit trail** of review actions; a guided first-run tour for judges.
+9. **Audit trail** ("Review activity" page) of review actions, conflict decisions, gap answers, publishing and acknowledgements; a guided first-run tour for judges.
+10. **Bulk approve** (one request approves all pending Verified claims, or all remaining), **version history with a before/after compare**, and **export** of the role-scoped handover as Markdown or a printable PDF with citation links.
+11. **Upload screen** for a Slack export (.zip) and notes (.md/.txt/.pdf) with an access label, on the Connect page.
 
 ## Technology and implementation
 - **Frontend:** Next.js 15 (TypeScript, App Router), Tailwind CSS v4, lucide-react icons; Playwright tests.
@@ -50,14 +52,17 @@ evidence cannot answer; a reviewer approves exactly what the successor may see; 
 
 ## Known limitations (we state them on purpose)
 - The role is chosen in the UI and sent in a header; it is not a verified login. Row-level-security policies exist in the database but the demo relies on the API's role checks.
-- Model output varies between runs; the PR #87 decision is extracted as an AI inference, not a Verified claim citing the PR. One extra conflict (Render vs a Vercel preview test) is arguably a false positive; the reviewer resolves it.
+- Model output varies between runs; the PR #87 decision is extracted as an AI inference, not a Verified claim citing the PR. A fresh live run on a new handover produced 5 conflicts, 3 of them false-looking payment conflicts (an old "card gateway added" commit versus the later UPI decision); a reviewer has to resolve or defer them. We tightened the conflict check afterwards but have not re-measured it, because the free model quota is small.
 - Free hosting sleeps when idle; free model quota is small.
 - Built for small software teams; not tested at scale or on other repos beyond the demo.
 
-## Testing and feedback evidence
-- Automated results: see above and `docs/evaluation.md`.
-- User interviews (at least 5 planned): **[TODO: results from docs/user-research.md; real numbers only]**
-- Handover test with and without Continuum: **[TODO: results from docs/testing.md; real numbers only]**
+## Testing and feedback evidence (all real; sources in docs/)
+- **Automated:** 27 API unit tests, live API smoke test, planted-facts scorer (7 of 8 planted facts, 94 of 94 shown claims cited; `docs/evaluation.md`), 33 browser tests on the mock UI, accessibility scan (axe: 0 violations on 8 screens and 3 dialogs, also on the deployed site), and a real-browser test of the full path on the deployed site (connect data, conflicts, Gap Interview, approve, publish, Successor view, acknowledge, flag unclear) that passed on 10 Nov.
+- **Judge-style run on the live site (10 Nov, after fixes):** reaches Publish and the Successor view on desktop and on 375 px phone emulation. Approving one claim takes about 1.5 s, bulk approve about 2 s (9 Nov before the fixes: 6 to 10 s per claim, Publish unreachable). Single samples on free hosting, not averages (`docs/testing.md`, section 2b).
+- **Real phone:** Rahul ran the path through publish and the Successor view on a real phone on 10 Nov and recorded the findings; the "this is unclear" step and the 15-minute cold-start check on the phone are recorded as not evidenced (`docs/testing.md`).
+- **Permission test on the live API:** Contributor and Leaver responses contain no lead-only text, fake key or fake phone; the 3 lead-only claims return HTTP 403 for them.
+- **User survey:** 6 real responses (club leads, developers, someone who handed over a project); trust in a software-written handover averaged 3.7 of 5; 5 of 6 would approve claims one by one "if it takes under 10 minutes" (`docs/user-research.md`). In-person interviews were not run.
+- **Handover test with vs without Continuum:** 2 real people, same 6 questions, both 6 of 6, one combined time (about 20 minutes). It shows no accuracy or speed difference; it is an illustration only (`docs/testing.md`, section 4).
 
 ## Three major improvements for Round 3 (confirm wording)
 1. **Cross-source conflict resolution.** Round 2 detects conflicts per topic and lets a reviewer resolve or defer them. Round 3 adds project-wide contradiction detection across sources and time, a side-by-side resolution screen with evidence on both sides, and resolution history.
