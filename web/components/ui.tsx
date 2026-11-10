@@ -64,7 +64,7 @@ export function LabelTag({ label }: { label: AccessLabel }) {
 
 export function Button({ variant = "secondary", className = "", ...p }: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: "primary" | "secondary" | "danger" | "ghost" }) {
   const v = {
-    primary: "bg-indigo-700 text-white hover:bg-indigo-800 disabled:bg-slate-300 disabled:text-slate-500",
+    primary: "bg-gradient-to-b from-indigo-600 to-indigo-700 text-white shadow-sm hover:from-indigo-700 hover:to-indigo-800 disabled:bg-slate-300 disabled:text-slate-500",
     secondary: "border border-slate-300 bg-white text-slate-900 hover:bg-slate-50 disabled:text-slate-400",
     danger: "border border-rose-300 bg-white text-rose-800 hover:bg-rose-50 disabled:text-slate-400",
     ghost: "text-slate-700 hover:bg-slate-100 disabled:text-slate-400",
@@ -73,7 +73,7 @@ export function Button({ variant = "secondary", className = "", ...p }: ButtonHT
 }
 
 export function Card({ children, className = "" }: { children: ReactNode; className?: string }) {
-  return <section className={`rounded-lg border border-slate-200 bg-white p-4 shadow-sm ${className}`}>{children}</section>;
+  return <section className={`rounded-xl border border-slate-200 bg-white p-4 shadow-sm ${className}`}>{children}</section>;
 }
 
 export function PageTitle({ title, sub, right }: { title: string; sub?: ReactNode; right?: ReactNode }) {

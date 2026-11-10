@@ -32,10 +32,10 @@ function Header() {
   const router = useRouter();
   return (
     <>
-      <header className="border-b border-slate-200 bg-white">
+      <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/85 backdrop-blur">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-3">
           <Link href="/" className="flex items-center gap-2 py-2 font-bold text-slate-900">
-            <Waypoints className="text-indigo-700" size={20} aria-hidden /> Continuum
+            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-600 to-fuchsia-600 text-white shadow-sm"><Waypoints size={18} aria-hidden /></span> Continuum
             <span className="hidden text-sm font-normal text-slate-500 sm:inline">Project handovers that show their work</span>
           </Link>
           <nav className="flex flex-wrap items-center gap-2 text-sm">
