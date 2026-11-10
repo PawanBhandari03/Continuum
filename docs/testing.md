@@ -163,7 +163,9 @@ Per-question marking (both people): UPI decision and reason, image-bucket creden
 - The file states "3 items were withheld by access level. Only the count is shown." and "Successor status: acknowledged" for section 7, so **acknowledging a section on the phone worked**.
 - The handover was still **DRAFT** at 9:19 (not published), with 7 Conflicting claims not yet reviewed, so the Successor saw a labelled draft preview.
 
-**Still not done or not evidenced:** resolving the 5 conflicts, **Publish**, pressing "This is unclear" (the button was visible; no flag is recorded in the file), and the **15-minute cold-start check**.
+**Publish on the phone (9:43, 10 Nov):** a phone screenshot shows "Published. This version is now locked and visible to the successor", "Published v9 · locked", readiness 80, 0 open conflicts, 113 of 113 claims. The API agrees (read-only check): status published, approved by "Reviewer (lead)" at 04:13 UTC (9:43 IST), all 5 conflicts marked "unresolved, successor to follow up" (4 individual actions; Pawan's change settles duplicates together), 0 open gaps. After publishing, the Contributor view still shows 110 claims with hidden count 3, contains none of the lead-only strings, and the evidence of the 3 lead-only claims returns HTTP 403 for a Contributor.
+
+**Still not done or not evidenced:** pressing "This is unclear" (no `flag_unclear` entry in the audit log) and the **15-minute cold-start check**.
 
 **Findings from the phone run and what was done**
 | # | Finding | Owner / status |
@@ -176,6 +178,7 @@ Per-question marking (both people): UPI decision and reason, image-bucket creden
 | 6 | The generated demo chat repeats the same filler message on several dates, so claims show 3 to 5 citations that are the same sentence, and near-duplicate claims appear (for example "Fixed pagination off-by-one" three times) | Rahul (demo data), Pawan (duplicate merging) |
 | 7 | One of the 2 gap questions asks "Who owns: listing images are stored in a third-party object bucket?" although the chat names Meera as the credential holder | Pawan (observation, not verified further) |
 | 8 | The Handovers list on the live site shows every test handover (this one, earlier ones); a judge would see them | Pawan to clear test handovers before submission |
+| 9 | The audit log shows the same section acknowledged **5 times within 12 seconds** (03:48:18 to 03:48:30 UTC), because the button stayed active while the request ran and repeated taps each logged an action | Rahul: fixed (buttons disabled while a request runs; test `tapping 'I have read this' repeatedly logs the acknowledgement once`); pushed 10 Nov |
 
 ## 6. User research
 See `docs/user-research.md` (6 survey responses recorded; interviews optional, not yet run).
