@@ -148,8 +148,28 @@ Per-question marking (both people): UPI decision and reason, image-bucket creden
 5. Nobody knows. Verification emails go out through it. In #dev on 2 Sep one person said they don't have the password and don't know who set it up; another said it already existed and the team just used it. It should appear as Missing and become a Gap Interview question for the leaver (Aditi); it shouldn't be guessed.
 6. PR #91 is a temporary fix for the login loop: it clears the session cookie on redirect and the proper fix was deferred; a TODO sits in auth/session.ts. Nothing in the sources says it is unsafe, so it is an AI inference and is labelled "AI inference, not stated in any source". It could hide the real cause or log users out unexpectedly. State: Inferred.
 
-## 5. Real phone and 15-minute cold-start check
-**Not yet run** (needs a person with a real phone). Emulated phone-width results are in section 2.
+## 5. Real phone run (Rahul, 10 Nov, about 8:59 to 9:02) and 15-minute cold-start check
+**Device:** an Android phone with a Chrome-style browser on 5G (model not recorded). Three screenshots from the phone and the exported file were supplied by Rahul.
+
+**What the evidence shows**
+- Reconstruct on the phone: all five stages show "done" and "Reconstruction finished. Claims are ready for review." (screenshot, 8:59).
+- Start here on the phone (9:01): "Start here, Pawan", version 3, the Draft preview notice, "You are viewing as Reviewer (Lead)", "Project in five lines" with source chips. Export and Print buttons fit the screen.
+- Export as Markdown on the phone (9:02): Chrome showed "File downloaded (43.19 KB)". The file (43,188 bytes) contains 113 claims: 98 Verified, 8 Inferred, 7 Conflicting; the fake key appears only as "[REDACTED SECRET]"; the lead-only mentor claim appears because the export was made as Lead.
+- The API's own record for this handover (`h_d117bfbe`, "Rahul → Pawan", created on the live site) agrees: created, reconstructed by the **live pipeline** (113 claims, 5 conflicts, 2 gap questions), one bulk approval of 98 Verified claims, both gap questions skipped, status still "in review" (not published).
+
+**Not done or not evidenced:** resolving the conflicts, Publish, the Successor view on the phone, acknowledge and flag on the phone, and the **15-minute cold-start check**. These are still open.
+
+**Findings from the phone run and what was done**
+| # | Finding | Owner / status |
+|---|---|---|
+| 1 | The page header plus the step tabs wrapped onto three rows, so the first phone screen was mostly navigation | Rahul: fixed (tabs are one scrollable row); pushed 10 Nov |
+| 2 | On Reconstruct the "finished" notice and the "Open the claim ledger" button were squeezed side by side and the button text was cut off | Rahul: fixed (they wrap); pushed 10 Nov |
+| 3 | The same GitHub repository was connected 6 times on this handover (11 sources, each repo copy with 53 evidence units), because the Connect screen allowed repeats | Rahul: fixed (a repeat repository, repeat sample sources or repeat file name is refused with a message); pushed 10 Nov |
+| 4 | The live pipeline produced 5 conflicts on a fresh handover. Three are about payments and look like false positives: "A card payment gateway module was added" (an old commit) and "A 1 rupee test payment was successful" are shown as conflicting with the UPI decision (PR #87), so the key planted decision is marked Conflicting. All 5 must be resolved or deferred before Publish. | Pawan |
+| 5 | "Project in five lines" is filled with trivia from the filler chat (dark mode toggle, API under 200 ms, cart rounding, posters printed) instead of what CampusKart is | Pawan (and Rahul: the generated chat repeats filler lines) |
+| 6 | The generated demo chat repeats the same filler message on several dates, so claims show 3 to 5 citations that are the same sentence, and near-duplicate claims appear (for example "Fixed pagination off-by-one" three times) | Rahul (demo data), Pawan (duplicate merging) |
+| 7 | One of the 2 gap questions asks "Who owns: listing images are stored in a third-party object bucket?" although the chat names Meera as the credential holder | Pawan (observation, not verified further) |
+| 8 | The Handovers list on the live site shows every test handover (this one, earlier ones); a judge would see them | Pawan to clear test handovers before submission |
 
 ## 6. User research
 See `docs/user-research.md` (6 survey responses recorded; interviews optional, not yet run).
