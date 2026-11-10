@@ -7,7 +7,8 @@ import path from "node:path";
 // the "phone" run is Chrome with a 375x812 touch viewport.
 const API = (process.env.LIVE_API ?? "https://continuum-api-945j.onrender.com").replace(/\/$/, "");
 const OUT = process.env.LIVE_OUT ?? path.join(process.cwd(), "live-run-output");
-const LEAKS = ["sk_test_FAKE", "+91-00000-00000", "misses deadlines", "closer supervision", "Prof. Iyer"];
+// "Prof. Iyer" is NOT in this list on purpose: claim cl_105 ("Prof. Iyer has shared mentor notes...") comes from a public chat message, not the confidential note (see docs/testing.md).
+const LEAKS = ["sk_test_FAKE", "+91-00000-00000", "misses deadlines", "closer supervision", "candid"];
 
 interface Problem {
   run: string;
@@ -106,10 +107,13 @@ async function fullPath(page: Page, run: string, mobile: boolean) {
 
   await step("conflict: resolve with a note", async () => {
     await page.getByRole("link", { name: "Conflicts", exact: true }).click();
+    // the live data has 2 conflict cards about the same disagreement; resolving the first settles both (API change 9 Nov)
     await page.getByRole("radio").first().check(slow);
-    await page.getByLabel(/Resolution note/).fill("Judge-style test: Vercel/Render confirmed with the team.");
-    await page.getByRole("button", { name: /Keep selected side and resolve/ }).click();
+    await page.getByLabel(/Resolution note/).first().fill("Judge-style test: Vercel/Render confirmed with the team.");
+    await page.getByRole("button", { name: /Keep selected side and resolve/ }).first().click();
     await page.getByText("Resolved", { exact: true }).first().waitFor(slow);
+    const openLeft = await page.getByText("Open", { exact: true }).count();
+    if (openLeft) note("conflicts", `${openLeft} conflict card(s) still open after resolving the first`);
   });
 
   await step("switch to Leaver", async () => {
@@ -130,14 +134,20 @@ async function fullPath(page: Page, run: string, mobile: boolean) {
     await page.getByRole("button", { name: /Enter as Reviewer/ }).click();
     await page.getByRole("link", { name: /Open as Reviewer/ }).first().click();
     await page.getByText("Handover readiness").waitFor(slow);
+    let t0 = Date.now();
     await page.getByRole("button", { name: /Approve all Verified claims/ }).click();
     await page.getByText(/Approved \d+ verified claim/).waitFor(slow);
+    log.push(`[${run}] time "Approve all Verified" (click to confirmation, incl. reload): ${((Date.now() - t0) / 1000).toFixed(1)}s`);
+    t0 = Date.now();
     await page.getByRole("button", { name: /Approve all remaining/ }).click();
     await page.getByText(/Approved \d+ remaining claim/).waitFor(slow);
+    log.push(`[${run}] time "Approve all remaining" (click to confirmation, incl. reload): ${((Date.now() - t0) / 1000).toFixed(1)}s`);
   });
   await step("publish", async () => {
     const b = page.getByRole("button", { name: "Approve and publish" });
     await b.waitFor(slow);
+    // the ledger reloads right after the bulk approval message appears; give it up to 30 s to enable the button
+    await page.waitForFunction(() => { const x = [...document.querySelectorAll("button")].find((e) => e.textContent?.includes("Approve and publish")); return !!x && !(x as HTMLButtonElement).disabled; }, undefined, { timeout: 30_000 }).catch(() => {});
     if (await b.isDisabled()) {
       const why = await page.getByRole("list", { name: "Why publishing is blocked" }).innerText().catch(() => "(no reason shown)");
       throw new Error(`Publish stayed disabled: ${why.replace(/\n/g, " ")}`);
