@@ -76,7 +76,7 @@ export default function ReconstructPage({ params }: { params: Promise<{ id: stri
         </ol>
       </Card>
       {job?.status === "done" && (
-        <div className="mt-4 flex items-center gap-3">
+        <div className="mt-4 flex flex-wrap items-center gap-3">
           <Notice>Reconstruction finished. Claims are ready for review.</Notice>
           <Link href={`/handovers/${id}/ledger`} className="rounded-md bg-indigo-700 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-800">Open the claim ledger →</Link>
         </div>

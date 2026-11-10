@@ -104,7 +104,7 @@ export function HandoverNav({ hid }: { hid: string }) {
   const path = usePathname();
   if (!role) return null;
   return (
-    <nav aria-label="Handover steps" className="mb-5 flex flex-wrap gap-1 border-b border-slate-200 pb-2">
+    <nav aria-label="Handover steps" className="mb-5 flex gap-1 overflow-x-auto whitespace-nowrap border-b border-slate-200 pb-2 sm:flex-wrap sm:overflow-visible">
       {TABS.filter((t) => t.roles.includes(role)).map((t) => {
         const href = `/handovers/${hid}/${t.seg}`;
         const on = path === href;
