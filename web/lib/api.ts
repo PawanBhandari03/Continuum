@@ -95,8 +95,9 @@ export interface Api {
 const MAX_INFLIGHT = 6;
 let inflight = 0;
 const waiting: Array<() => void> = [];
-async function slot<T>(fn: () => Promise<T>): Promise<T> {
-  if (inflight >= MAX_INFLIGHT) await new Promise<void>((r) => waiting.push(r));
+async function slot<T>(fn: () => Promise<T>, priority = false): Promise<T> {
+  // user actions (writes) go to the front of the queue so they are never stuck behind background reads
+  if (inflight >= MAX_INFLIGHT) await new Promise<void>((r) => (priority ? waiting.unshift(r) : waiting.push(r)));
   inflight++;
   try {
     return await fn();
@@ -106,6 +107,7 @@ async function slot<T>(fn: () => Promise<T>): Promise<T> {
   }
 }
 async function limitedFetch(url: string, init: RequestInit, timeoutMs = 30000): Promise<Response> {
+  const priority = (init.method ?? "GET").toUpperCase() !== "GET";
   return slot(async () => {
     let last: unknown;
     let endWaking: (() => void) | null = null;
@@ -126,7 +128,7 @@ async function limitedFetch(url: string, init: RequestInit, timeoutMs = 30000): 
     } finally {
       endWaking?.(); // banner clears on success and on final failure
     }
-  });
+  }, priority);
 }
 
 let currentRole: Role | null = null;
