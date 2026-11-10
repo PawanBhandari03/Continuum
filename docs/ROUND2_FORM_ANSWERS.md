@@ -12,7 +12,7 @@ Rahul Bramhankar
 6. Functioning project: https://continuum-web-kodb.onrender.com
    (no sign-in; click "Enter as Reviewer". First load may take up to a minute on free hosting)
 7. Repository: https://github.com/PawanBhandari03/Continuum  (must be PUBLIC)
-8. Drive PDF link: [TODO: Drive link to docs/Continuum_Round2.pdf, "Anyone with the link", Viewer]
+8. Drive PDF link: https://drive.google.com/file/d/1dKYXkuKSmJROq-Sd0_iKk2ccdF-zAqOc/view?usp=sharing
 
 9. Features completed:
 GitHub connector: README, commits, PRs and comments, issues, TODO/FIXME scan, with per-source status

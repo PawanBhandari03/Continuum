@@ -8,7 +8,7 @@ Fill the placeholders marked **[TODO]** with real results before submitting. Tes
 - API: https://continuum-api-945j.onrender.com (health check: /health)
 - Source repository: https://github.com/PawanBhandari03/Continuum
 - Synthetic demo project the product reads: https://github.com/PawanBhandari03/campuskart (fictional; see its NOTICE.md; commit dates are simulated)
-- Updated project PDF: **[TODO: docs/Continuum_Round2.pdf from Rahul's Claude, then a Drive link with "anyone with the link"]**
+- Updated project PDF: https://drive.google.com/file/d/1dKYXkuKSmJROq-Sd0_iKk2ccdF-zAqOc/view?usp=sharing
 
 ## What Continuum is (one paragraph)
 Continuum rebuilds a project's current state from its repo, team chat, notes and issues and produces a handover where every statement
