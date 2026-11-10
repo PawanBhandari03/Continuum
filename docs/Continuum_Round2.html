@@ -74,11 +74,11 @@ Team <b>BINARY BUILDERS</b>: Pawan Singh Bhandari (backend, AI/ML, team lead) an
 </ol>
 
 <div class="shots">
-<figure><img src="img/img1.png"><figcaption>Reviewer's claim ledger: readiness score, open conflicts and gaps, review actions, filters.</figcaption></figure>
-<figure><img src="img/img2.png"><figcaption>A source chip opens the original text with the cited quote highlighted.</figcaption></figure>
-<figure><img src="img/img3.png"><figcaption>Successor's "Start here": state badges, source chips, "N items hidden by your access level".</figcaption></figure>
+<figure><img src="img/n-ledger.png"><figcaption>Reviewer's claim ledger: readiness score, open conflicts and gaps, review actions, filters.</figcaption></figure>
+<figure><img src="img/n-chip.png"><figcaption>A source chip opens the original chat text with the quoted span highlighted. Here the support check found only partial support, so the claim stays Inferred.</figcaption></figure>
+<figure><img src="img/n-successor.png"><figcaption>Successor's "Start here": state badges, source chips, "N items hidden by your access level".</figcaption></figure>
 </div>
-<p class="small">Screenshots: live site, 9 Nov 2026, automated Chrome run.</p>
+<p class="small">Screenshots: the current build against the live API, 10 Nov 2026, automated Chrome run.</p>
 
 <h2>2. Architecture and data flow</h2>
 <div class="flow">
@@ -138,6 +138,7 @@ Team <b>BINARY BUILDERS</b>: Pawan Singh Bhandari (backend, AI/ML, team lead) an
 <tr><td>Successor "Start here" (7 sections), source chips, hidden count, acknowledge / unclear</td><td class="ok">Built</td><td>"Project in five lines" shows 4 claims on the demo data (it was empty on 9 Nov); one of them is minor payments detail from chat rather than a core decision.</td></tr>
 <tr><td>Evidence viewer (original text in context, quote highlighted, redactions as blocks)</td><td class="ok">Built</td><td></td></tr>
 <tr><td>Guided first-run tour; "Waking the server" banner; error and empty states</td><td class="ok">Built</td><td></td></tr>
+<tr><td>Landing page with one-click role entry, light theme with one accent colour, fixed header; "Reset demo" shown when the demo handover is already published</td><td class="ok">Built</td><td>Redesigned on 10 Nov; the 10 Nov browser tests and live end-to-end run were repeated after it.</td></tr>
 <tr><td>Accessibility basics: text plus icon badges, keyboard focus, dialogs that trap focus and close on Esc, touch targets on phones</td><td class="ok">Built</td><td>axe-core: 0 WCAG A/AA violations on 8 screens of the live site (9 Nov). No screen-reader audit; no dark mode.</td></tr>
 <tr><td>Review activity (audit log) page</td><td class="ok">Built</td><td>Records review actions, conflict decisions, gap answers, publish, acknowledgements. Does not record views or exports.</td></tr>
 <tr><td>Export approved handover as Markdown and printable PDF with citation links</td><td class="ok">Built</td><td>Uses only what the viewer's role may see. Measured on the live site: 15.7 s for 91 claims on 10 Nov (35 s on 9 Nov; one run each).</td></tr>
@@ -155,7 +156,7 @@ Team <b>BINARY BUILDERS</b>: Pawan Singh Bhandari (backend, AI/ML, team lead) an
 <tr><td>Planted facts found (strict keyword scorer, one run)</td><td><b>7 of 8</b>. The miss: the UPI decision is extracted as an Inferred claim citing the chat, not as a Verified claim citing PR #87. Earlier runs scored differently (6/8 and about 8/8), so this is one run, not an average. (<code>docs/evaluation.md</code>)</td></tr>
 <tr><td>Claims shown with a valid citation</td><td><b>94 of 94</b> (claims without a surviving citation are dropped or labelled Inferred)</td></tr>
 <tr><td>Permission test, live API, Contributor and Leaver</td><td>No fake key, fake phone or mentor feedback in /view, /claims, /sources, /conflicts, /gaps; evidence of all 3 lead-only claims returns HTTP 403; the Lead's evidence masks the key and phone. (<code>docs/testing.md</code>, 9 Nov)</td></tr>
-<tr><td>Automated tests</td><td>API: 27 unit tests, a live smoke test and a planted-facts scorer. Web: 47 permission, export and diff checks on the mock API; 17 Playwright tests on the mock UI; a real-browser test against the deployed site.</td></tr>
+<tr><td>Automated tests</td><td>API: 27 unit tests, a live smoke test and a planted-facts scorer. Web: 47 permission, export and diff checks on the mock API; 37 Playwright browser tests on the mock UI (screens, permissions, accessibility, phone width); a real-browser test against the deployed site.</td></tr>
 <tr><td>User survey</td><td>6 real responses (club leads, developers, someone who had handed over a project). Most lost "why decisions were made" and "who owns what"; average trust in a software-written handover 3.7 of 5 (nobody chose 5); 5 of 6 would approve claims one by one "if it takes under 10 minutes". (<code>docs/user-research.md</code>)</td></tr>
 <tr><td>Handover test (with vs without Continuum)</td><td>2 real people who did not know the project; same 6 questions; both 6 of 6; about 20 minutes (one combined figure). <b>No speed or accuracy difference can be claimed.</b> (<code>docs/testing.md</code>)</td></tr>
 <tr><td>Judge-style run on the live site (automated Chrome, desktop and 375 px emulation)</td><td>Worked: entry, ledger, evidence drawer, Gap Interview, Successor view with hidden count, acknowledge and flag. On 9 Nov the path to Publish could not be completed (about 6 to 10 s per approval). After the backend fixes, the run on 10 Nov reached <b>Publish, Successor, acknowledge and flag</b> on desktop and phone emulation with no failed step; axe found 0 violations on 8 live screens. (<code>docs/testing.md</code>, section 2b)</td></tr>
@@ -173,7 +174,7 @@ Team <b>BINARY BUILDERS</b>: Pawan Singh Bhandari (backend, AI/ML, team lead) an
 <h2 class="pb">6. Changes from the Round 1 plan</h2>
 <table>
 <tr><th style="width:28%">Round 1 plan</th><th style="width:34%">What happened</th><th>Why</th></tr>
-<tr><td>Claude API for extraction</td><td>Gemini API behind a swappable interface</td><td>No usable Claude API credit; Gemini has a free tier</td></tr>
+<tr><td>Claude API for extraction</td><td>Gemini API behind a swappable interface</td><td>Gemini has a free tier we could use throughout the build window</td></tr>
 <tr><td>shadcn/ui</td><td>Our own Tailwind components</td><td>Saved setup time</td></tr>
 <tr><td>Local embeddings (multilingual-e5)</td><td>Skipped; topic keys, fuzzy matching and a model contradiction check instead</td><td>Memory limits on free hosting; time</td></tr>
 <tr><td>Supabase Auth login</td><td>One-click demo roles</td><td>Judges must use the link without signing in; real auth is later hardening</td></tr>

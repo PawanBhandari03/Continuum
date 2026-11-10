@@ -32,10 +32,11 @@ function Frame({ children }: { children: ReactNode }) {
       <footer className="border-t border-slate-200 bg-white">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 text-xs text-slate-500">
           <span>Continuum · Team Binary Builders</span>
-          {USE_MOCKS && (
+          {(
             <button
               className="inline-flex items-center gap-1 underline"
               onClick={async () => {
+                if (!window.confirm("Reset the demo to its starting state? Review progress on the demo handover will be lost.")) return;
                 await api.resetDemo();
                 window.location.href = "/handovers";
               }}

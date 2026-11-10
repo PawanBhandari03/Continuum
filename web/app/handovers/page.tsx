@@ -62,6 +62,20 @@ export default function HandoversPage() {
                   <h2 className="font-semibold capitalize">{h.leaver} → {h.successor} <span className="text-sm font-normal normal-case text-slate-500">(CampusKart{h.id === "h_1" ? "" : " · new"})</span></h2>
                   <p className="text-sm text-slate-600">{STATUS[h.status]} · v{h.version} · target {fmtDate(h.target_date)} · successor role: {h.successor_role}</p>
                   {h.published_at && <p className="text-xs text-slate-500">Approved by {h.approved_by} on {fmtDate(h.published_at)}</p>}
+                  {h.id === "h_1" && h.status === "published" && (
+                    <p className="mt-2 max-w-md text-sm text-amber-900">
+                      This demo handover was already published, so it is locked. To walk through the review steps again, reset the demo.{" "}
+                      <button
+                        className="font-semibold underline"
+                        onClick={async () => {
+                          await api.resetDemo();
+                          window.location.reload();
+                        }}
+                      >
+                        Reset demo
+                      </button>
+                    </p>
+                  )}
                 </div>
                 <Link href={ROLE_META[role].home(h.id)} className="inline-flex items-center rounded-md bg-indigo-700 px-3 py-2.5 text-sm font-medium text-white hover:bg-indigo-800 sm:py-1.5">
                   Open as {ROLE_META[role].label}
