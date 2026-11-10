@@ -2,7 +2,8 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, type ReactNode } from "react";
-import { RotateCcw, Waypoints } from "lucide-react";
+import { RotateCcw } from "lucide-react";
+import { LogoMark } from "./logo";
 import { api, USE_MOCKS } from "@/lib/api";
 import { ROLE_META, SessionProvider, useSession } from "@/lib/session";
 import type { Role } from "@/lib/types";
@@ -15,37 +16,59 @@ export function AppShell({ children }: { children: ReactNode }) {
     <SessionProvider>
       <EvidenceProvider>
         <TourProvider>
-          <Header />
-          <ServerBanner />
-          <main className="mx-auto w-full max-w-6xl px-4 py-6">{children}</main>
-          <footer className="mx-auto max-w-6xl px-4 pb-24 text-xs text-slate-500">
-            Continuum · Team BINARY BUILDERS · All demo data is synthetic. Secrets and personal details in it are fake.
-          </footer>
+          <Frame>{children}</Frame>
         </TourProvider>
       </EvidenceProvider>
     </SessionProvider>
   );
 }
 
-function Header() {
+function Frame({ children }: { children: ReactNode }) {
+  const home = usePathname() === "/";
+  return (
+    <div className={home ? "min-h-screen bg-slate-950 text-white" : ""}>
+      <Header dark={home} />
+      <ServerBanner />
+      <main className={home ? "w-full" : "mx-auto w-full max-w-6xl px-4 py-6"}>{children}</main>
+      <footer className={`mx-auto max-w-6xl px-4 pb-24 pt-6 text-xs ${home ? "text-slate-400" : "text-slate-500"}`}>
+        Continuum · Team BINARY BUILDERS · Demo project <strong>CampusKart</strong>: all data is synthetic; secrets and personal details in it are fake.
+        {USE_MOCKS && (
+          <button
+            className="ml-3 inline-flex items-center gap-1 underline"
+            onClick={async () => {
+              await api.resetDemo();
+              window.location.href = "/handovers";
+            }}
+          >
+            <RotateCcw size={11} aria-hidden /> Reset demo
+          </button>
+        )}
+      </footer>
+    </div>
+  );
+}
+
+function Header({ dark = false }: { dark?: boolean }) {
   const { role, setRole } = useSession();
   const router = useRouter();
   return (
     <>
-      <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/85 backdrop-blur">
+      <header className={`sticky top-0 z-30 border-b backdrop-blur ${dark ? "border-white/10 bg-slate-950/80 text-white" : "border-slate-200 bg-white/85"}`}>
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-3">
-          <Link href="/" className="flex items-center gap-2 py-2 font-bold text-slate-900">
-            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-600 to-fuchsia-600 text-white shadow-sm"><Waypoints size={18} aria-hidden /></span> Continuum
-            <span className="hidden text-sm font-normal text-slate-500 sm:inline">Project handovers that show their work</span>
+          <Link href="/" className={`flex items-center gap-2 py-2 font-bold ${dark ? "text-white" : "text-slate-900"}`}>
+<LogoMark size={36} /> <span className="text-lg tracking-tight">Continuum</span>
           </Link>
           <nav className="flex flex-wrap items-center gap-2 text-sm">
+            <span className={`hidden items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs md:inline-flex ${dark ? "border-white/15 bg-white/5 text-slate-200" : "border-slate-200 bg-slate-50 text-slate-600"}`} title={USE_MOCKS ? "Running on the built-in demo data store in your browser." : "Connected to the live API."}>
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" aria-hidden /> Demo: CampusKart (synthetic data)
+            </span>
             <HelpButton />
             {role && (
               <>
-                <Link href="/handovers" className="rounded px-2 py-2.5 text-slate-700 hover:bg-slate-100 sm:py-1">Handovers</Link>
+                <Link href="/handovers" className="rounded px-2 py-2.5 text-current hover:bg-slate-500/15 sm:py-1">Handovers</Link>
                 <span className="rounded-full border border-indigo-200 bg-indigo-50 px-2.5 py-1 text-xs font-semibold text-indigo-900">Viewing as: {ROLE_META[role].label}</span>
                 <button
-                  className="rounded px-2 py-1 text-slate-700 hover:bg-slate-100"
+                  className="rounded px-2 py-1 text-current hover:bg-slate-500/15"
                   onClick={() => {
                     setRole(null);
                     router.push("/");
@@ -58,20 +81,6 @@ function Header() {
           </nav>
         </div>
       </header>
-      <div className="border-b border-amber-200 bg-amber-50 px-4 py-1.5 text-center text-xs text-amber-900">
-        Demo project: <strong>CampusKart</strong> (synthetic data). {USE_MOCKS ? "Running on the built-in demo data store in your browser." : "Connected to the live API."}
-        {USE_MOCKS && (
-          <button
-            className="ml-3 inline-flex items-center gap-1 underline"
-            onClick={async () => {
-              await api.resetDemo();
-              window.location.href = "/handovers";
-            }}
-          >
-            <RotateCcw size={11} aria-hidden /> Reset demo
-          </button>
-        )}
-      </div>
     </>
   );
 }

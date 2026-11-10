@@ -123,7 +123,7 @@ export function TourProvider({ children }: { children: ReactNode }) {
 export function HelpButton() {
   const { open } = useTour();
   return (
-    <button onClick={open} className="inline-flex items-center gap-1 rounded px-2 py-1 text-sm text-slate-700 hover:bg-slate-100" aria-label="Help: open the guided tour">
+    <button onClick={open} className="inline-flex items-center gap-1 rounded px-2 py-1 text-sm text-current hover:bg-slate-500/15" aria-label="Help: open the guided tour">
       <CircleHelp size={15} aria-hidden /> Help
     </button>
   );
