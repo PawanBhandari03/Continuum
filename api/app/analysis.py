@@ -89,7 +89,13 @@ def pick_project_claims(claims: list[Claim], n: int = 5) -> list[Claim]:
     existing claims with their own citations."""
     pool = [c for c in claims if c.type in ("fact", "decision", "dependency") and c.state in ("verified", "confirmed")
             and c.review_status != "rejected"]
-    pool.sort(key=lambda c: (c.state != "confirmed", -len(c.citations), c.id))
+    # core topics (deploy, payments, auth, email, storage) first: they say what the project is made of,
+    # unlike repeated chat chatter that happens to have many citations
+    pool.sort(key=lambda c: (c.entity_key not in REQUIRED_SLOTS or not fills_slot(c, c.entity_key),
+                             c.state != "confirmed", -len(c.citations), c.id))
+    core = [c for c in pool if c.entity_key in REQUIRED_SLOTS and fills_slot(c, c.entity_key)]
+    if len({c.workstream for c in core}) >= 3:
+        pool = core  # enough core-topic claims: do not pad with chat trivia
     picked, seen = [], set()
     for c in pool:
         if c.workstream in seen:

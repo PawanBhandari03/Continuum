@@ -181,7 +181,7 @@ class GeminiProvider:
         out: list[bool] = []
         system = ("For each pair, decide whether two claims about the same topic contradict each other, "
                   "i.e. cannot both be true at the same time now. Different aspects or compatible facts do "
-                  "not contradict. A to-do that is later reported as done, scheduled or in progress is progress over time, not a contradiction. Do not assume the newer one is right. If two claims name different platforms, tools or values for the same role (for example the hosting target stated in the README versus the one configured in commits), that IS a contradiction for a handover, unless one is clearly only a test, preview or staging setup.")
+                  "not contradict. A to-do that is later reported as done, scheduled or in progress is progress over time, not a contradiction. Do not assume the newer one is right. If two claims name different platforms, tools or values for the same role (for example the hosting target stated in the README versus the one configured in commits), that IS a contradiction for a handover, unless one is clearly only a test, preview or staging setup. A statement about something that happened earlier (a module that was added and later replaced) or a one-off test (a test payment that succeeded) does NOT contradict a later decision or the current state; only flag claims that both describe how things are NOW.")
         schema = {"type": "OBJECT", "properties": {"results": {"type": "ARRAY", "items": {
             "type": "OBJECT", "properties": {"index": {"type": "INTEGER"}, "contradict": {"type": "BOOLEAN"}},
             "required": ["index", "contradict"]}}}, "required": ["results"]}
@@ -201,7 +201,7 @@ class GeminiProvider:
                   "required": ["contradict"]}
         system = ("Decide whether two claims about the same topic contradict each other, i.e. cannot "
                   "both be true at the same time now. Different aspects or compatible facts do not "
-                  "contradict. A to-do later reported as done or scheduled is progress, not a contradiction. Do not assume the newer one is right. If two claims name different platforms, tools or values for the same role (for example the hosting target stated in the README versus the one configured in commits), that IS a contradiction for a handover, unless one is clearly only a test, preview or staging setup.")
+                  "contradict. A to-do later reported as done or scheduled is progress, not a contradiction. Do not assume the newer one is right. If two claims name different platforms, tools or values for the same role (for example the hosting target stated in the README versus the one configured in commits), that IS a contradiction for a handover, unless one is clearly only a test, preview or staging setup. A statement about something that happened earlier (a module that was added and later replaced) or a one-off test (a test payment that succeeded) does NOT contradict a later decision or the current state; only flag claims that both describe how things are NOW.")
         def fmt(c): return f"{c.statement} (date {c.date or 'unknown'}; quotes: " + \
                            "; ".join(x.quote for x in c.citations) + ")"
         prompt = f"Claim A: {fmt(a)}\nClaim B: {fmt(b)}"
