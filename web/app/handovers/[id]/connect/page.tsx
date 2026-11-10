@@ -32,8 +32,22 @@ export default function ConnectPage({ params }: { params: Promise<{ id: string }
     load();
   }, [load]);
 
+  const norm = (u: string) => u.trim().toLowerCase().replace(/\.git$/, "").replace(/\/+$/, "");
+  /** Returns a message if this source is already connected, so the same data is not ingested twice. */
+  function duplicate(body: Parameters<typeof api.addSource>[1]): string | null {
+    const list = sources ?? [];
+    if (body.sample) return list.some((s) => /^CampusKart repo/.test(s.name)) ? "The CampusKart sample sources are already connected." : null;
+    if (body.type === "github" && body.ref) return list.some((s) => norm(s.name) === norm(body.ref ?? "")) ? "This repository is already connected." : null;
+    return null;
+  }
+
   async function add(body: Parameters<typeof api.addSource>[1]) {
     setErr(null);
+    const dup = duplicate(body);
+    if (dup) {
+      setErr(dup);
+      return;
+    }
     try {
       setSources(await api.addSource(id, body));
     } catch (e) {
@@ -44,6 +58,10 @@ export default function ConnectPage({ params }: { params: Promise<{ id: string }
   async function upload(type: "chat_export" | "notes", file: File) {
     setErr(null);
     setLastUpload(null);
+    if ((sources ?? []).some((s) => s.type === type && s.name === file.name)) {
+      setErr(`A file named ${file.name} is already connected. Rename the file if it is a different one.`);
+      return;
+    }
     setUploading(type);
     try {
       const s = await api.uploadSource(id, { type, file, label: labels[type] });
