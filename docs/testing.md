@@ -157,7 +157,13 @@ Per-question marking (both people): UPI decision and reason, image-bucket creden
 - Export as Markdown on the phone (9:02): Chrome showed "File downloaded (43.19 KB)". The file (43,188 bytes) contains 113 claims: 98 Verified, 8 Inferred, 7 Conflicting; the fake key appears only as "[REDACTED SECRET]"; the lead-only mentor claim appears because the export was made as Lead.
 - The API's own record for this handover (`h_d117bfbe`, "Rahul → Pawan", created on the live site) agrees: created, reconstructed by the **live pipeline** (113 claims, 5 conflicts, 2 gap questions), one bulk approval of 98 Verified claims, both gap questions skipped, status still "in review" (not published).
 
-**Not done or not evidenced:** resolving the conflicts, Publish, the Successor view on the phone, acknowledge and flag on the phone, and the **15-minute cold-start check**. These are still open.
+**Successor view on the phone (9:19 to 9:20), same handover:** a Contributor-role Markdown export made on the phone (file 42,325 bytes, exported 9:19) and a screenshot at 9:20 of the "Still unresolved" section with the "I have read this" and "This is unclear" buttons. I compared the Contributor export with the Lead export of the same handover (113 claims):
+- The Contributor export has **110 claims**; the 3 missing claims are exactly the 3 lead-only ones (the redacted test key, "the mentor notes file must not be visible to contributors", and "the developer frequently fails to meet deadlines"). None of their text or their source "mentor-notes.md" appears anywhere in the Contributor file.
+- Searching the Contributor file for the key, the phone number, "REDACTED", "misses deadlines", "closer supervision", "mentor-notes" and "lead only" found nothing. The line "Prof. Iyer has shared mentor notes on a shared sheet for the lead" is present because it comes from a public chat message (it reveals that mentor notes exist).
+- The file states "3 items were withheld by access level. Only the count is shown." and "Successor status: acknowledged" for section 7, so **acknowledging a section on the phone worked**.
+- The handover was still **DRAFT** at 9:19 (not published), with 7 Conflicting claims not yet reviewed, so the Successor saw a labelled draft preview.
+
+**Still not done or not evidenced:** resolving the 5 conflicts, **Publish**, pressing "This is unclear" (the button was visible; no flag is recorded in the file), and the **15-minute cold-start check**.
 
 **Findings from the phone run and what was done**
 | # | Finding | Owner / status |
