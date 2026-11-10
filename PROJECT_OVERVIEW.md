@@ -3,7 +3,7 @@
 *Team BINARY BUILDERS — Pawan Singh Bhandari (backend/AI), Rahul Bramhankar (frontend/design)*
 *Last updated: 7 Nov 2026 (pre-build). Claude updates the "Build log" and "Current status" sections as we build.*
 
-> How this file relates to the others: **CLAUDE.md** = instructions and rules for Claude (scope, deadlines, working agreements). **PROJECT_OVERVIEW.md** (this) = what we're building and how, for humans, updated as we go. **BUILD_PREP.md** = pre-window planning. **DAY1_PLAYBOOK.md** = exact steps for the first hours.
+> How this file relates to the others: **CLAUDE.md** = instructions and rules for Claude (scope, deadlines, working agreements). **PROJECT_OVERVIEW.md** (this) = what we're building and how, for humans, updated as we go.
 
 ## 1. What Continuum is
 **Tagline:** Project handovers that show their work.

@@ -1,7 +1,7 @@
 # API contracts
 
 Data shapes: see `web/lib/types.ts` (authoritative; the API's Pydantic models in `api/app/models.py` mirror it).
-Section 6 of `HANDOFF_FOR_RAHUL.md` explains the semantics.
+
 
 ## Running the API
 ```
