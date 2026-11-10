@@ -167,6 +167,8 @@ Per-question marking (both people): UPI decision and reason, image-bucket creden
 
 **Still not done or not evidenced:** pressing "This is unclear" (no `flag_unclear` entry in the audit log) and the **15-minute cold-start check**.
 
+**Rahul's later statement (10 Nov):** Rahul reports that both items are done on his side. No supporting evidence was supplied (no screenshot of "Flagged unclear", and no time or message for the cold start). A read-only check of the audit logs of all three handovers on the live API (`h_1`, `h_c38ec329`, `h_d117bfbe`) found **no `flag_unclear` entry**. Note that the demo reset used by the live test scripts also clears a handover's audit log and acknowledgements, so a flag made on `h_1` before a reset would not remain. These two items are therefore recorded as **reported done, not evidenced**. To close them: a screenshot of a section showing "Flagged unclear" taken on the phone, and for the cold start the idle time, how long the first load took, and what the screen showed.
+
 **Findings from the phone run and what was done**
 | # | Finding | Owner / status |
 |---|---|---|
