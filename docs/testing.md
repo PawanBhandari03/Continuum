@@ -39,7 +39,7 @@ Script: `web/tests/live/deployed-check.spec.ts` (Chrome, real demo data with 94 
 | 375 px phone emulation: horizontal scroll on 8 screens | None |
 | 375 px phone emulation: controls under 36 px | Found: radio buttons on the Conflicts page were 22 px. Fixed (24 px radios inside 40 px tall labels) and pushed; re-check after that deploy is recorded in the build log. |
 
-## 2. Judge-style run on the LIVE site (automated)
+## 2. Judge-style run on the LIVE site (automated), 9 Nov: as found, before Pawan's fixes (re-test results are in 2b)
 **What this is:** an automated Chrome run against https://continuum-web-kodb.onrender.com in a fresh browser context (no stored sign-in, equivalent to incognito), on 9 Nov. Desktop 1280×800, then a 375×812 touch viewport. **The "phone" run is Chrome emulation, not a real phone.** Script: `web/tests/live/judge-run.spec.ts`. The shared demo handover was reset afterwards through the API's demo reset.
 
 **Worked on the live site**
@@ -62,6 +62,46 @@ Script: `web/tests/live/deployed-check.spec.ts` (Chrome, real demo data with 94 
 | 5 | Low | The version counter inflates (one per review action; "version 46" after about 45 approvals). Cosmetic but looks odd. | screenshot `phone-13` |
 | 6 | Mine (frontend) | On a phone-width screen some controls are smaller than 28 px (logo link, "How is this calculated?", "resolve", "interview", source chips). No horizontal scrolling was detected on landing, ledger, evidence drawer or Start here. | run log |
 | 7 | Mine (frontend) | Live data has 94 claims in one long list; the ledger has no paging or "needs attention first" ordering. | observed |
+
+## 2b. Re-test on 10 Nov after Pawan's fixes (measured on the live site; 9 Nov numbers kept for comparison)
+Pawan pushed a bulk-approve endpoint, faster writes, the project section, settled duplicate conflicts and the version-diff endpoint (commit `cddcdfd`). I then fixed two slow spots on the web side (commits `aec685d`, `99a9ff1`). All numbers below are **single samples on free hosting**, not averages. "UI" means click to visible confirmation in Chrome (includes reloading the screen); "API" means a direct call.
+
+| What | 9 Nov (before) | 10 Nov (after) |
+|---|---|---|
+| Approve one claim (API, 3 samples) | 9.8 s, 6.0 s, 7.7 s | 1.74 s, 1.87 s, 1.41 s |
+| List pending claims (API) | 6.6 s (81 rows) | 0.8 s (94 rows) |
+| "Approve all Verified" | did not finish in 120 s (estimated 8 to 15 min one by one) | API 1.88 s (78 claims); UI 2.4 to 2.5 s in the final run (earlier runs on 10 Nov before my web fix: 5.5 to 7.7 s) |
+| "Approve all remaining" | not reached | API 2.26 s (13 claims); UI 1.4 to 1.9 s |
+| Mark a conflict unresolved (API) | not measured | 2.98 s; both duplicate conflicts changed together |
+| Acknowledge, API call alone | not measured | 1.35 s |
+| Acknowledge, click to visible badge (UI) | 18.4 s desktop, 12.4 s phone emulation (9 Nov); 16.5 s and 26.3 s (10 Nov, before the web fix) | 3.0 s desktop, 3.1 s phone emulation (final run); one separate probe 5.1 s |
+| Flag "unclear" (UI) | 3.1 s, 3.3 s | 4.2 s desktop, 3.2 s phone emulation |
+| Evidence requests fired when opening Start here | 91 | 14 (chips load only when near the screen) |
+| Markdown export, Contributor, 91 claims | about 100 s estimated (one by one) | 35.0 s (9 Nov, parallel) then **15.7 s** (10 Nov, after the web and API fixes), one run each |
+| Audit log (API) | 35.4 s once | 1.1 s (9 rows) |
+| Version diff v1 to v2 (API) | HTTP 404 | HTTP 200 in 2.7 s |
+| Demo reset (API) | 11.4 s | 6.7 s to 11.4 s |
+| "Project in five lines" for the Successor | 0 claims | 5 claims |
+| Duplicate Render-vs-Vercel conflict | 2 conflicts, each resolved separately | 2 conflict cards, resolving one settles both |
+
+**Judge-style run, 10 Nov (final run, after the web fix):** the full path now reaches **Publish and then the Successor view, acknowledge and flag**, on desktop (1280 px) and on 375 px phone emulation, with no failed step and no notes; the API permission check as Contributor passed again (3 lead-only claims return 403). The demo was reset to 94 claims afterwards.
+
+**Deployed-site checks, 10 Nov:** axe found 0 violations on all 8 screens (the Conflicts page, which timed out once on 9 Nov, loaded normally). The earlier 22 px radio buttons on Conflicts are fixed. One new finding: the "Open as Reviewer (Lead)" link on the Handovers list was 32 px high at phone width; fixed in a later commit (see the build log).
+
+| 9 Nov problem | Status on 10 Nov |
+|---|---|
+| 1. Approvals too slow to reach Publish | **Fixed** (single approval about 1.4 to 1.9 s; bulk about 2 s) |
+| 2. "Project in five lines" empty | **Fixed** (5 claims) |
+| 3. Duplicate conflict | **Settled together** (two cards still appear; the README date quirk was not re-checked) |
+| 4. Slow writes | **Much better** (1.3 to 2.3 s per write call); acknowledge in the UI was slowed by my own chip requests, fixed |
+| 5. Version counter inflates; diff returns 404 | Diff **fixed**; version counter not re-checked |
+| 6. Small tap targets | Fixed except the 32 px link above (fixed afterwards, needs a re-check) |
+| 7. Export slow | **Improved** (about 100 s est. to 15.7 s) |
+| 8. 94 claims in one long list | Attention-first ordering and "show all" are deployed |
+
+**Environment note:** on 10 Nov Windows Application Control blocked Next's native compiler on Rahul's PC, so `npm run test:e2e` could not build with its usual command. I built with plain `next build` (WebAssembly fallback) and ran the same 33 tests against it with a temporary config: 33 of 33 passed. Render builds are not affected.
+
+**Not done:** the real-phone run and the 15-minute cold-start check by hand (Rahul); the live upload endpoint (see 1c).
 
 ## 3. Permission checks on the LIVE API (read-only, 9 Nov)
 Direct calls with header `X-Demo-Role`:
@@ -116,6 +156,6 @@ See `docs/user-research.md` (6 survey responses recorded; interviews optional, n
 
 ## 7. Known limitations (so far)
 - Role comes from a header, not a verified login.
-- Live approvals and other writes are slow (section 2, problem 1).
+- Writes were slow on 9 Nov (6 to 10 s) and were measured at about 1.3 to 2.3 s on 10 Nov (single samples, section 2b); free-tier hosting can still be slower after idle (the API took 33 s to answer its first health check after a long idle on 10 Nov).
 - Tests in sections 1 and 2 are automated; real-device and real-user testing is still open.
 - Accessibility: automated axe checks pass locally and on the deployed site (sections 1b and 1d); no screen-reader audit; no dark mode.
