@@ -60,3 +60,17 @@ test("a Contributor cannot open the activity page", async ({ page }) => {
   await expect(page).toHaveURL(/\/handovers\/h_1\/start$/);
   await expect(page.getByRole("list", { name: "Activity log" })).toHaveCount(0);
 });
+
+test("tapping 'I have read this' repeatedly logs the acknowledgement once", async ({ page }) => {
+  await page.goto("/handovers/h_1/start");
+  await page.evaluate(() => localStorage.setItem("continuum-role", "contributor"));
+  await page.goto("/handovers/h_1/start");
+  const btn = page.getByRole("button", { name: "I have read this" }).first();
+  await btn.waitFor();
+  for (let i = 0; i < 5; i++) await btn.click({ force: true, noWaitAfter: true }).catch(() => {});
+  await expect(page.getByText("Acknowledged", { exact: true }).first()).toBeVisible();
+  await page.evaluate(() => localStorage.setItem("continuum-role", "lead"));
+  await page.goto("/handovers/h_1/activity");
+  const log = page.getByRole("list", { name: "Activity log" });
+  await expect(log.getByRole("listitem").filter({ hasText: "Acknowledged (successor)" })).toHaveCount(1);
+});
