@@ -19,7 +19,7 @@ Everything here is something that exists in the repo or was measured. Where some
 | User survey | **Done: 6 real responses** |
 | Handover test (with vs without Continuum) | **Done: 2 real people, 6 of 6 each**, one combined time (about 20 min); no speed or accuracy difference can be claimed |
 | Live-site judge-style test (desktop + phone emulation) | **Done twice** (9 Nov as found, 10 Nov after fixes); the full path to Publish, Successor, acknowledge and flag now passes |
-| Real phone run (Android) | **Mostly done**: create, reconstruct, Successor view, acknowledge, Markdown export, **publish at 9:43 on 10 Nov** (API confirms). **Not evidenced: pressing "This is unclear" on the phone, and the 15-minute cold-start check** |
+| Real phone run (Android) | **Mostly done**: create, reconstruct, Successor view, acknowledge, Markdown export, **publish at 9:43 on 10 Nov** (API confirms). **Reported done by Rahul but not evidenced: pressing "This is unclear" on the phone, and the 15-minute cold-start check** |
 | Short interviews | **Not run** (optional; only the survey) |
 | Round 2 project PDF, manual testing report PDF, demo script, README | **Done** |
 
@@ -82,7 +82,7 @@ Two real people who did not know CampusKart answered the same 6 questions: **6 o
 - 8:59 to 9:02: created a handover (Rahul to Pawan), reconstructed with the **live pipeline** (113 claims, 5 conflicts, 2 gap questions), viewed Start here, exported Markdown (43.19 KB).
 - 9:19 to 9:20: Successor view and a Contributor export from the phone. Compared with the Lead export of the same handover: **110 claims against 113; the 3 missing claims are exactly the lead-only ones**; no key, phone number or mentor text in the Contributor file; "3 items were withheld by access level" shown; section 7 acknowledged.
 - 9:43: **Published v9, locked** (screenshot). The API agrees: status published, 5 conflicts marked "unresolved, successor to follow up", readiness 80, the Contributor view has 110 claims, hidden count 3, evidence of the 3 lead-only claims returns **403**.
-- **Not evidenced:** pressing "This is unclear" (no flag in the audit log) and the **15-minute cold-start check**. If either was done, add the result to `docs/testing.md` section 5.
+- **Not evidenced:** pressing "This is unclear" (no flag in the audit log) and the **15-minute cold-start check**. Rahul reported later on 10 Nov that both are done on his side, but supplied no screenshot, time or message, and a read-only check of all three handovers' audit logs found no `flag_unclear` entry (a demo reset also clears a handover's audit log, so a flag on `h_1` before a reset would not remain). They are recorded as **reported done, not evidenced** until a screenshot of "Flagged unclear" from the phone and the cold-start details (idle time, first-load time, what the screen showed) are added to `docs/testing.md` section 5.
 - Found on this run and fixed: step tabs took three rows (now one scrollable row); the Reconstruct "finished" row was squeezed (now wraps); repeated sources (now refused); repeated taps logged one section acknowledged **5 times in 12 seconds** (buttons now disabled while a request runs; test added).
 
 ---
