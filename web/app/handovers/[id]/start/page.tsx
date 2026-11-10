@@ -55,7 +55,7 @@ export default function StartPage({ params }: { params: Promise<{ id: string }> 
         <div className="mb-4 flex flex-wrap items-center gap-3 text-sm text-slate-700">
           <span>{acked} of {view.sections.length} sections acknowledged</span>
           {role && <span className="rounded-full border border-slate-300 bg-white px-2 py-0.5 text-xs">You are viewing as {ROLE_META[role].label}</span>}
-          {view.hidden_count > 0 && <span className="inline-flex items-center gap-1 rounded-full border border-fuchsia-300 bg-fuchsia-50 px-2 py-0.5 text-xs font-medium text-fuchsia-900"><Lock size={12} aria-hidden /> {view.hidden_count} item{view.hidden_count > 1 ? "s" : ""} hidden by your access level</span>}
+          {view.hidden_count > 0 && <span className="inline-flex items-center gap-1 rounded-full border border-teal-300 bg-teal-50 px-2 py-0.5 text-xs font-medium text-teal-900"><Lock size={12} aria-hidden /> {view.hidden_count} item{view.hidden_count > 1 ? "s" : ""} hidden by your access level</span>}
         </div>
       )}
       <div className="space-y-8">

@@ -24,42 +24,43 @@ export function AppShell({ children }: { children: ReactNode }) {
 }
 
 function Frame({ children }: { children: ReactNode }) {
-  const home = usePathname() === "/";
   return (
-    <div className={home ? "min-h-screen bg-slate-950 text-white" : ""}>
-      <Header dark={home} />
+    <div className="flex min-h-screen flex-col">
+      <Header />
       <ServerBanner />
-      <main className={home ? "w-full" : "mx-auto w-full max-w-6xl px-4 py-6"}>{children}</main>
-      <footer className={`mx-auto max-w-6xl px-4 pb-24 pt-6 text-xs ${home ? "text-slate-400" : "text-slate-500"}`}>
-        Continuum · Team BINARY BUILDERS · Demo project <strong>CampusKart</strong>: all data is synthetic; secrets and personal details in it are fake.
-        {USE_MOCKS && (
-          <button
-            className="ml-3 inline-flex items-center gap-1 underline"
-            onClick={async () => {
-              await api.resetDemo();
-              window.location.href = "/handovers";
-            }}
-          >
-            <RotateCcw size={11} aria-hidden /> Reset demo
-          </button>
-        )}
+      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6">{children}</main>
+      <footer className="border-t border-slate-200 bg-white">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 text-xs text-slate-500">
+          <span>Continuum · Team Binary Builders</span>
+          {USE_MOCKS && (
+            <button
+              className="inline-flex items-center gap-1 underline"
+              onClick={async () => {
+                await api.resetDemo();
+                window.location.href = "/handovers";
+              }}
+            >
+              <RotateCcw size={11} aria-hidden /> Reset demo
+            </button>
+          )}
+        </div>
       </footer>
     </div>
   );
 }
 
-function Header({ dark = false }: { dark?: boolean }) {
+function Header() {
   const { role, setRole } = useSession();
   const router = useRouter();
   return (
     <>
-      <header className={`sticky top-0 z-30 border-b backdrop-blur ${dark ? "border-white/10 bg-slate-950/80 text-white" : "border-slate-200 bg-white/85"}`}>
+      <header className="sticky top-0 z-30 border-b border-slate-200 bg-white">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-3">
-          <Link href="/" className={`flex items-center gap-2 py-2 font-bold ${dark ? "text-white" : "text-slate-900"}`}>
+          <Link href="/" className="flex items-center gap-2 py-2 font-bold text-slate-900">
 <LogoMark size={36} /> <span className="text-lg tracking-tight">Continuum</span>
           </Link>
           <nav className="flex flex-wrap items-center gap-2 text-sm">
-            <span className={`hidden items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs md:inline-flex ${dark ? "border-white/15 bg-white/5 text-slate-200" : "border-slate-200 bg-slate-50 text-slate-600"}`} title={USE_MOCKS ? "Running on the built-in demo data store in your browser." : "Connected to the live API."}>
+            <span className="hidden items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs text-slate-600 md:inline-flex" title={USE_MOCKS ? "Running on the built-in demo data store in your browser." : "Connected to the live API."}>
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" aria-hidden /> Demo: CampusKart (synthetic data)
             </span>
             <HelpButton />

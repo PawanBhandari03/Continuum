@@ -56,7 +56,7 @@ export function SourceStatusChip({ status, reason }: { status: SourceStatus; rea
 export function LabelTag({ label }: { label: AccessLabel }) {
   const m: Record<AccessLabel, string> = { public: "Public", contributor: "Contributor", lead_only: "Lead only" };
   return (
-    <span className={`inline-flex rounded border px-1.5 py-0.5 text-[11px] font-medium ${label === "lead_only" ? "border-fuchsia-300 bg-fuchsia-50 text-fuchsia-900" : "border-slate-300 bg-slate-50 text-slate-700"}`}>
+    <span className={`inline-flex rounded border px-1.5 py-0.5 text-[11px] font-medium ${label === "lead_only" ? "border-teal-300 bg-teal-50 text-teal-900" : "border-slate-300 bg-slate-50 text-slate-700"}`}>
       {m[label]}
     </span>
   );
@@ -64,7 +64,7 @@ export function LabelTag({ label }: { label: AccessLabel }) {
 
 export function Button({ variant = "secondary", className = "", ...p }: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: "primary" | "secondary" | "danger" | "ghost" }) {
   const v = {
-    primary: "bg-gradient-to-b from-indigo-600 to-indigo-700 text-white shadow-sm hover:from-indigo-700 hover:to-indigo-800 disabled:bg-slate-300 disabled:text-slate-500",
+    primary: "bg-indigo-700 text-white hover:bg-indigo-800 disabled:bg-slate-300 disabled:text-slate-500",
     secondary: "border border-slate-300 bg-white text-slate-900 hover:bg-slate-50 disabled:text-slate-400",
     danger: "border border-rose-300 bg-white text-rose-800 hover:bg-rose-50 disabled:text-slate-400",
     ghost: "text-slate-700 hover:bg-slate-100 disabled:text-slate-400",

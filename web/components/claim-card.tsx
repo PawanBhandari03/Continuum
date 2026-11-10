@@ -27,12 +27,12 @@ export function Statement({ claim }: { claim: Claim }) {
 export function ClaimCard({ claim, actions, footer, showReview = false }: { claim: Claim; actions?: ReactNode; footer?: ReactNode; showReview?: boolean }) {
   const rejected = claim.review_status === "rejected";
   return (
-    <article className={`rounded-lg border bg-white p-3 ${rejected ? "border-slate-200 opacity-60" : "border-slate-200"} ${claim.label === "lead_only" ? "ring-1 ring-fuchsia-200" : ""}`} data-claim-id={claim.id}>
+    <article className={`rounded-lg border bg-white p-3 ${rejected ? "border-slate-200 opacity-60" : "border-slate-200"} ${claim.label === "lead_only" ? "ring-1 ring-teal-200" : ""}`} data-claim-id={claim.id}>
       <div className="mb-1.5 flex flex-wrap items-center gap-2">
         <StateBadge state={claim.state} />
         <span className="rounded border border-slate-200 bg-slate-50 px-1.5 py-0.5 text-xs text-slate-700">{TYPE_LABEL[claim.type]}</span>
         {claim.workstream && claim.workstream !== "general" && <span className="text-xs text-slate-500">#{claim.workstream}</span>}
-        {claim.label === "lead_only" && <span className="inline-flex items-center gap-1 rounded border border-fuchsia-300 bg-fuchsia-50 px-1.5 py-0.5 text-xs font-medium text-fuchsia-900"><Lock size={11} aria-hidden /> Lead only</span>}
+        {claim.label === "lead_only" && <span className="inline-flex items-center gap-1 rounded border border-teal-300 bg-teal-50 px-1.5 py-0.5 text-xs font-medium text-teal-900"><Lock size={11} aria-hidden /> Lead only</span>}
         {claim.sensitive && <span className="rounded border border-rose-300 bg-rose-50 px-1.5 py-0.5 text-xs font-medium text-rose-900">Sensitive</span>}
         {showReview && <span className={`ml-auto text-xs font-medium ${claim.review_status === "pending" ? "text-slate-500" : rejected ? "text-rose-700" : "text-emerald-800"}`}>{REVIEW_LABEL[claim.review_status]}</span>}
       </div>
