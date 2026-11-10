@@ -133,15 +133,16 @@ Team <b>BINARY BUILDERS</b>: Pawan Singh Bhandari (backend, AI/ML, team lead) an
 <tr><td>Secret, email and phone masking; access labels</td><td class="ok">Built</td><td>Regex-based scan (not detect-secrets, which was in the Round 1 plan).</td></tr>
 <tr><td>AI claim extraction with citations; deterministic quote check; support check</td><td class="ok">Built</td><td>Output varies between runs (see section 5).</td></tr>
 <tr><td>Five evidence states; conflicts side by side; gaps; readiness score with formula</td><td class="ok">Built</td><td>One extra, arguably duplicate, conflict appears on the demo data.</td></tr>
-<tr><td>Review: approve, edit, reject, redact, mark sensitive; version history; publish lock</td><td class="ok">Built</td><td>Approving many claims one by one is slow on the live API (section 5).</td></tr>
+<tr><td>Review: approve, edit, reject, redact, mark sensitive; version history; publish lock</td><td class="ok">Built</td><td>Bulk approve (one request) and faster single actions; measured 10 Nov: single approval 1.4 to 1.9 s, bulk about 2 s (section 5).</td></tr>
 <tr><td>Gap Interview; answers become Exit Q&amp;A evidence</td><td class="ok">Built</td><td></td></tr>
 <tr><td>Successor "Start here" (7 sections), source chips, hidden count, acknowledge / unclear</td><td class="ok">Built</td><td>"Project in five lines" is currently empty on the demo data.</td></tr>
 <tr><td>Evidence viewer (original text in context, quote highlighted, redactions as blocks)</td><td class="ok">Built</td><td></td></tr>
 <tr><td>Guided first-run tour; "Waking the server" banner; error and empty states</td><td class="ok">Built</td><td></td></tr>
 <tr><td>Accessibility basics: text plus icon badges, keyboard focus, dialogs that trap focus and close on Esc, touch targets on phones</td><td class="ok">Built</td><td>axe-core: 0 WCAG A/AA violations on 8 screens of the live site (9 Nov). No screen-reader audit; no dark mode.</td></tr>
 <tr><td>Review activity (audit log) page</td><td class="ok">Built</td><td>Records review actions, conflict decisions, gap answers, publish, acknowledgements. Does not record views or exports.</td></tr>
-<tr><td>Export approved handover as Markdown and printable PDF with citation links</td><td class="ok">Built</td><td>Uses only what the viewer's role may see. Measured on the live site: 35 s for 91 claims (one run).</td></tr>
-<tr><td>Version compare (before/after text)</td><td class="no">UI built, backend pending</td><td>The diff endpoint does not exist yet, so the button shows an error on the live site.</td></tr>
+<tr><td>Export approved handover as Markdown and printable PDF with citation links</td><td class="ok">Built</td><td>Uses only what the viewer's role may see. Measured on the live site: 15.7 s for 91 claims on 10 Nov (35 s on 9 Nov; one run each).</td></tr>
+<tr><td>Version compare (before/after text)</td><td class="ok">Built</td><td>Backend diff endpoint and the compare screen both work on the live site (diff call answered in 2.7 s on 10 Nov).</td></tr>
+<tr><td>Bulk approve ("Approve all Verified", "Approve all remaining")</td><td class="ok">Built</td><td>One request; about 2 s for the 94-claim demo handover (10 Nov, single samples).</td></tr>
 <tr><td>Real login (Supabase Auth)</td><td class="no">Not built</td><td>Roles are chosen in the UI and sent in a header.</td></tr>
 <tr><td>Local embeddings; Trello CSV; DOCX</td><td class="no">Not built</td><td>Cut by the plan's cut list.</td></tr>
 <tr><td>Guest role; redaction review queue; audit of views and exports</td><td class="no">Not built</td><td>Round 3.</td></tr>
@@ -157,15 +158,15 @@ Team <b>BINARY BUILDERS</b>: Pawan Singh Bhandari (backend, AI/ML, team lead) an
 <tr><td>Automated tests</td><td>API: 26 unit tests, a live smoke test and a planted-facts scorer. Web: 47 permission, export and diff checks on the mock API; 17 Playwright tests on the mock UI; a real-browser test against the deployed site.</td></tr>
 <tr><td>User survey</td><td>6 real responses (club leads, developers, someone who had handed over a project). Most lost "why decisions were made" and "who owns what"; average trust in a software-written handover 3.7 of 5 (nobody chose 5); 5 of 6 would approve claims one by one "if it takes under 10 minutes". (<code>docs/user-research.md</code>)</td></tr>
 <tr><td>Handover test (with vs without Continuum)</td><td>2 real people who did not know the project; same 6 questions; both 6 of 6; about 20 minutes (one combined figure). <b>No speed or accuracy difference can be claimed.</b> (<code>docs/testing.md</code>)</td></tr>
-<tr><td>Judge-style run on the live site (automated Chrome, desktop and 375 px emulation)</td><td>Worked: entry, ledger, evidence drawer, Gap Interview, Successor view with hidden count, acknowledge and flag. <b>Not completed:</b> the path to Publish, because approving 94 claims one by one took longer than the 2-minute wait (about 6 to 10 s per approval). (<code>docs/testing.md</code>)</td></tr>
+<tr><td>Judge-style run on the live site (automated Chrome, desktop and 375 px emulation)</td><td>Worked: entry, ledger, evidence drawer, Gap Interview, Successor view with hidden count, acknowledge and flag. On 9 Nov the path to Publish could not be completed (about 6 to 10 s per approval). After the backend fixes, the run on 10 Nov reached <b>Publish, Successor, acknowledge and flag</b> on desktop and phone emulation with no failed step; axe found 0 violations on 8 live screens. (<code>docs/testing.md</code>, section 2b)</td></tr>
 </table>
 
 <h3>Known limitations (stated on purpose)</h3>
 <ul>
-<li><b>Approval speed on free hosting.</b> A single approval takes about 6 to 10 seconds on the live API, so reviewing every claim of the full demo handover takes many minutes. A bulk-approve endpoint is the planned fix.</li>
+<li><b>Free-tier speed.</b> On 9 Nov a single approval took 6 to 10 s, which blocked reaching Publish. After a bulk endpoint and faster writes, measured on 10 Nov: single approval 1.4 to 1.9 s, bulk about 2 s (single samples). The free tier can still be slow after idle: the API took 33 s to answer its first request after a long idle, and the web shows a "Waking the server" message.</li>
 <li><b>Role is not a verified login.</b> The role is chosen in the UI and sent in a header, so anyone who sets the header acts as that role. Row-level-security policies exist in the database but the demo relies on the API's role checks.</li>
 <li><b>Model variability.</b> Gemini output differs between runs; the free tier allows about 20 requests per model per day, so the demo handover replays a stored real run and new handovers run the live pipeline.</li>
-<li><b>Demo-data quirks.</b> "Project in five lines" is empty; the same Render-vs-Vercel disagreement appears as two conflicts; some dates show the ingest date.</li>
+<li><b>Demo-data quirks.</b> "Project in five lines" now has 5 claims (it was empty on 9 Nov). The same Render-vs-Vercel disagreement still appears as two conflict cards, although resolving one settles both. Some dates may show the ingest date (not re-checked).</li>
 <li><b>Scope.</b> Built for small software teams and the demo project; not tested at scale, on other repositories, or with a screen reader. Real-phone testing has not been done yet.</li>
 </ul>
 
@@ -187,7 +188,7 @@ Team <b>BINARY BUILDERS</b>: Pawan Singh Bhandari (backend, AI/ML, team lead) an
 <h2>7. Three improvements committed for Round 3</h2>
 <ol>
 <li><b>Cross-source conflict resolution.</b> Round 2 detects conflicts per topic and lets a reviewer resolve or defer each one. Round 3: project-wide contradiction detection across sources and time, merging duplicates of the same disagreement, a side-by-side resolution screen with the evidence on both sides, and a resolution history.</li>
-<li><b>Acknowledgement loop with version diff.</b> Round 2 records acknowledge/unclear per section. Round 3: "unclear" flags routed back to the reviewer and leaver as tasks, and a working version diff (claims added, edited, rejected, with before and after text). <i>Already started:</i> the diff screen and mock are built; the backend endpoint is still to do.</li>
+<li><b>Acknowledgement loop with version diff.</b> Round 2 records acknowledge/unclear per section. Round 3: "unclear" flags routed back to the reviewer and leaver as tasks, and a working version diff (claims added, edited, rejected, with before and after text). <i>Already started:</i> the diff screen and the backend diff endpoint both work (10 Nov); routing unclear flags back as tasks is still to do.</li>
 <li><b>Sensitive-data protection.</b> Round 2 masks secrets and PII and hides lead-only claims. Round 3: a redaction review queue, a Guest role, a full audit log that also covers views and exports, and export of the approved handover with citations as links. <i>Already started:</i> the audit page and the Markdown/print export exist; views and exports are not yet logged.</li>
 </ol>
 
