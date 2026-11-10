@@ -63,7 +63,7 @@ export default function HandoversPage() {
                   <p className="text-sm text-slate-600">{STATUS[h.status]} · v{h.version} · target {fmtDate(h.target_date)} · successor role: {h.successor_role}</p>
                   {h.published_at && <p className="text-xs text-slate-500">Approved by {h.approved_by} on {fmtDate(h.published_at)}</p>}
                 </div>
-                <Link href={ROLE_META[role].home(h.id)} className="inline-flex items-center rounded-md bg-indigo-700 px-3 py-1.5 text-sm font-medium text-white hover:bg-indigo-800">
+                <Link href={ROLE_META[role].home(h.id)} className="inline-flex items-center rounded-md bg-indigo-700 px-3 py-2.5 text-sm font-medium text-white hover:bg-indigo-800 sm:py-1.5">
                   Open as {ROLE_META[role].label}
                 </Link>
               </div>
