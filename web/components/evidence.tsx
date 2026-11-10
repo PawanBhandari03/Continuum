@@ -1,7 +1,7 @@
 "use client";
 // Source chips + evidence drawer. Click a chip => original text in context, quote highlighted,
 // redactions shown as blocks, author / time / link / access label / support level.
-import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import { ExternalLink, X } from "lucide-react";
 import { api } from "@/lib/api";
 import { useSession } from "@/lib/session";
@@ -49,17 +49,32 @@ export function SourceChips({ claim }: { claim: Claim }) {
   const { role } = useSession();
   const { open } = useEvidenceDrawer();
   const [details, setDetails] = useState<EvidenceDetail[] | null>(null);
+  const box = useRef<HTMLDivElement>(null);
+  const [near, setNear] = useState(false);
+  // Load a chip's label only when it is within about two screens of the viewport: a handover with 90+ claims
+  // would otherwise fire 90+ requests at once and slow down everything the user clicks.
   useEffect(() => {
-    if (!role) return;
+    const el = box.current;
+    if (!el || near) return;
+    if (typeof IntersectionObserver === "undefined") {
+      setNear(true);
+      return;
+    }
+    const io = new IntersectionObserver((entries) => entries.some((e) => e.isIntersecting) && setNear(true), { rootMargin: "1200px 0px" });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [near]);
+  useEffect(() => {
+    if (!role || !near) return;
     let live = true;
     loadEvidence(claim.id, role).then((d) => live && setDetails(d)).catch(() => live && setDetails([]));
     return () => {
       live = false;
     };
-  }, [claim.id, claim.citations.length, role]);
+  }, [claim.id, claim.citations.length, role, near]);
   if (!claim.citations.length) return <span className="text-xs italic text-slate-500">No citations</span>;
   return (
-    <div className="flex flex-wrap gap-1.5" aria-label="Sources">
+    <div ref={box} className="flex flex-wrap gap-1.5" aria-label="Sources">
       {claim.citations.map((c, i) => {
         const d = details?.find((x) => x.citation.evidence_id === c.evidence_id);
         const Icon = d ? sourceIcon(d.source.type) : sourceIcon("notes");
@@ -134,7 +149,7 @@ function Drawer({ claim, evidenceId, onClose }: { claim: Claim; evidenceId?: str
             <p className="mt-1 text-sm font-medium text-slate-900">{claim.statement}</p>
             {claim.confidence_reason && <p className="mt-1 text-xs text-slate-600">Why this state: {claim.confidence_reason}</p>}
           </div>
-          <button onClick={onClose} aria-label="Close evidence viewer" className="rounded p-1 hover:bg-slate-100"><X size={18} /></button>
+          <button onClick={onClose} aria-label="Close evidence viewer" className="rounded p-2.5 hover:bg-slate-100 sm:p-1"><X size={18} /></button>
         </header>
         <div className="space-y-5 p-4">
           {err && <p className="rounded border border-rose-300 bg-rose-50 p-2 text-sm text-rose-900">{err}</p>}

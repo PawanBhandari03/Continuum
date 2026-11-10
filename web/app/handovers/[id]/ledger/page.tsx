@@ -220,7 +220,7 @@ export default function LedgerPage({ params }: { params: Promise<{ id: string }>
       {showVersions && (
         <ModalShell label="Version history" onClose={() => setShowVersions(false)} panelClassName="h-full w-full max-w-xl overflow-y-auto bg-white p-4 shadow-xl">
           <div>
-            <div className="flex items-center justify-between"><h2 className="font-semibold">Version history</h2><button aria-label="Close" onClick={() => setShowVersions(false)} className="rounded p-1 hover:bg-slate-100"><X size={18} /></button></div>
+            <div className="flex items-center justify-between"><h2 className="font-semibold">Version history</h2><button aria-label="Close" onClick={() => setShowVersions(false)} className="rounded p-2.5 hover:bg-slate-100 sm:p-1"><X size={18} /></button></div>
             {!versions && <div className="mt-4"><SkeletonList rows={2} label="Loading versions" /></div>}
             {versions?.length === 0 && <div className="mt-4"><EmptyState title="No versions yet" /></div>}
             <div className="mt-4"><VersionCompare hid={id} versions={versions} /></div>
