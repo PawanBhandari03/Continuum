@@ -47,12 +47,12 @@ Live site tested: continuum-web-kodb.onrender.com · API: continuum-api-945j.onr
 <tr><th style="width:30%">Manual task (from "Rahul: your manual tasks")</th><th style="width:16%">Status</th><th>Result in one line</th></tr>
 <tr><td>1. User interviews (5 or more)</td><td class="ok">Survey done<br><span class="warn">Interviews not run</span></td><td>6 real survey responses recorded. No in-person interviews yet (optional, would add richer quotes).</td></tr>
 <tr><td>2. Handover test with vs without Continuum</td><td class="ok">Done</td><td>2 real people, same 6 questions, both 6 of 6. About 20 minutes (one combined figure). No speed or accuracy difference can be claimed.</td></tr>
-<tr><td>3. Click through the live site like a judge</td><td class="warn">Partly</td><td>Automated run on desktop and 375 px phone emulation done, with real findings (section 4). Full path to Publish <b>not completed</b> on the live site. Real phone and 15-minute cold-start check: <b>not yet run</b>.</td></tr>
+<tr><td>3. Click through the live site like a judge</td><td class="warn">Partly</td><td>Automated run on desktop and 375 px phone emulation, twice (section 4 as found on 9 Nov; section 9 after Pawan's fixes on 10 Nov): the full path now reaches Publish, Successor, acknowledge and flag. Real phone and 15-minute cold-start check: <b>not yet run</b> (Rahul).</td></tr>
 <tr><td>4. Fill in the placeholders</td><td class="ok">Mostly</td><td><code>docs/user-research.md</code> and <code>docs/testing.md</code> filled with real results; README and the Round 2 project PDF updated.</td></tr>
 </table>
 
 <div class="box red">
-<b>What Pawan most needs to know (ranked).</b>
+<b>As found on 9 Nov (ranked). Update: Pawan fixed items 1 to 4 and the re-test on 10 Nov is in section 9.</b>
 <ol>
 <li><b>A judge cannot reach "Publish" on the live site.</b> Each approve call takes 6 to 10 seconds, and the live data has 94 claims to review. One-by-one approval would take 8 to 15 minutes. We need a single bulk-approve endpoint (section 6, fix 1).</li>
 <li><b>"Project in five lines" is empty</b> for the Successor ("Nothing visible to your role in this section"). That is the first section a judge reads.</li>
@@ -176,12 +176,30 @@ Good news: the permission checks on the live API all passed (section 7).
 <tr><td>Open the site again after 15 minutes idle; check the "Waking the server" message and how long it takes</td><td>Rahul</td><td>Tue 10 Nov</td></tr>
 <tr><td>Optional: 2 or 3 short interviews (ask what was confusing in the demo)</td><td>Rahul</td><td>Tue evening</td></tr>
 <tr><td>Optional: repeat the handover test with separate timers or harder questions</td><td>Rahul</td><td>Tue evening</td></tr>
-<tr><td>Bulk approve, project section, duplicate conflict, diff endpoint</td><td>Pawan</td><td>As early as possible, so Rahul can re-test</td></tr>
-<tr><td>Re-run the live judge test after fixes (script is ready)</td><td>Rahul and Claude</td><td>After Pawan's fixes</td></tr>
+<tr><td>Bulk approve, project section, duplicate conflict, diff endpoint</td><td>Pawan</td><td class="ok">Done 9 Nov; re-tested 10 Nov (section 9). The duplicate conflict card still shows twice, but resolving one settles both.</td></tr>
+<tr><td>Re-run the live judge test after fixes (script is ready)</td><td>Rahul and Claude</td><td class="ok">Done 10 Nov (section 9)</td></tr>
 <tr><td>Open every submission link in incognito</td><td>Rahul and Pawan</td><td>Tue night</td></tr>
 </table>
 
-<h2>9. Limits of this report</h2>
+<h2 class="pb">9. Re-test on 10 Nov after Pawan's fixes</h2>
+<p>Pawan pushed a bulk-approve endpoint, faster writes, the project section, settled duplicate conflicts and the version-diff endpoint. I re-ran the live judge-style test and re-timed the calls. <b>Result: the full path now reaches Publish, then the Successor view, acknowledge and flag, on desktop and on 375 px phone emulation, with no failed step.</b> All numbers are single samples on free hosting. Details and every number: <code>docs/testing.md</code>, section 2b.</p>
+<table>
+<tr><th style="width:36%">What</th><th>9 Nov (before)</th><th>10 Nov (after)</th></tr>
+<tr><td>Approve one claim (API, 3 samples)</td><td>9.8 s, 6.0 s, 7.7 s</td><td class="ok">1.74 s, 1.87 s, 1.41 s</td></tr>
+<tr><td>"Approve all Verified" (API / UI)</td><td>did not finish in 120 s</td><td class="ok">1.88 s (78 claims) / 2.4 to 2.5 s in the final run</td></tr>
+<tr><td>"Approve all remaining" (API / UI)</td><td>not reached</td><td class="ok">2.26 s (13 claims) / 1.4 to 1.9 s</td></tr>
+<tr><td>Acknowledge, click to visible badge (UI)</td><td>18.4 s desktop, 12.4 s phone</td><td class="ok">3.0 s desktop, 3.1 s phone (after my web fix; 16.5 to 26.3 s just before it)</td></tr>
+<tr><td>Markdown export, 91 claims</td><td>about 100 s (estimate, one by one)</td><td class="ok">15.7 s (35.0 s on 9 Nov after the parallel change)</td></tr>
+<tr><td>Audit log (API)</td><td>35.4 s once</td><td class="ok">1.1 s</td></tr>
+<tr><td>Version diff</td><td>HTTP 404</td><td class="ok">HTTP 200, 2.7 s</td></tr>
+<tr><td>"Project in five lines" for the Successor</td><td>0 claims</td><td class="ok">5 claims</td></tr>
+<tr><td>Duplicate conflict</td><td>2 conflicts, resolved separately</td><td>2 cards; resolving one settles both</td></tr>
+<tr><td>Accessibility (axe, 8 screens on the live site)</td><td>not measured on live</td><td class="ok">0 violations</td></tr>
+</table>
+<p><b>Found and fixed on my side during the re-test:</b> acknowledging was slow in the UI (16 to 26 s) although the API call takes about 1.5 s, because 91 source-chip requests queued ahead of the click; fixed by loading chips only when near the screen and letting user actions jump the queue (evidence requests 91 down to 14). A 32 px link on the phone Handovers list was enlarged.</p>
+<p><b>Still open (Rahul, by hand):</b> the real phone run and the 15-minute cold-start check. The API took 33 s to answer its first health check after a long idle on 10 Nov, which is the cold start judges may see.</p>
+
+<h2>10. Limits of this report</h2>
 <ul>
 <li>The click-through was automated, not a human on a real device. Emulated phone results do not replace a real phone.</li>
 <li>Survey and handover test are small samples (6 and 2 people), mostly friends and contacts. They are illustrations, not proof.</li>
