@@ -47,7 +47,7 @@ Live site tested: continuum-web-kodb.onrender.com · API: continuum-api-945j.onr
 <tr><th style="width:30%">Manual task (from "Rahul: your manual tasks")</th><th style="width:16%">Status</th><th>Result in one line</th></tr>
 <tr><td>1. User interviews (5 or more)</td><td class="ok">Survey done<br><span class="warn">Interviews not run</span></td><td>6 real survey responses recorded. No in-person interviews yet (optional, would add richer quotes).</td></tr>
 <tr><td>2. Handover test with vs without Continuum</td><td class="ok">Done</td><td>2 real people, same 6 questions, both 6 of 6. About 20 minutes (one combined figure). No speed or accuracy difference can be claimed.</td></tr>
-<tr><td>3. Click through the live site like a judge</td><td class="warn">Partly</td><td>Automated run on desktop and 375 px phone emulation, twice (section 4 as found on 9 Nov; section 9 after Pawan's fixes on 10 Nov): the full path now reaches Publish, Successor, acknowledge and flag. Real phone and 15-minute cold-start check: <b>not yet run</b> (Rahul).</td></tr>
+<tr><td>3. Click through the live site like a judge</td><td class="warn">Partly</td><td>Automated run on desktop and 375 px phone emulation, twice (section 4 as found on 9 Nov; section 9 after Pawan's fixes on 10 Nov): the full path now reaches Publish, Successor, acknowledge and flag. Real phone: <b>partly done 10 Nov</b> (create, reconstruct, view, export; section 10); publish, Successor and the 15-minute cold start are not yet done.</td></tr>
 <tr><td>4. Fill in the placeholders</td><td class="ok">Mostly</td><td><code>docs/user-research.md</code> and <code>docs/testing.md</code> filled with real results; README and the Round 2 project PDF updated.</td></tr>
 </table>
 
@@ -199,7 +199,21 @@ Good news: the permission checks on the live API all passed (section 7).
 <p><b>Found and fixed on my side during the re-test:</b> acknowledging was slow in the UI (16 to 26 s) although the API call takes about 1.5 s, because 91 source-chip requests queued ahead of the click; fixed by loading chips only when near the screen and letting user actions jump the queue (evidence requests 91 down to 14). A 32 px link on the phone Handovers list was enlarged.</p>
 <p><b>Still open (Rahul, by hand):</b> the real phone run and the 15-minute cold-start check. The API took 33 s to answer its first health check after a long idle on 10 Nov, which is the cold start judges may see.</p>
 
-<h2>10. Limits of this report</h2>
+<h2>10. Real phone run by Rahul (10 Nov, about 8:59 to 9:02)</h2>
+<p>Android phone, Chrome-style browser (model not recorded). Screenshots show Reconstruct finishing on the live pipeline, the Start here page, and the Markdown export downloading (43.19 KB). The API record agrees: handover <code>h_d117bfbe</code> was created, reconstructed (113 claims, 5 conflicts, 2 gap questions), 98 Verified claims were bulk-approved, both gap questions were skipped, and it was not published. <b>Not yet done on the phone:</b> resolving conflicts, Publish, the Successor view, acknowledge, and the 15-minute cold-start check.</p>
+<table>
+<tr><th style="width:4%">#</th><th>Finding</th><th style="width:20%">Owner / status</th></tr>
+<tr><td>1</td><td>Header and step tabs wrapped onto three rows, so the first phone screen was mostly navigation.</td><td class="ok">Rahul: fixed (one scrollable row)</td></tr>
+<tr><td>2</td><td>On Reconstruct, the "finished" notice and the "Open the claim ledger" button were squeezed together and the button was cut off.</td><td class="ok">Rahul: fixed (they wrap)</td></tr>
+<tr><td>3</td><td>The same GitHub repository was connected 6 times (11 sources) because repeats were allowed.</td><td class="ok">Rahul: fixed (repeats refused)</td></tr>
+<tr><td>4</td><td><b>5 conflicts on a fresh live run; 3 about payments look like false positives</b> ("card gateway module added", "1 rupee test payment successful" shown as conflicting with the UPI decision), so the key decision shows as Conflicting. All must be resolved or deferred before Publish.</td><td class="bad">Pawan</td></tr>
+<tr><td>5</td><td>"Project in five lines" holds trivia from the filler chat (dark mode toggle, API under 200 ms, posters printed), not what CampusKart is.</td><td class="warn">Pawan (and Rahul: demo chat repeats filler lines)</td></tr>
+<tr><td>6</td><td>The demo chat repeats the same filler message on several dates, so claims show 3 to 5 identical citations and near-duplicate claims.</td><td class="warn">Rahul (data), Pawan (duplicate merging)</td></tr>
+<tr><td>7</td><td>A gap question asks who owns the image bucket although the chat names Meera.</td><td class="warn">Pawan (observation)</td></tr>
+<tr><td>8</td><td>The live Handovers list shows every test handover; judges would see them.</td><td class="warn">Pawan: clear test handovers before submitting</td></tr>
+</table>
+
+<h2>11. Limits of this report</h2>
 <ul>
 <li>The click-through was automated, not a human on a real device. Emulated phone results do not replace a real phone.</li>
 <li>Survey and handover test are small samples (6 and 2 people), mostly friends and contacts. They are illustrations, not proof.</li>
