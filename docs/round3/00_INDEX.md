@@ -17,6 +17,7 @@ Documentation/roadmap 15. Round 3 is measured against the three improvements we 
 | [06_SPEC_EXTRAS_AND_UI.md](06_SPEC_EXTRAS_AND_UI.md) | Extras (view-as, checklist, timeline, radar, CI) and UI plan + judge path |
 | [07_TEST_PLAN.md](07_TEST_PLAN.md) | Tests, leak canary, failure cases, usability sessions |
 | [08_SUBMISSION_DOCS_OUTLINE.md](08_SUBMISSION_DOCS_OUTLINE.md) | Final report, privacy/a11y, roadmap, video outline |
+| [09_README_DRAFT.md](09_README_DRAFT.md) | Final README template in the winners' style (fill with real results) |
 
 ---
 
