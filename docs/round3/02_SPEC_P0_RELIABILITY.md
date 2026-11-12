@@ -90,6 +90,20 @@ New model:
 - Publishing creates version N+1 (snapshot, see 04). UI shows "Draft rev 12 · last published v2".
 - Migration: existing h_1 reset → version 0, revision 1.
 
+## P0.7 Judge-safe demo state (blocking for "use it unaided")
+Risk created by our own Round 3 design: the successor view will read the latest **published** snapshot (04) and the
+version counter starts at 0 before publish (P0.5). A judge who clicks "Enter as Successor" or "Guest" first would
+see an empty handover. Also, with the full loop (flags, tasks, v2, v3) judges sharing one `h_1` would change each
+other's state.
+- **Seeded state:** the stored demo includes a **published v1 snapshot**, one answered successor task, an open gap,
+  one open conflict and a draft in progress towards v2. Every role has content on first click. Reset restores this.
+- **Per-visitor sandbox:** "Enter the demo" on the landing creates a fresh copy (`h_demo_<random>`) from the stored run
+  using the existing `_copy_set` + snapshot machinery, stores its id in the browser, and routes every role to it.
+  Sandboxes older than 24 h are deleted by a cleanup on handover list. `h_1` stays as the template, read-only.
+  This also removes the "do not publish on the live demo" weak spot permanently (Reset demo then resets only your copy).
+- Acceptance: two browsers entering the demo get different handover ids; publishing in one does not change the other;
+  Successor/Guest first-click shows a non-empty v1.
+
 ## P0.6 Smaller correctness fixes
 - **Duplicate conflict cards** → solved structurally in 03 (one conflict per disagreement cluster).
 - **Redundant gap question**: if an owner-gap and a slot-gap target the same `entity_key`, keep one question that asks both ("Who owns the SMTP account and how do you log in?").
@@ -104,4 +118,5 @@ New model:
 - [ ] README/notes dates correct
 - [ ] contributor requests to conflicts/gaps/versions/jobs return no lead-only text or 403/404
 - [ ] version stays 0 until publish; revision increments
-- [ ] Round 2 e2e (37) still green
+- [ ] Round 2 e2e (37) green **after** updating the tests listed under "Intentional contract changes" in 00_INDEX
+- [ ] P0.7: fresh sandbox per visitor; Successor/Guest first click shows published v1

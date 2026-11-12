@@ -71,10 +71,25 @@ All in one new migration file `supabase/migrations/0002_round3.sql` (written in 
 | POST | /auth/* via Supabase; /handovers/{id}/members | members | 05 (3e) |
 | GET/POST | /handovers/{id}/checklist | contributor | E2 |
 
+## Intentional contract changes (update these tests and mock shapes on purpose, hour 0–3)
+These are deliberate breaks of Round 2 behaviour; failing old tests here are expected, not regressions.
+| Change | Old behaviour / tests that assert it | New |
+|---|---|---|
+| Conflict resolution values | `resolved` / `unresolved_followup` (conflicts page, mock-api, real-e2e "Mark unresolved") | `open/kept/both_true/corrected/deferred` |
+| Ack on draft | Successor "Draft preview" lets you ack (start page, real-e2e step 6, e2e specs) | ack only on a published version → 400 on draft |
+| Hidden claim evidence | 403 (permission test, Round 2 PDF wording) | 404 not found |
+| `handover.version` | increments on every action; UI shows "v37" | latest published version; draft `revision` separate |
+| Publish lock | locked forever after publish | each published version frozen; editing starts the next draft |
+| Successor view source | live claims | latest published snapshot (draft preview for lead only) |
+| Demo entry | shared `h_1` | per-visitor sandbox copy (P0.7); `h_1` is the template |
+| Gaps/conflicts/versions for non-leads | unfiltered | filtered or 403 (P0.4) |
+Update: `web/lib/types.ts`, `web/lib/mock-api.ts`, `docs/contracts.md`, affected Playwright specs, `tests/real-e2e.mjs`,
+`api/tests`, `api/smoke.py`, and the README/PDF wording that mentions 403 or "locked".
+
 ## Timeline (hours from 13 Nov 23:59)
 | Hours | Pawan (backend/AI) | Rahul (frontend/testing) |
 |---|---|---|
-| 0–3 | migration 0002; P0.5 version semantics; P0.4 permission fixes | update types.ts + mock-api shapes for all new endpoints (from this book) |
+| 0–3 | migration 0002; P0.5 version semantics; P0.4 permission fixes; P0.7 seeded v1 + sandbox | update types.ts + mock-api shapes for all new endpoints (from this book) |
 | 3–8 | P0.1 rules extractor + fallback; P0.2; P0.3 | Conflicts redesign on mocks |
 | 8–14 | 04 snapshots + snapshot-based view/diff | Start here: version picker + diff panel on mocks |
 | 14–22 | 03 detection rules + clustering + resolve actions + history | wire Conflicts to API; Tasks page on mocks |

@@ -10,7 +10,7 @@ The submitted Round 1 proposal is `Continuum_BinaryBuilders_Round1.pdf` (source:
 - **Dates (IST):**
   - Round 1 (The Plan): 5–6 Nov 2026, PDF proposal due 6 Nov 18:00. Results emailed same night.
   - Round 2 (The Build): **OFFICIAL (selection email, 7 Nov): opens Sun 8 Nov 10:00 IST, closes Wed 11 Nov 10:00 IST.** (Earlier note said 7–10 Nov; superseded.) We are one of 59 teams selected. **Only the team leader (Pawan) submits, one per team.** Submission link will be posted in the WhatsApp group https://chat.whatsapp.com/HAmk6bZBLG68jT7259acBi (keep checking). Submit: working project link, repo link, updated project PDF, list of completed features, technology/implementation details, changes from the original plan, three major (non-cosmetic) Round 3 improvements. **A judge must open the link and use the core product without assistance or walkthrough. All links must open without sign-in — test in incognito.** Late submissions are not evaluated. Prizes: PPO/incubation (Inkloom AI), Rs 30,000, credits.
-  - Round 3 (The Finish): **13–16 Nov, 72 hours from 10:00.**
+  - Round 3 (The Finish): **OFFICIAL (finalist email from support@wecodecoders.in, 11 Nov): opens Fri 13 Nov 23:59 IST, closes Mon 16 Nov 23:59 IST (72 h).** No product code before 13 Nov 23:59 IST. Seat needs the team leader to submit the KonfHub confirmation form and pay ₹399 per team (non-refundable per wecodecoders.in/terms). Round 3 build book (specs, plan, tests): `docs/round3/00_INDEX.md`. Submission format/link to be announced.
 - **No late window.** Missing a round's deadline ends the event for the team.
 - Every participant submits individually each round (same project, own role in own words). No submission = no certificate.
 - Official Round 1 PDF format: we received none, so we used our own layout.
@@ -174,4 +174,7 @@ Synthetic project **"CampusKart"** (campus marketplace app): a public repo we cr
 
 - 2026-11-06: Round 1 proposal (16-page PDF) finished and uploaded to Drive; link tested anonymously (works). Both members to submit the Google Form individually before 18:00 IST.
 - 2026-11-07: Round 1 passed (selected, 59 teams in Round 2). Window is 8 Nov 10:00 -> 11 Nov 10:00 IST. Round 3 dates not yet confirmed in the email (earlier note said 13-16 Nov; verify). BUILD_PREP.md written (hours there are relative to window start).
+- 2026-11-10: Round 2 submitted by Pawan via the official Google Form (only the leader submits). Live web/API on Render, repo public, PDF on Drive.
+- 2026-11-11 23:58: Finalist email (top 50) from support@wecodecoders.in. Confirmation = KonfHub form + ₹399 per team within ~12 h (rule on wecodecoders.in/terms).
+- 2026-11-12: Competitor research and Round 3 build book written (`docs/round3/`, planning only). Pawan declined to backdate code; all Round 3 code starts 13 Nov 23:59 IST.
 - (Superseded) Next: wait for the Round 1 result email (6 Nov, ~23:59); create GitHub repo in this folder (docs only until the window opens); prepare synthetic CampusKart data design; Round 2 build starts 7 Nov 10:00.
