@@ -56,6 +56,20 @@ Numbers quoted are the teams' own claims unless marked "checked".
 | Multi-tenant SaaS, billing, Slack/Drive live connectors | Bramhastra | no | **SKIP** — not promised, high cost; say so in roadmap |
 | Embeddings / semantic search | Bramhastra | no | **SKIP** (memory limits on free hosting) |
 
+## What the organiser's other winners tell us (checked 12 Nov)
+The organiser posted winners of three shorter, free events (CodeVerse, Code Conqueror, CodeHack India 2026). They all
+used one different problem ("Unlock Underused Equipment and Spaces"), so they are not our competitors, but they show
+what this organiser's judges reward.
+- **CodeVerse 1st, ShareLab (divyo0/sharelab):** whole repo uploaded in 2 web commits ("Add files via upload"); the
+  README's live-link line is still a placeholder. What it does have: a "Try it in 3 minutes" section, demo accounts in a
+  table, a 10-step journey, and a **"Judging need → how we handle it"** table; human oversight, explainable rules,
+  hash-chained audit with tamper test, appeals; 16 end-to-end tests; ready-to-paste form answers and a contributions file.
+- **CodeVerse 2nd, SpareLook** and **3rd, EquipSync**, **Code Conqueror 1st, SpareSlot:** 4–36 pages of commits, long
+  READMEs (20–55 KB), docs folders (decisions, security review, RLS matrix, judge demo, AI use, test suites).
+**Takeaways:** (1) the written submission and README carry a lot of weight: map every judging criterion to visible
+evidence; (2) trust themes win here: human oversight, explainability, tamper-evident audit, fairness; (3) a clear
+judge path at the top of the README. We still follow the build-window rule regardless of what others did.
+
 ## How we win the comparison (story for judges)
 1. **Same honesty, better evidence**: real model + deterministic checks, and it still works offline (rule mode labelled as such).
 2. **Only one with a closed loop that respects the reader**: flag -> task -> answer -> new signed version -> successor re-acknowledges only what changed.

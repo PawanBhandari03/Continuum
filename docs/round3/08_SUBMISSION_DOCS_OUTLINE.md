@@ -16,6 +16,12 @@ to something visible in the product, a test result, or a file in the repo.
 9. Roadmap (realistic, section D).
 10. Team and contributions (section E). AI-use disclosure.
 
+## A2. README top (pattern from the organiser's winners)
+1. One-line pitch + live link + "Try it in 5 minutes" (judge path, roles, no sign-in).
+2. **"Judging criterion → where to see it" table** for all five Round 3 criteria (Completeness, Improvements,
+   Reliability, Usability, Documentation), each row linking to a screen, a test file or a doc section.
+3. "The three improvements we promised → what shipped" table with screenshots.
+
 ## B. Completed-improvements list (form text, one line each + where to see it)
 To be written from what actually ships.
 
