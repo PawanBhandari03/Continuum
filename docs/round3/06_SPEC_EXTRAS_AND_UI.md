@@ -60,6 +60,20 @@ GitHub Actions: API pytest + web typecheck/unit/e2e (mock mode). Badge in README
 - Use the existing components (`Card`, `Button`, `Notice`, `ClaimCard`, `ModalShell`, `EmptyState`, `LoadError`, `SkeletonList`).
 - Copy: plain words; say what happens next ("Aditi will see this in her inbox").
 
+### Patterns borrowed from the organiser's other winners (SpareSlot, EquipSync, SpareLook, ShareLab; checked 12 Nov)
+| Pattern | Seen in | Our version |
+|---|---|---|
+| **"Judge's tour" as a top-nav page** with numbered steps and one-click "Sign in as" per step | SpareSlot | `/tour` page: the 6-step judge path, each step a button that switches role and opens the right screen; keep the modal tour too |
+| **"What needs your attention" home per role** (count tiles: Decide · Today · Settle) from one API call | SpareSlot | Role homes: Reviewer tiles (open conflicts, answered tasks, privacy items, pending claims); Leaver (questions waiting); Successor (new version, answered questions, sections to acknowledge). Endpoint `GET /handovers/{id}/home` |
+| **Blocked actions explain themselves** ("X is not possible yet: reason"), server decides which buttons show | SpareSlot | Publish, Ack, Resolve show the exact rule that blocks them with a link to fix it (partly exists for publish) |
+| **Mandatory reason on every human decision** | SpareSlot, ShareLab | already for conflicts; extend to reject, unmask, escalate, resolve task |
+| **"Advice only" automated suggestion, person decides** | SpareSlot (deposits), ShareLab | conflict side suggestion ("newer activity suggests Vercel — your call"), people-sensitive suggestion in Privacy |
+| **Hero with small live product preview cards + trust badge row** | EquipSync | we have example claim cards; add a badge row (Every claim cited · Works without AI · Tamper-evident log · Role-filtered) |
+| **FAQ on the landing** | EquipSync | 5 questions: what the AI does, who sees what, what if sources disagree, where data lives, what it costs to run |
+| **README status table: Implemented / Partial / Not verified + dated test report** | SpareLook | add to README and PDF; only list runs we executed |
+| Tabs kept in the URL (`?tab=`) so links target them | SpareSlot | ledger filters and Start-here version in the URL |
+| Dark mode toggle | EquipSync | **skip** (user asked for a plain light UI) |
+
 ### Judge path (written on landing and in the tour)
 1. Enter as Reviewer → Conflicts → keep Vercel side → note → Confirm.
 2. Privacy → see PAN/Aadhaar/key masked → escalate mentor note (already lead-only) → Publish v1.
