@@ -128,3 +128,15 @@ def test_fallback_uses_rules_when_model_fails():
     fb = FallbackProvider(Broken())
     res = run([U("d1", "We decided to use UPI deep links for payments.")], fb, role="contributor")
     assert res.claims and fb.used["rules"] >= 1 and "quota" in fb.errors[0]
+
+
+def test_more_topics_database_and_ci_with_aliases():
+    db1 = C("d1", "The app stores its data in Postgres.", "e1", ek="database")
+    db2 = C("d2", "User data is kept in MongoDB.", "e2", ek="database")
+    db3 = C("d3", "We use PostgreSQL on Supabase.", "e3", ek="database")
+    assert rule_contradicts(db1, db2) is True
+    assert rule_contradicts(db1, db3) is False          # Postgres and PostgreSQL are the same value
+    ci1 = C("c1", "CI runs on GitHub Actions.", "e4", ek="ci")
+    ci2 = C("c2", "The CircleCI pipeline builds every push.", "e5", ek="ci")
+    assert rule_contradicts(ci1, ci2) is True
+    assert rule_contradicts(ci1, C("c3", "CI runs on GH Actions.", "e6", ek="ci")) is False

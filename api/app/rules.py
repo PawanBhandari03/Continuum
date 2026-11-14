@@ -40,6 +40,9 @@ VALUES = {
     "email": ["college smtp", "gmail", "sendgrid", "ses", "mailgun", "resend"],
     "storage": ["s3", "cloudinary", "firebase storage", "supabase storage"],
     "auth": ["jwt", "session cookie", "firebase auth", "supabase auth", "oauth"],
+    # a tuple groups aliases of one value, so "Postgres" and "PostgreSQL" are never reported as a disagreement
+    "database": [("postgres", "postgresql"), ("mysql", "mariadb"), "mongodb", "sqlite", "firestore"],
+    "ci": [("github actions", "gh actions"), "circleci", "jenkins", ("gitlab ci", "gitlab-ci"), "travis"],
 }
 PAST = re.compile(r"\b(was|were|earlier|used to|previously|replaced|moved from|switched from|old|no longer|"
                   r"preview|staging|test payment|tested on)\b", re.I)
@@ -74,8 +77,14 @@ def _claim(typ: str, sentence: str, unit: EvidenceUnit, owner: str | None = None
 
 
 def values_in(text: str, slot: str) -> set[str]:
+    """Named values of a topic found in the text, as canonical names (aliases collapsed)."""
     t = f" {text.lower()} "
-    return {v for v in VALUES.get(slot, []) if re.search(rf"(?<![a-z]){re.escape(v)}(?![a-z])", t)}
+    out = set()
+    for entry in VALUES.get(slot, []):
+        names = (entry,) if isinstance(entry, str) else entry
+        if any(re.search(rf"(?<![a-z]){re.escape(n)}(?![a-z])", t) for n in names):
+            out.add(names[0])
+    return out
 
 
 class RuleProvider:

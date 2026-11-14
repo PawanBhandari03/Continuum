@@ -30,7 +30,7 @@ Rules:
   dependency (external service, credential, account and who holds it), owner (who owns what),
   next_action (open work someone must do), open_question (unresolved question), fact.
 - `workstream` and `entity_key` are one lowercase word naming the topic. Use exactly one of:
-  deploy, payments, auth, email, storage, ci, ui, data, process, people, general.
+  deploy, payments, auth, email, storage, database, ci, ui, data, process, people, general.
   Use `deploy` for hosting/deployment, `email` for SMTP/mail, `storage` for file/image storage.
 - If your claim is a conclusion not stated in any unit, set `inferred` true.
 - Emit ONE claim per evidence unit that states a current configuration, decision or fact, citing only that

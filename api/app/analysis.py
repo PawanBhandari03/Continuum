@@ -31,6 +31,8 @@ SLOT_KEYWORDS = {
     "auth": ["login", "log in", "auth", "session", "refresh token", "password", "sign-in", "signin"],
     "email": ["smtp", "email", "e-mail", "verification mail"],
     "storage": ["bucket", "image upload", "object storage", "s3", "storage", "uploaded image", "listing images"],
+    "database": ["postgres", "mysql", "mariadb", "mongodb", "sqlite", "firestore", "database"],
+    "ci": ["github actions", "circleci", "jenkins", "gitlab ci", "travis", "ci pipeline", "continuous integration"],
 }
 
 
