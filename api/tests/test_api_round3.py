@@ -233,3 +233,46 @@ def test_unchanged_sections_keep_their_acknowledgement(api):
     assert c.post(f"/handovers/{sid}/publish", headers=L).json()["version"] == 2
     sec = {x["key"]: x for x in c.get(f"/handovers/{sid}/view", headers=C).json()["sections"]}
     assert sec["first_week"]["ack"] == "acknowledged" and sec["first_week"]["carried_over"]
+
+
+def _privacy_seed(s, sid):
+    from app.protect import scan
+    text = ("Pay the vendor at campuskart.club@okaxis, PAN ABCPE1234F. "
+            "Rohan has been unreliable about replying to sellers this month.")
+    s.ins("evidence_units", [{"id": f"{sid}__ev_vendor", "handover_id": sid, "source_id": f"{sid}__src_github",
+                              "author": "notes", "ts": "2026-10-12T12:00:00+00:00", "text": text, "locator": "notes://v#p1",
+                              "label": "contributor", "redactions": [r.model_dump() for r in scan(text)], "flags": []}])
+    s.ins("claims", [{"id": f"{sid}__cl_v", "handover_id": sid, "type": "fact", "statement": "Rohan is unreliable.",
+                      "state": "verified", "confidence_reason": "", "workstream": "people", "entity_key": "people",
+                      "owner": None, "label": "contributor", "review_status": "approved", "sensitive": False,
+                      "section": "state", "date": None, "citations": [{"evidence_id": f"{sid}__ev_vendor",
+                                                                       "quote": "Rohan has been unreliable", "support": "full"}],
+                      "conflict_id": None, "version": 1, "confirmed_by": None, "confirmed_at": None, "method": "model"}])
+    main.cache_clear()
+    main.build_privacy_queue(sid)
+
+
+def test_privacy_queue_lists_detectors_without_raw_values_and_escalation_hides_claim(api):
+    c, s, sid = api
+    _privacy_seed(s, sid)
+    q = c.get(f"/handovers/{sid}/redactions", headers=L).json()
+    names = {i["detector"]: i for i in q["items"]}
+    assert {"upi_id", "pan", "people_sensitive"} <= set(names)
+    assert "ABCPE1234F" not in str(q) and "okaxis" not in str(q)        # raw values never sent
+    assert c.get(f"/handovers/{sid}/redactions", headers=C).status_code == 403
+    # a pending judgement about a person blocks publishing until the reviewer decides
+    c.post(f"/conflicts/{sid}__cf_1/resolve", headers=L, json={"action": "keep", "keep_claim_ids": [f"{sid}__cl_2"],
+                                                              "note": "Commits since 2 Oct configure Vercel."})
+    r = c.post(f"/handovers/{sid}/publish", headers=L)
+    assert r.status_code == 400 and "privacy" in r.text.lower()
+    pid = names["people_sensitive"]["id"]
+    assert c.post(f"/redactions/{pid}/decide", headers=L, json={"decision": "escalate_lead_only"}).status_code == 400
+    c.post(f"/redactions/{pid}/decide", headers=L, json={"decision": "escalate_lead_only", "reason": "HR matter, lead only"})
+    assert s.one("claims", {"id": f"{sid}__cl_v"})["label"] == "lead_only"
+    assert c.post(f"/handovers/{sid}/publish", headers=L).status_code == 200
+    assert "unreliable" not in text_of(c.get(f"/handovers/{sid}/view", headers=C))
+    # secrets can never be unmasked
+    sec = next(i for i in c.get(f"/handovers/{sid}/redactions", headers=L).json()["items"] if i["kind"] == "secret") \
+        if any(i["kind"] == "secret" for i in c.get(f"/handovers/{sid}/redactions", headers=L).json()["items"]) else None
+    if sec:
+        assert c.post(f"/redactions/{sec['id']}/decide", headers=L, json={"decision": "unmask", "reason": "testing"}).status_code == 400

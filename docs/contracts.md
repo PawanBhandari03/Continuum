@@ -87,3 +87,13 @@ one successor question already answered by the leaver.
 | GET /jobs/{id} | lead | |
 Claim adds `method: model|rules|human`; `review_status` adds `superseded` (lost a conflict decision; hidden from non-leads).
 Evidence unit adds `flags` (e.g. `possible_injection`). Coming next (shapes to be added here): redaction queue, rules-mode indicator.
+
+**Privacy queue (Improvement 3, lead only)**
+| Method / path | Body / response |
+|---|---|
+| GET /handovers/{id}/redactions?status= | `{items:[{id,evidence_id,detector,detector_name,kind: secret|pii|manual|suggestion,preview,decision: pending|keep_masked|unmask|escalate_lead_only|added_manual,decided_by,decided_at,reason,source_name,source_id,label,author,ts,locator}], counts:{decision:n}}` — `preview` is masked context; raw values are never sent |
+| POST /redactions/{id}/decide | `{decision: keep_masked|unmask|escalate_lead_only|dismiss, reason}` — reason ≥5 chars except keep_masked; secrets cannot be unmasked; `escalate_lead_only` relabels the passage and every claim citing it |
+| POST /evidence/{id}/redact | `{start, end, reason}` manual mask |
+Pending `people_sensitive` suggestions block publishing. Secrets enter the queue already decided (`keep_masked`).
+
+**AI status:** `GET /ai/status` → `{mode: auto|model|rules, model_configured, calls:{model,rules}, recent_errors}`. Claims made without AI have `method: "rules"`.

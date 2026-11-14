@@ -1,10 +1,35 @@
 {
   "_comment": "Access labels per demo source. Pawan's ingestion should apply these as default_label. Synthetic data.",
   "sources": [
-    { "path": "chat-export/", "type": "chat_export", "default_label": "contributor" },
-    { "path": "notes/architecture.md", "type": "notes", "default_label": "contributor" },
-    { "path": "notes/onboarding.md", "type": "notes", "default_label": "contributor" },
-    { "path": "notes/meeting-2026-10-20.md", "type": "notes", "default_label": "contributor" },
-    { "path": "notes/mentor-notes.md", "type": "notes", "default_label": "lead_only" }
+    {
+      "path": "chat-export/",
+      "type": "chat_export",
+      "default_label": "contributor"
+    },
+    {
+      "path": "notes/architecture.md",
+      "type": "notes",
+      "default_label": "contributor"
+    },
+    {
+      "path": "notes/onboarding.md",
+      "type": "notes",
+      "default_label": "contributor"
+    },
+    {
+      "path": "notes/meeting-2026-10-20.md",
+      "type": "notes",
+      "default_label": "contributor"
+    },
+    {
+      "path": "notes/vendor-payments-2026-10-12.md",
+      "type": "notes",
+      "default_label": "contributor"
+    },
+    {
+      "path": "notes/mentor-notes.md",
+      "type": "notes",
+      "default_label": "lead_only"
+    }
   ]
 }

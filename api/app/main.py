@@ -352,10 +352,12 @@ def add_source(hid: str, body: NewSource, x_demo_role: Optional[str] = Header(No
     get_handover_row(hid)
     if body.sample:
         ingest_sample(hid)
+        build_privacy_queue(hid)
         return {"ok": True}
     sid = f"{hid}__src_{uuid.uuid4().hex[:6]}"
     if body.type == "github":
         ingest_github(hid, body.ref or "", body.name or (body.ref or "GitHub repo"), sid)
+        build_privacy_queue(hid)
         log(hid, ACTORS[role], "connect", f"Connected GitHub repo {body.ref}", role=role, target_type="source",
             target_id=sid)
         return {"ok": True}
@@ -420,6 +422,7 @@ async def upload_source(hid: str, type: str = Form(...), file: UploadFile = File
                               "status_reason": rep.get("reason"), "default_label": label, "unit_count": len(units)}])
         if units:
             db().ins("evidence_units", [unit_row(u, hid) for u in units])
+            build_privacy_queue(hid)
         bump(hid, ACTORS[role], "upload", f"Uploaded {name}: {rep['status']}, {len(units)} evidence units",
              role=role, target_type="source", target_id=sid)
         return {"id": sid, "type": type, "name": name, "status": rep["status"], "status_reason": rep.get("reason"),
@@ -647,6 +650,7 @@ def reset_demo(hid: str, x_demo_role: Optional[str] = Header(None)):
     _wipe_review_state(hid)
     n = _restore(hid)
     demo_labels(hid)
+    build_privacy_queue(hid)
     seed_published(hid)
     return {"ok": True, "claims": n[0]}
 
@@ -680,6 +684,7 @@ def create_sandbox():
                                 for u in units])
     _restore(hid)
     demo_labels(hid)
+    build_privacy_queue(hid)
     seed_published(hid)
     return {"handover_id": hid}
 
@@ -1550,6 +1555,142 @@ def log_export(hid: str, body: ExportLog, x_demo_role: Optional[str] = Header(No
     return {"version": v, "sha256": row["sha256"] if row else None, "exported_at": now()}
 
 
+# ---------------- privacy review queue (Improvement 3) ----------------
+DETECTOR_NAMES = {"api_key": "API key", "jwt": "Login token (JWT)", "private_key": "Private key",
+                  "url_token": "Token inside a link", "password_assignment": "Password or secret",
+                  "env_line": "Environment secret", "upi_id": "UPI ID", "email": "Email address",
+                  "pan": "PAN number", "aadhaar": "Aadhaar number", "ifsc": "Bank IFSC code", "phone": "Phone number",
+                  "people_sensitive": "Judgement about a person", "manual": "Masked by a reviewer", "": "Masked"}
+
+
+def _preview(text: str, start: int, end: int, reds: list[Redaction]) -> str:
+    """Masked context around a span. The raw value never leaves the API, even for the reviewer."""
+    a, b = max(0, start - 40), min(len(text), end + 40)
+    inside = [Redaction(start=r.start - a, end=r.end - a, kind=r.kind) for r in reds if r.start >= a and r.end <= b]
+    return ("…" if a else "") + redact_text(text[a:b], inside) + ("…" if b < len(text) else "")
+
+
+def build_privacy_queue(hid: str) -> int:
+    """One queue row per masked span, plus suggestions for judgements about people in text a successor could
+    read. Idempotent: existing rows (and their decisions) are kept."""
+    from .protect import people_sensitive
+    have = {r["id"] for r in db().sel("redaction_reviews", {"handover_id": hid}, select="id")}
+    rows = []
+    for u in db().sel("evidence_units", {"handover_id": hid}):
+        reds = [Redaction(**x) for x in (u.get("redactions") or [])]
+        for r in reds:
+            rid = f"rr_{u['id']}_{r.start}"
+            if rid not in have:
+                rows.append({"id": rid, "handover_id": hid, "evidence_id": u["id"], "start_pos": r.start,
+                             "end_pos": r.end, "detector": r.detector or r.kind, "kind": r.kind,
+                             "preview": _preview(u["text"], r.start, r.end, reds),
+                             "decision": "keep_masked" if r.kind == "secret" else "pending"})
+        if u["label"] != "lead_only":
+            for s, e in people_sensitive(u["text"]):
+                rid = f"rr_{u['id']}_p{s}"
+                if rid not in have:
+                    rows.append({"id": rid, "handover_id": hid, "evidence_id": u["id"], "start_pos": s, "end_pos": e,
+                                 "detector": "people_sensitive", "kind": "suggestion",
+                                 "preview": _preview(u["text"], max(0, s - 60), min(len(u["text"]), e + 60), reds),
+                                 "decision": "pending"})
+    if rows:
+        db().ins("redaction_reviews", rows)
+    return len(rows)
+
+
+@app.get("/handovers/{hid}/redactions")
+def privacy_queue(hid: str, status: Optional[str] = None, x_demo_role: Optional[str] = Header(None)):
+    need(role_of(x_demo_role), "lead")
+    units = {u["id"]: u for u in units_all(hid)}
+    srcs = sources_all(hid)
+    out = []
+    for r in db().sel("redaction_reviews", {"handover_id": hid}, order="id.asc"):
+        if status and r["decision"] != status:
+            continue
+        u = units.get(r["evidence_id"], {})
+        s = srcs.get(u.get("source_id"), {})
+        out.append({**{k: r.get(k) for k in ("id", "evidence_id", "detector", "kind", "preview", "decision",
+                                             "decided_by", "decided_at", "reason")},
+                    "detector_name": DETECTOR_NAMES.get(r["detector"], r["detector"]),
+                    "source_name": s.get("name"), "source_id": u.get("source_id"), "label": u.get("label"),
+                    "author": u.get("author"), "ts": u.get("ts"), "locator": u.get("locator")})
+    counts = {}
+    for r in out:
+        counts[r["decision"]] = counts.get(r["decision"], 0) + 1
+    return {"items": out, "counts": counts}
+
+
+class Decide(BaseModel):
+    decision: str            # keep_masked | unmask | escalate_lead_only | dismiss (suggestions)
+    reason: str = ""
+
+
+@app.post("/redactions/{rid}/decide")
+def decide_redaction(rid: str, body: Decide, x_demo_role: Optional[str] = Header(None)):
+    role = role_of(x_demo_role)
+    need(role, "lead")
+    actor = ACTORS[role]
+    r = db().one("redaction_reviews", {"id": rid})
+    if not r:
+        raise not_found("Item not found")
+    hid, eid = r["handover_id"], r["evidence_id"]
+    reason = body.reason.strip()
+    d = body.decision
+    if d not in ("keep_masked", "unmask", "escalate_lead_only", "dismiss"):
+        raise HTTPException(400, "decision must be keep_masked, unmask, escalate_lead_only or dismiss")
+    if d in ("unmask", "escalate_lead_only", "dismiss") and len(reason) < 5:
+        raise HTTPException(400, "Write a short reason for this decision.")
+    if d == "unmask":
+        if r["kind"] == "secret":
+            raise HTTPException(400, "Secrets cannot be unmasked. Mask it, or make the whole source lead-only.")
+        if r["kind"] == "suggestion":
+            raise HTTPException(400, "Nothing is masked here; use dismiss or escalate_lead_only.")
+        u = db().one("evidence_units", {"id": eid})
+        keep = [x for x in (u.get("redactions") or []) if not (x["start"] == r["start_pos"] and x["end"] == r["end_pos"])]
+        db().upd("evidence_units", {"id": eid}, {"redactions": keep})
+    if d == "escalate_lead_only":
+        db().upd("evidence_units", {"id": eid}, {"label": "lead_only"})
+        recompute_labels(hid)
+    stored = {"dismiss": "keep_masked" if r["kind"] != "suggestion" else "unmask"}.get(d, d)
+    db().upd("redaction_reviews", {"id": rid}, {"decision": stored, "decided_by": actor, "decided_at": now(),
+                                               "reason": reason or None})
+    cache_clear()
+    words = {"keep_masked": "kept masked", "unmask": "unmasked (not sensitive)", "dismiss": "dismissed (not sensitive)",
+             "escalate_lead_only": "made the passage lead-only"}[d]
+    bump(hid, actor, "privacy_decision", f"Privacy: {DETECTOR_NAMES.get(r['detector'], r['detector'])} {words}"
+         + (f". Reason: {reason}" if reason else ""), role, target_type="evidence", target_id=eid)
+    return {k: v for k, v in db().one("redaction_reviews", {"id": rid}).items() if k != "handover_id"}
+
+
+class ManualMask(BaseModel):
+    start: int
+    end: int
+    reason: str
+
+
+@app.post("/evidence/{eid}/redact")
+def manual_redact(eid: str, body: ManualMask, x_demo_role: Optional[str] = Header(None)):
+    role = role_of(x_demo_role)
+    need(role, "lead")
+    u = db().one("evidence_units", {"id": eid})
+    if not u:
+        raise not_found("Evidence not found")
+    if not (0 <= body.start < body.end <= len(u["text"])) or len(body.reason.strip()) < 5:
+        raise HTTPException(400, "Choose a valid range and give a reason.")
+    reds = (u.get("redactions") or []) + [{"start": body.start, "end": body.end, "kind": "manual", "detector": "manual"}]
+    db().upd("evidence_units", {"id": eid}, {"redactions": sorted(reds, key=lambda x: x["start"])})
+    db().ins("redaction_reviews", [{"id": f"rr_{eid}_m{body.start}", "handover_id": u["handover_id"], "evidence_id": eid,
+                                    "start_pos": body.start, "end_pos": body.end, "detector": "manual", "kind": "manual",
+                                    "preview": _preview(u["text"], body.start, body.end,
+                                                        [Redaction(**x) for x in reds]),
+                                    "decision": "added_manual", "decided_by": ACTORS[role], "decided_at": now(),
+                                    "reason": body.reason.strip()}], upsert=True)
+    cache_clear()
+    bump(u["handover_id"], ACTORS[role], "privacy_decision", f"Privacy: reviewer masked part of a passage. Reason: {body.reason.strip()}",
+         role, target_type="evidence", target_id=eid)
+    return {"ok": True}
+
+
 # ---------------- demo seeding ----------------
 @app.post("/demo/seed")
 def seed_demo():
@@ -1560,4 +1701,5 @@ def seed_demo():
         log(TEMPLATE, "Reviewer (lead)", "create", "Handover created.", role="lead", target_type="handover",
             target_id=TEMPLATE)
     ingest_sample(TEMPLATE)
+    build_privacy_queue(TEMPLATE)
     return {"ok": True, "handover_id": TEMPLATE}
