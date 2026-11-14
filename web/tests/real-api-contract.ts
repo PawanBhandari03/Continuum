@@ -1,6 +1,7 @@
 // Checks that the REAL API returns the shapes the web client expects (web/lib/types.ts).
 // Usage (from web/): NEXT_PUBLIC_API_URL=http://localhost:8000 npx --yes tsx tests/real-api-contract.ts
-import { api } from "../lib/api";
+import { api, setApiRole } from "../lib/api";
+setApiRole("lead"); // reading versions and readiness is a reviewer action; the contributor view is requested explicitly below
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const need = (name: string, obj: any, keys: string[]) => {
@@ -12,7 +13,7 @@ const need = (name: string, obj: any, keys: string[]) => {
 async function main() {
   const hs = await api.listHandovers();
   need("handover", hs[0], ["id", "leaver", "successor", "successor_role", "target_date", "status", "version", "approved_by", "published_at"]);
-  const hid = hs[0].id;
+  const hid = (hs.find((h) => h.published_at) ?? hs[0]).id; // the contributor view needs a published handover
   const src = await api.getSources(hid);
   need("source", src[0], ["id", "type", "name", "status", "status_reason", "default_label", "unit_count"]);
   const claims = await api.getClaims(hid);
