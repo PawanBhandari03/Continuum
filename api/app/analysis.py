@@ -69,8 +69,11 @@ def dedup_claims(claims: list[Claim], threshold: int = 86) -> list[Claim]:
     batches): keep the strongest state, union the citations."""
     kept: list[Claim] = []
     for c in claims:
-        twin = next((k for k in kept if k.type == c.type and k.label == c.label and
-                     fuzz.token_set_ratio(k.statement.lower(), c.statement.lower()) >= threshold), None)
+        def same(k: Claim) -> bool:
+            if k.method == "rules" or c.method == "rules":  # rule statements are raw sentences: near-identical only
+                return fuzz.ratio(k.statement.lower(), c.statement.lower()) >= 92
+            return fuzz.token_set_ratio(k.statement.lower(), c.statement.lower()) >= threshold
+        twin = next((k for k in kept if k.type == c.type and k.label == c.label and same(k)), None)
         if twin is None:
             kept.append(c)
             continue
@@ -114,9 +117,22 @@ def assign_sections(claims: list[Claim]) -> None:
         c.section = "project"
 
 
-def detect_conflicts(claims: list[Claim], provider: Provider) -> list[Conflict]:
-    """Group by entity_key; ask the model about small candidate pairs only.
-    Both sides are kept; nothing is auto-resolved and newest is NOT preferred."""
+def _is_document(eid: str, units: dict) -> bool:
+    u = units.get(eid)
+    loc = (u.locator if u else "") or ""
+    return "readme" in eid.lower() or loc.startswith("notes://") or loc.lower().endswith("readme.md")
+
+
+def _newest(c: Claim, units: dict) -> str:
+    return max((units[x.evidence_id].timestamp for x in c.citations if x.evidence_id in units), default=c.date or "")
+
+
+def detect_conflicts(claims: list[Claim], provider: Provider, units: dict | None = None) -> list[Conflict]:
+    """Group current-state claims by topic. Named values decide most pairs without AI (rules.rule_contradicts);
+    the model is asked only about pairs the rules cannot judge. Pairs that disagree are clustered, so one
+    disagreement = one conflict with all its sides. Nothing is auto-resolved and newest is NOT preferred."""
+    from .rules import rule_contradicts
+    units = units or {}
     groups: dict[str, list[Claim]] = {}
     for c in claims:
         if c.type in CONFLICT_TYPES and c.entity_key:
@@ -124,24 +140,65 @@ def detect_conflicts(claims: list[Claim], provider: Provider) -> list[Conflict]:
             if kws and not any(k in c.statement.lower() + ' ' for k in kws):
                 continue  # tagged with a topic, but its own text is not about it
             groups.setdefault(c.entity_key, []).append(c)
-    candidates: list[tuple[str, Claim, Claim]] = []
+    edges: list[tuple[str, Claim, Claim, str]] = []
+    ask: list[tuple[str, Claim, Claim]] = []
     for key, grp in groups.items():
         n = 0
         for a, b in combinations(grp, 2):
             if a.statement == b.statement or n >= MAX_PAIRS_PER_GROUP:
                 continue
             n += 1
-            candidates.append((key, a, b))
-    verdicts = contradicts_all(provider, [(a, b) for _, a, b in candidates])
+            verdict = rule_contradicts(a, b)
+            if verdict is True:
+                edges.append((key, a, b, "rules"))
+            elif verdict is None:
+                ask.append((key, a, b))
+    for (key, a, b), contradict in zip(ask, contradicts_all(provider, [(a, b) for _, a, b in ask])):
+        if contradict:
+            edges.append((key, a, b, "model"))
+    parent: dict[str, str] = {}
+
+    def find(x):
+        parent.setdefault(x, x)
+        while parent[x] != x:
+            parent[x] = parent[parent[x]]
+            x = parent[x]
+        return x
+    by_id = {c.id: c for c in claims}
+    for key, a, b, src in edges:  # union-find: connected disagreements become one conflict
+        parent[find(a.id)] = find(b.id)
+    comps: dict[str, list[str]] = {}
+    how: dict[str, set] = {}
+    for key, a, b, src in edges:
+        for x in (a.id, b.id):
+            members = comps.setdefault(find(x), [])
+            if x not in members:
+                members.append(x)
+        how.setdefault(find(a.id), set()).add(src)
     conflicts: list[Conflict] = []
-    for (key, a, b), contradict in zip(candidates, verdicts):
-        if not contradict:
-            continue
+    rank = {"public": 0, "contributor": 1, "lead_only": 2}
+    for root, ids in comps.items():
+        sides = [by_id[i] for i in ids]
+        key = sides[0].entity_key
         cid = f"cf_{len(conflicts) + 1}"
-        conflicts.append(Conflict(
-            id=cid, claim_ids=[a.id, b.id],
-            summary=f"Sources disagree about {key}: \"{a.statement}\" vs \"{b.statement}\""))
-        for c in (a, b):
+        docs = [c for c in sides if c.citations and all(_is_document(x.evidence_id, units) for x in c.citations)]
+        acts = [c for c in sides if c not in docs]
+        stale = bool(docs and acts and max(_newest(c, units) for c in acts) > max(_newest(c, units) for c in docs))
+        owners = {c.owner for c in sides if c.owner}
+        kind = ("staleness" if stale else
+                "ownership" if all(c.type == "owner" for c in sides) and len(owners) > 1 else "value")
+        if stale:
+            d = docs[0]
+            when = sorted({_newest(c, units)[:10] for c in acts})
+            summary = (f'The documentation ({_newest(d, units)[:10] or "undated"}) says "{d.statement}", but newer '
+                       f'activity ({", ".join(when)}) says "' + '" / "'.join(c.statement for c in acts) + '".')
+        else:
+            summary = f"Sources disagree about {key}: " + " vs ".join(f'"{c.statement}"' for c in sides)
+        conflicts.append(Conflict(id=cid, claim_ids=ids, summary=summary, entity_key=key, kind=kind,
+                                  severity="blocking" if key in REQUIRED_SLOTS else "warning",
+                                  detected_by="+".join(sorted(how.get(root, {"model"}))),
+                                  label=max((c.label for c in sides), key=lambda l: rank[l])))
+        for c in sides:
             c.state, c.conflict_id = "conflicting", cid
             c.confidence_reason = "Conflicts with another claim; not auto-resolved"
             c.section = "unresolved"

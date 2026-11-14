@@ -53,15 +53,30 @@ def run(units: list[EvidenceUnit], provider: Provider, role: Role = "lead",
                 res.dropped += 1
                 continue
             claim.label = claim_label(claim, by_id)
+            if claim.state == "verified" and all("possible_injection" in (by_id[c.evidence_id].flags or [])
+                                                 for c in claim.citations):
+                claim.state = "inferred"  # text that tries to instruct the AI is never the sole proof of a fact
+                claim.confidence_reason = "Only source looks like an instruction to the AI (possible prompt injection)"
             if any(r.kind in ("secret", "pii") for c in claim.citations
                    for r in by_id[c.evidence_id].redactions):
                 claim.sensitive = claim.sensitive or claim.label == "lead_only"
             res.claims.append(claim)
+    cross = getattr(provider, "extract_cross", None)
+    if cross:  # deterministic patterns that need every unit at once (recurring problems)
+        ids = {u.id for u in allowed}
+        for raw in cross(allowed):
+            cites, problems = check_citations(raw, by_id, ids)
+            n += 1
+            support = "supports" if len(cites) >= 2 else "partially"
+            claim = build_claim(raw, f"cl_{n}", cites, support, problems)
+            if claim:
+                claim.label = claim_label(claim, by_id)
+                res.claims.append(claim)
     on_stage("conflicts_gaps", 90)
     normalize_entities(res.claims)
     res.claims = dedup_claims(res.claims)
     assign_sections(res.claims)
-    res.conflicts = detect_conflicts(res.claims, provider)
+    res.conflicts = detect_conflicts(res.claims, provider, by_id)
     gap_claims, res.gaps = detect_gaps(res.claims, allowed)
     res.claims.extend(gap_claims)
     res.readiness = compute_readiness(res.claims, res.conflicts, res.gaps)

@@ -38,7 +38,8 @@ def build_claim(raw: RawClaim, claim_id: str, citations: list[Citation],
     if not citations and not raw.inferred:
         return None  # nothing to stand on: drop rather than invent
     if citations and not raw.inferred and support == "supports":
-        state, reason = "verified", "Quote matches source; support check: supports"
+        state, reason = "verified", ("Rule match: the source states this word for word (no AI)" if raw.method == "rules"
+                                     else "Quote matches source; support check: supports")
     elif citations and not raw.inferred and support == "partially":
         state, reason = "inferred", "Source only partially supports this; treated as inference"
         citations = [c.model_copy(update={"support": "partial"}) for c in citations]
@@ -53,4 +54,4 @@ def build_claim(raw: RawClaim, claim_id: str, citations: list[Citation],
     return Claim(id=claim_id, type=raw.type, statement=stmt, state=state,
                  confidence_reason=reason, workstream=raw.workstream,
                  entity_key=raw.entity_key or raw.workstream, owner=raw.owner,
-                 date=raw.date, citations=citations)
+                 date=raw.date, citations=citations, method=raw.method)

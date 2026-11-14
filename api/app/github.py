@@ -105,10 +105,19 @@ def fetch_github(ref: str, source_id: str, label: AccessLabel = "contributor", t
         return [], report
     branch = report.get("default_branch", "main")
 
+    def last_change(path: str) -> str:
+        """Date of the last commit that touched a file (a README's real age), not today's date."""
+        try:
+            rows = gh.get(f"/repos/{owner}/{repo}/commits", {"path": path, "per_page": 1}).json()
+            return rows[0]["commit"]["author"]["date"] if rows else datetime.now(timezone.utc).isoformat()
+        except GitHubError:
+            return datetime.now(timezone.utc).isoformat()
+
     def readme():
         r = gh.get(f"/repos/{owner}/{repo}/readme", None).json()
         text = httpx.get(r["download_url"], timeout=30).text
-        add("gh_readme", owner, datetime.now(timezone.utc).isoformat(), "README.md:\n" + text, f"{base}/blob/{branch}/README.md")
+        add("gh_readme", owner, last_change(r.get("path") or "README.md"), "README.md:\n" + text,
+            f"{base}/blob/{branch}/README.md")
 
     def commits():
         for c in gh.pages(f"/repos/{owner}/{repo}/commits", limit=max_commits):
@@ -153,10 +162,12 @@ def fetch_github(ref: str, source_id: str, label: AccessLabel = "contributor", t
             raw = httpx.get(f"https://raw.githubusercontent.com/{owner}/{repo}/{branch}/{f['path']}", timeout=30)
             if raw.status_code != 200:
                 continue
-            for i, line in enumerate(raw.text.splitlines(), 1):
-                if _TODO.search(line):
+            hits = [(i, line) for i, line in enumerate(raw.text.splitlines(), 1) if _TODO.search(line)]
+            when = last_change(f["path"]) if hits else None
+            for i, line in hits:
+                if True:
                     add(f"gh_todo_{re.sub(r'[^a-z0-9]+', '_', f['path'].lower())}_{i}", owner,
-                        datetime.now(timezone.utc).isoformat(), f"{f['path']} line {i}: {line.strip()}",
+                        when, f"{f['path']} line {i}: {line.strip()}",
                         f"{base}/blob/{branch}/{f['path']}#L{i}")
 
     for name, fn in (("readme", readme), ("commits", commits), ("issues and pull requests", issues_and_prs),

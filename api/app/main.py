@@ -65,11 +65,35 @@ def use_store(store) -> None:
 
 
 def provider():
+    """LLM_MODE: auto (model, falling back to rules call by call), model (model only), rules (no AI at all)."""
     global _provider
     if _provider is None:
-        from .gemini import GeminiProvider
-        _provider = GeminiProvider()
+        import os
+        from .rules import FallbackProvider, RuleProvider
+        mode = os.environ.get("LLM_MODE", "auto").lower()
+        if mode == "rules":
+            _provider = RuleProvider()
+        else:
+            try:
+                from .gemini import GeminiProvider
+                primary = GeminiProvider()
+            except Exception:
+                primary = None  # no key configured: rules only
+            _provider = primary if mode == "model" else FallbackProvider(primary)
     return _provider
+
+
+def ai_status() -> dict:
+    p = provider()
+    used = getattr(p, "used", None)
+    if p.__class__.__name__ == "RuleProvider":
+        mode, configured = "rules", False
+    elif used is not None:
+        mode, configured = "auto", getattr(p, "primary", None) is not None
+    else:
+        mode, configured = "model", True
+    return {"mode": mode, "model_configured": configured, "calls": used or {},
+            "recent_errors": getattr(p, "errors", [])[-3:]}
 
 
 _cache: dict = {}
@@ -228,6 +252,12 @@ def visible_live_claims(hid: str, role: str) -> list[Claim]:
 @app.api_route("/health", methods=["GET", "HEAD"])
 def health():
     return {"ok": True}
+
+
+@app.get("/ai/status")
+def get_ai_status():
+    """Whether the AI model is configured and how many calls fell back to rules (shown on Reconstruct)."""
+    return ai_status()
 
 
 class NewHandover(BaseModel):
@@ -460,6 +490,9 @@ def _reconstruct(hid: str, job_id: str) -> None:
         if h["status"] == "draft":
             db().upd("handovers", {"id": hid}, {"status": "in_review"})
         note = f"Reconstruction: {len(claims)} claims, {len(conflicts)} conflicts, {len(gaps)} gaps."
+        used = getattr(prov, "used", None)
+        if used and used.get("rules"):
+            note += f" {used['rules']} step(s) answered by rules because the AI was unavailable."
         if errors:
             note += f" {len(errors)} model call(s) failed; result may be incomplete."
         bump(hid, "system", "reconstruct", note, role="system", target_type="handover", target_id=hid)

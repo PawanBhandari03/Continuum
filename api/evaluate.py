@@ -10,12 +10,25 @@ from fastapi.testclient import TestClient  # noqa: E402
 from app.main import app  # noqa: E402
 from rapidfuzz import fuzz  # noqa: E402
 
+import sys  # noqa: E402
+from app import main  # noqa: E402
+
 c = TestClient(app)
 L, C = {"X-Demo-Role": "lead"}, {"X-Demo-Role": "contributor"}
+if "--offline-rules" in sys.argv:
+    # No database and no AI: ingest the CampusKart sources into memory and reconstruct in rules mode.
+    from app.memstore import MemStore
+    from app.rules import RuleProvider
+    main.use_store(MemStore())
+    main._provider = RuleProvider()
+    main.seed_demo()
+    main.db().ins("jobs", [{"id": "j1", "handover_id": "h_1", "status": "queued", "progress": 0}])
+    main._reconstruct("h_1", "j1")
+    print("job:", main.db().one("jobs", {"id": "j1"}))
 claims = c.get("/handovers/h_1/claims", headers=L).json()
 contrib = c.get("/handovers/h_1/claims", headers=C).json()
-conflicts = c.get("/handovers/h_1/conflicts").json()
-gaps = c.get("/handovers/h_1/gaps").json()
+conflicts = c.get("/handovers/h_1/conflicts", headers=L).json()
+gaps = c.get("/handovers/h_1/gaps", headers=L).json()
 
 
 def has(cl, *words):

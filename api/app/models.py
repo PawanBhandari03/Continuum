@@ -115,4 +115,5 @@ class RawClaim(BaseModel):
     owner: Optional[str] = None
     date: Optional[str] = None
     inferred: bool = False
+    method: Literal["model", "rules", "human"] = "model"
     citations: list[RawCitation] = Field(default_factory=list)
