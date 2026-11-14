@@ -27,3 +27,31 @@ are dropped or labelled Inferred). States in the last run: 80 Verified, 10 Infer
 - The scorer uses keywords, so it can both over- and under-count.
 - Permission checks tested against the live database through the API (`api/smoke.py`); the database's row-level-security policies exist but the demo relies on the API's role checks.
 - Not yet measured: precision of conflicts beyond this dataset, behaviour on other repos, load.
+
+---
+
+## Round 3 measurements (14 Nov 2026, measured, not estimated)
+
+Same synthetic CampusKart data plus one new planted notes file (`notes/vendor-payments-2026-10-12.md`: fake UPI ID, PAN and
+Aadhaar, a remark judging a teammate, and a prompt-injection line). Scorer: `api/evaluate.py` (strict keyword checks).
+Both runs use the in-memory store and the GitHub snapshot fixture, so they are reproducible without a database.
+
+| Run | Command | Items 1-8 | Round 3 checks (11, 11b, 12, 13) | Claims with a valid citation | Conflicts |
+|---|---|---|---|---|---|
+| **Rules mode (no AI at all)** | `CONTINUUM_GITHUB=snapshot python evaluate.py --offline-rules` | **8/8** | **4/4** | 29/29 | 1 (Render vs Vercel, kind "out of date") |
+| **AI mode (Gemini, rules fallback)** | `CONTINUUM_GITHUB=snapshot python evaluate.py --offline-ai` | **8/8** | **4/4** | 114/114 | 1 (Render vs Vercel, kind "out of date") |
+
+What changed since Round 2 (7/8, 2 conflicts of which one false):
+- Item 1 (UPI decision citing PR #87) is now found as **Verified** in both modes (Round 2: Inferred, scored as a miss).
+- Conflicts are decided by named values and clustered: the Render-vs-Vercel disagreement is one conflict with all its sides;
+  "frontend tested on Vercel preview" and past-tense statements no longer raise false conflicts.
+- Item 6 (Windows build) now cites all 3 occurrences (Round 2: 2 of 3).
+- The AI run used 28 model calls and needed no fallback; rules mode made no model calls.
+
+Honest caveats:
+- One run each, on one synthetic dataset we wrote ourselves; the rules were tuned on this data, so rules-mode recall on
+  other projects will be lower. Rules mode produces far fewer claims (29 vs 114): it is a reliability fallback, not a
+  replacement for the model.
+- In AI mode the model also turned the planted remark about a teammate into a contributor-visible risk claim. The privacy
+  gate blocks publishing until a reviewer decides on it (tested), which is the intended safety net, not a model success.
+- The live demo still replays the Round 2 stored run (94 claims), re-checked with the Round 3 conflict rules.

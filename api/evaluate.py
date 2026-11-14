@@ -1,6 +1,6 @@
 """Scores the live h_1 handover against demo-data/ANSWER_KEY.md (planted facts 1-10).
 Keyword checks are deliberately simple and strict; results are printed as found/total, not estimated.
-Usage: python evaluate.py"""
+Usage: python evaluate.py [--offline-rules | --offline-ai]"""
 import json
 import warnings
 
@@ -15,16 +15,22 @@ from app import main  # noqa: E402
 
 c = TestClient(app)
 L, C = {"X-Demo-Role": "lead"}, {"X-Demo-Role": "contributor"}
-if "--offline-rules" in sys.argv:
+if "--offline-rules" in sys.argv or "--offline-ai" in sys.argv:
     # No database and no AI: ingest the CampusKart sources into memory and reconstruct in rules mode.
     from app.memstore import MemStore
     from app.rules import RuleProvider
     main.use_store(MemStore())
-    main._provider = RuleProvider()
+    if "--offline-ai" in sys.argv:  # in-memory store, real Gemini (falls back to rules per call if it fails)
+        from app.rules import FallbackProvider
+        from app.gemini import GeminiProvider
+        main._provider = FallbackProvider(GeminiProvider())
+    else:
+        main._provider = RuleProvider()
     main.seed_demo()
     main.db().ins("jobs", [{"id": "j1", "handover_id": "h_1", "status": "queued", "progress": 0}])
     main._reconstruct("h_1", "j1")
     print("job:", main.db().one("jobs", {"id": "j1"}))
+    print("calls:", getattr(main._provider, "used", None), "errors:", getattr(main._provider, "errors", [])[:3])
 claims = c.get("/handovers/h_1/claims", headers=L).json()
 contrib = c.get("/handovers/h_1/claims", headers=C).json()
 conflicts = c.get("/handovers/h_1/conflicts", headers=L).json()
@@ -68,10 +74,25 @@ results["9b secret/PII masked in lead evidence"] = bool(ev) and not any("sk_test
 src = c.get("/handovers/h_1/sources", headers=L).json()
 results["10 noise filtered (no bot text in claims)"] = not any("deploy succeeded" in x["statement"].lower() for x in claims)
 
+# Round 3 planted items (demo-data/ANSWER_KEY.md 11-13)
+units = {u["id"]: u for u in main.db().sel("evidence_units", {"handover_id": "h_1"})}
+vendor = [u for u in units.values() if "vendor-payments" in u["source_id"]]
+dets = {r.get("detector") for u in vendor for r in (u.get("redactions") or [])}
+results["11 UPI ID, PAN, Aadhaar masked"] = {"upi_id", "pan", "aadhaar"} <= dets
+inj = {u["id"] for u in units.values() if "possible_injection" in (u.get("flags") or [])}
+results["13 injection line flagged and never sole proof of a Verified claim"] = bool(inj) and not any(
+    x["state"] == "verified" and x["citations"] and all(ci["evidence_id"] in inj for ci in x["citations"]) for x in claims)
+q = c.get("/handovers/h_1/redactions", headers=L).json()["items"] if main.db().sel("redaction_reviews", {"handover_id": "h_1"}) else []
+results["12 remark about a person queued for the reviewer"] = any(i["detector"] == "people_sensitive" for i in q)
+leak_all = json.dumps(contrib).lower()
+results["11b fake IDs never in the Contributor view"] = not any(k in leak_all for k in ("abcpe1234f", "9999 0000 1231", "campuskart.club@okaxis"))
+
 print("PLANTED FACTS")
 for k, v in results.items():
     print(("FOUND " if v else "MISS  ") + k + ("" if v is True or v is False else f"   [{v}]"))
 found = sum(1 for k, v in results.items() if v and k.split()[0] in list("12345678"))
+extra = [k for k in results if k.split()[0] in ("11", "11b", "12", "13")]
+print(f"Round 3 privacy/injection checks: {sum(1 for k in extra if results[k])}/{len(extra)}")
 print(f"\nItems 1-8 found: {found}/8")
 nongap = [x for x in claims if x["type"] != "gap"]
 print(f"Claims with a citation: {sum(1 for x in nongap if x['citations'])}/{len(nongap)}")
