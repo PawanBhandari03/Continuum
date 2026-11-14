@@ -4,9 +4,9 @@ import { use, useCallback, useEffect, useMemo, useState } from "react";
 import { Check, ChevronDown, ChevronUp, EyeOff, History, Lock, Pencil, ShieldAlert, X } from "lucide-react";
 import { api } from "@/lib/api";
 import { useSession } from "@/lib/session";
-import type { Claim, ClaimType, EvidenceState, Handover, Readiness, ReviewStatus, SectionKey, VersionEntry } from "@/lib/types";
+import type { Claim, ClaimType, EvidenceState, Handover, Readiness, ReviewStatus, SectionKey, VersionsInfo } from "@/lib/types";
 import { Button, Card, Notice, PageTitle, fmtDateTime } from "@/components/ui";
-import { HandoverNav, RoleGuard } from "@/components/shell";
+import { HandoverNav, RoleGuard, notifyChanged } from "@/components/shell";
 import { ClaimCard } from "@/components/claim-card";
 import { ExportButtons } from "@/components/export";
 import { VersionCompare } from "@/components/version-diff";
@@ -26,7 +26,7 @@ export default function LedgerPage({ params }: { params: Promise<{ id: string }>
   const [h, setH] = useState<Handover | null>(null);
   const [claims, setClaims] = useState<Claim[] | null>(null);
   const [ready, setReady] = useState<Readiness | null>(null);
-  const [versions, setVersions] = useState<VersionEntry[] | null>(null);
+  const [versions, setVersions] = useState<VersionsInfo | null>(null);
   const [showVersions, setShowVersions] = useState(false);
   const [showFormula, setShowFormula] = useState(false);
   const [err, setErr] = useState<string | null>(null);
@@ -46,7 +46,9 @@ export default function LedgerPage({ params }: { params: Promise<{ id: string }>
   }, [id]);
   useEffect(() => { load(); }, [load]);
 
+  // status "published" = the latest version has no unpublished changes; editing is always possible and starts the next draft
   const published = h?.status === "published";
+  const latest = versions?.published[0] ?? null;
   const open = (claims ?? []).filter(Boolean);
   const pending = open.filter((c) => c.review_status === "pending").length;
   const conflictsOpen = ready?.open_conflicts ?? 0;
@@ -62,13 +64,13 @@ export default function LedgerPage({ params }: { params: Promise<{ id: string }>
 
   async function act(c: Claim, action: Parameters<typeof api.patchClaim>[1]["action"], extra: { edited_statement?: string } = {}) {
     setErr(null); setMsg(null);
-    try { await api.patchClaim(c.id, { action, ...extra }, actor); invalidateEvidence(); await load(); }
+    try { await api.patchClaim(c.id, { action, ...extra }, actor); invalidateEvidence(); notifyChanged(); await load(); }
     catch (e) { setErr(friendlyError(e)); }
   }
   async function publish() {
     setErr(null); setMsg(null);
     const r = await api.publish(id, actor);
-    if (!r.ok) setBlocked(r.reasons); else { setBlocked([]); setMsg("Published. This version is now locked and visible to the successor."); }
+    if (!r.ok) setBlocked(r.reasons); else { setBlocked([]); setMsg(`Published v${r.version}. That version is now frozen (SHA-256 ${r.sha256?.slice(0, 12)}…) and is what the successor reads. Further edits start the next draft.`); notifyChanged(); }
     await load();
   }
   async function bulk() {
@@ -95,7 +97,7 @@ export default function LedgerPage({ params }: { params: Promise<{ id: string }>
       <PageTitle
         title="Claim ledger"
         sub="Every statement below is a claim with an evidence state and clickable sources. Nothing reaches the successor until you approve it and publish."
-        right={<div className="flex flex-col items-end gap-2"><Button onClick={() => setShowVersions(true)}><History size={14} aria-hidden /> Version history (v{h?.version ?? "…"})</Button>{claims && claims.length > 0 && <ExportButtons hid={id} />}</div>}
+        right={<div className="flex flex-col items-end gap-2"><Button onClick={() => setShowVersions(true)}><History size={14} aria-hidden /> Versions (published v{h?.version ?? "…"})</Button>{claims && claims.length > 0 && <ExportButtons hid={id} />}</div>}
       />
       {loadErr && <div className="mb-3"><LoadError message={loadErr} onRetry={load} /></div>}
       {!claims && !loadErr && <SkeletonList rows={4} label="Loading claims" />}
@@ -120,11 +122,16 @@ export default function LedgerPage({ params }: { params: Promise<{ id: string }>
               <div><dt className="text-slate-500">Open gaps</dt><dd className="font-semibold">{ready.open_gaps} {ready.open_gaps > 0 && <Link className="tap text-xs font-normal text-indigo-700 underline" href={`/handovers/${id}/interview`}>interview</Link>}</dd></div>
             </dl>
             <div className="ml-auto flex flex-col items-end gap-1">
+              {latest && (
+                <span className="inline-flex items-center gap-1 rounded-md border border-emerald-300 bg-emerald-50 px-3 py-1.5 text-xs font-medium text-emerald-900" title={`SHA-256 ${latest.sha256}`}>
+                  <Lock size={13} aria-hidden /> Successor reads v{latest.version} · signed {latest.sha256.slice(0, 10)}…
+                </span>
+              )}
               {published ? (
-                <span className="inline-flex items-center gap-1 rounded-md border border-emerald-300 bg-emerald-50 px-3 py-1.5 text-sm font-medium text-emerald-900"><Lock size={14} aria-hidden /> Published v{h?.version} · locked</span>
+                <span className="text-xs text-slate-600">No changes since v{h?.version}. Any edit starts draft v{(h?.version ?? 0) + 1}.</span>
               ) : (
                 <>
-                  <Button variant="primary" disabled={reasons.length > 0} onClick={publish}>Approve and publish</Button>
+                  <Button variant="primary" disabled={reasons.length > 0} onClick={publish}>Publish v{(h?.version ?? 0) + 1}</Button>
                   <Button variant="ghost" onClick={bulk} className="text-xs">Approve all Verified claims</Button>
                   <Button variant="ghost" onClick={approveRest} disabled={pending === 0} className="text-xs">Approve all remaining ({pending})</Button>
                 </>
@@ -177,7 +184,7 @@ export default function LedgerPage({ params }: { params: Promise<{ id: string }>
                   <div className="space-y-2.5">
                     {items.map((c) => (
                       <ClaimCard key={c.id} claim={c} showReview
-                        actions={published ? undefined : (
+                        actions={c.review_status === "superseded" ? undefined : (
                           <>
                             <Button variant="secondary" onClick={() => act(c, "approve")} disabled={c.review_status === "approved"}><Check size={14} aria-hidden /> Approve</Button>
                             <Button onClick={() => setEditing({ id: c.id, text: c.statement })}><Pencil size={14} aria-hidden /> Edit</Button>
@@ -222,12 +229,25 @@ export default function LedgerPage({ params }: { params: Promise<{ id: string }>
           <div>
             <div className="flex items-center justify-between"><h2 className="font-semibold">Version history</h2><button aria-label="Close" onClick={() => setShowVersions(false)} className="rounded p-2.5 hover:bg-slate-100 sm:p-1"><X size={18} /></button></div>
             {!versions && <div className="mt-4"><SkeletonList rows={2} label="Loading versions" /></div>}
-            {versions?.length === 0 && <div className="mt-4"><EmptyState title="No versions yet" /></div>}
-            <div className="mt-4"><VersionCompare hid={id} versions={versions} /></div>
-            <h3 className="mt-5 text-sm font-semibold">All changes</h3>
+            {versions && (
+              <>
+                <h3 className="mt-4 text-sm font-semibold">Published versions</h3>
+                {versions.published.length === 0 && <EmptyState title="Nothing published yet" />}
+                <ul className="mt-2 space-y-2">
+                  {versions.published.map((v) => (
+                    <li key={v.version} className="rounded border border-slate-200 p-2 text-sm">
+                      <b>v{v.version}</b> · {fmtDateTime(v.published_at)} · {v.published_by}
+                      <div className="break-all font-mono text-[11px] text-slate-500">SHA-256 {v.sha256}</div>
+                    </li>
+                  ))}
+                </ul>
+                <div className="mt-4"><VersionCompare hid={id} published={versions.published} /></div>
+              </>
+            )}
+            <h3 className="mt-5 text-sm font-semibold">Draft changes since the beginning (newest first)</h3>
             <ol className="mt-2 space-y-3 border-l-2 border-slate-200 pl-4">
-              {versions?.map((v, i) => (
-                <li key={i}><div className="text-xs text-slate-500">v{v.version} · {fmtDateTime(v.at)} · <b>{v.actor}</b></div><div className="text-sm">{v.summary}</div></li>
+              {versions?.draft?.log.map((v, i) => (
+                <li key={i}><div className="text-xs text-slate-500">rev {v.revision ?? "–"} · {fmtDateTime(v.at)} · <b>{v.actor}</b></div><div className="text-sm">{v.summary}</div></li>
               ))}
             </ol>
           </div>

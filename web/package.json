@@ -7,10 +7,10 @@
     "build": "next build --turbopack",
     "start": "next start",
     "lint": "eslint",
-    "test:permissions": "npx --yes tsx tests/permissions.test.ts",
-    "test:unit": "npx --yes tsx tests/permissions.test.ts && npx --yes tsx tests/diff.test.ts",
+    "test:unit": "npx --yes tsx tests/real-api-contract.ts",
     "typecheck": "tsc --noEmit",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "api": "cd ../api && python dev.py"
   },
   "dependencies": {
     "lucide-react": "^1.70.0",

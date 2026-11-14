@@ -11,22 +11,24 @@ import { Button } from "./ui";
 const STATE_LABEL = { verified: "Verified", inferred: "Inferred", conflicting: "Conflicting", missing: "Missing", confirmed: "Confirmed" } as const;
 
 /** "Export as Markdown" + "Print / Save as PDF" for the current role's view of the handover. */
-export function ExportButtons({ hid }: { hid: string }) {
+export function ExportButtons({ hid, version }: { hid: string; version?: number }) {
   const { role } = useSession();
   const [busy, setBusy] = useState<"md" | "print" | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [printModel, setPrintModel] = useState<ExportModel | null>(null);
 
-  const make = useCallback(async () => {
+  const make = useCallback(async (format: string) => {
     if (!role) throw new Error("Choose a role first.");
-    return buildExportModel(api, hid, role);
-  }, [hid, role]);
+    const m = await buildExportModel(api, hid, role, version);
+    await api.logExport(hid, format, m.version || undefined); // every export is recorded in the audit log
+    return m;
+  }, [hid, role, version]);
 
   async function exportMd() {
     setErr(null);
     setBusy("md");
     try {
-      const m = await make();
+      const m = await make("markdown");
       downloadText(exportFileName(m, "md"), toMarkdown(m));
     } catch (e) {
       setErr(friendlyError(e));
@@ -38,7 +40,7 @@ export function ExportButtons({ hid }: { hid: string }) {
     setErr(null);
     setBusy("print");
     try {
-      setPrintModel(await make());
+      setPrintModel(await make("pdf"));
     } catch (e) {
       setErr(friendlyError(e));
     } finally {
@@ -77,7 +79,7 @@ function PrintableHandover({ model }: { model: ExportModel }) {
       <h1>Handover: {h.leaver} → {h.successor} (CampusKart)</h1>
       <ul>{headerLines(model).map((l) => <li key={l}>{l}</li>)}</ul>
       <p><em>{GENERATED_LINE}</em></p>
-      {h.status !== "published" && <p><strong>Draft.</strong> The reviewer has not approved or published this version.</p>}
+      {!model.version && <p><strong>Draft.</strong> The reviewer has not approved or published this version.</p>}
       {model.sections.map((s, i) => (
         <section key={s.key}>
           <h2>{i + 1}. {s.title}</h2>

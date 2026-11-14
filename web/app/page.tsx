@@ -1,15 +1,17 @@
 "use client";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import {
   AlertTriangle, ArrowRight, BadgeCheck, CircleHelp, ClipboardCheck, Eye, FileSearch, GitBranch, History,
-  Lightbulb, LockKeyhole, MessageSquareText, Mic, Network, ScanSearch, ShieldCheck, UserRoundCheck,
+  Lightbulb, Loader2, LockKeyhole, MessageSquareText, Mic, Network, ScanSearch, ShieldCheck, UserRoundCheck, Globe2,
 } from "lucide-react";
 import { ROLE_META, useSession } from "@/lib/session";
+import { friendlyError } from "@/lib/status";
 import type { Role } from "@/lib/types";
 
-const ICON = { lead: ClipboardCheck, contributor: UserRoundCheck, leaver: Mic };
+const ICON = { lead: ClipboardCheck, contributor: UserRoundCheck, leaver: Mic, guest: Globe2 };
 const ORDER: Role[] = ["lead", "leaver", "contributor"];
-const TAG: Record<Role, string> = { lead: "Step 1", leaver: "Step 2", contributor: "Step 3" };
+const TAG: Record<Role, string> = { lead: "Step 1", leaver: "Step 2", contributor: "Step 3", guest: "Optional" };
 
 const STEPS = [
   { icon: GitBranch, t: "Connect", d: "Repo, chat export, notes and issues. Secrets and personal data are masked on the way in." },
@@ -43,11 +45,21 @@ function Example({ state, text, src, cls, Icon }: { state: string; text: string;
 }
 
 export default function Landing() {
-  const { setRole } = useSession();
+  const { setRole, ensureDemo } = useSession();
   const router = useRouter();
-  const enter = (r: Role) => {
+  const [busy, setBusy] = useState<Role | null>(null);
+  const [err, setErr] = useState<string | null>(null);
+  const enter = async (r: Role) => {
+    setErr(null);
+    setBusy(r);
     setRole(r);
-    router.push(`/handovers`);
+    try {
+      const hid = await ensureDemo();
+      router.push(ROLE_META[r].home(hid));
+    } catch (e) {
+      setErr(friendlyError(e));
+      setBusy(null);
+    }
   };
   return (
     <div className="space-y-16 pb-6">
@@ -61,7 +73,7 @@ export default function Landing() {
             When someone leaves, Continuum rebuilds the project&apos;s current state from its repo, chat, notes and issues. Every statement links to its source, uncertainty is labelled instead of hidden, and a reviewer approves exactly what the successor may see.
           </p>
           <ul className="mt-6 grid max-w-xl gap-2 text-sm text-slate-700 sm:grid-cols-2">
-            {["Every claim cites its source", "Uncertainty is labelled, never hidden", "Role-based access", "No sign-in needed for the demo"].map((x) => (
+            {["Every claim cites its source", "Uncertainty is labelled, never hidden", "Each version signed and frozen", "No sign-in needed for the demo"].map((x) => (
               <li key={x} className="flex items-center gap-2"><BadgeCheck className="shrink-0 text-blue-700" size={16} aria-hidden /> {x}</li>
             ))}
           </ul>
@@ -77,8 +89,8 @@ export default function Landing() {
             {ORDER.map((r) => {
               const Icon = ICON[r];
               return (
-                <button key={r} onClick={() => enter(r)} className="group flex w-full items-center gap-4 rounded-xl border border-slate-200 bg-white p-4 text-left transition hover:border-blue-600 hover:bg-blue-50/50">
-                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-blue-700 text-white"><Icon size={20} aria-hidden /></span>
+                <button key={r} onClick={() => enter(r)} disabled={busy !== null} aria-busy={busy === r} className="group flex w-full items-center gap-4 rounded-xl border border-slate-200 bg-white p-4 text-left transition hover:border-blue-600 hover:bg-blue-50/50 disabled:cursor-wait disabled:opacity-80">
+                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-blue-700 text-white">{busy === r ? <Loader2 size={20} className="animate-spin" aria-hidden /> : <Icon size={20} aria-hidden />}</span>
                   <span className="min-w-0 flex-1">
                     <span className="block text-xs font-semibold text-blue-700">{TAG[r]}</span>
                     <span className="block font-semibold text-slate-900">Enter as {ROLE_META[r].label}</span>
@@ -89,6 +101,12 @@ export default function Landing() {
               );
             })}
           </div>
+          {busy && <p className="mt-3 text-sm text-slate-600" role="status">Preparing your own copy of the demo, so nothing you do affects other visitors. This takes a few seconds (up to a minute if the free server was asleep).</p>}
+          {err && <p className="mt-3 text-sm text-rose-800" role="alert">{err}</p>}
+          <button onClick={() => enter("guest")} disabled={busy !== null} className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-blue-700 hover:text-blue-900 disabled:opacity-60">
+            <Globe2 size={15} aria-hidden /> Or enter as Guest: see only what is public
+          </button>
+          <p className="mt-3 border-t border-slate-100 pt-3 text-xs text-slate-500">Works even when the AI is unavailable: a rule-based fallback finds all 8 planted facts in this demo on its own, and every claim says how it was made.</p>
         </div>
       </section>
 
