@@ -55,3 +55,25 @@ Honest caveats:
 - In AI mode the model also turned the planted remark about a teammate into a contributor-visible risk claim. The privacy
   gate blocks publishing until a reviewer decides on it (tested), which is the intended safety net, not a model success.
 - The live demo still replays the Round 2 stored run (94 claims), re-checked with the Round 3 conflict rules.
+
+---
+
+## Row-level security check (14 Nov 2026, real Supabase project)
+
+`api/rls_check.py` creates three throwaway users (lead, invited successor, stranger) with the Supabase admin API, signs
+them in, then reads the tables **directly through PostgREST with each user's own token**, bypassing our API, and also
+calls the API. It deletes everything it created. Result: **13 of 13 passed**.
+
+| Check | Result |
+|---|---|
+| Signed-in creation makes a private handover with the creator as lead | pass |
+| Database: lead reads both evidence units (contributor-level and lead-only) | pass |
+| Database: the invited contributor reads **only** the contributor-level unit and the contributor-level source | pass |
+| Database: a stranger reads nothing; nobody signed in reads nothing; a stranger cannot see the handover row | pass |
+| Database: contributor cannot read the audit log; lead can | pass |
+| Database: a member cannot change evidence directly (no write policy; row unchanged) | pass |
+| API: stranger gets 404, anonymous gets 401, a forged `X-Demo-Role: lead` header does not lift a contributor (403) | pass |
+
+Limits: the in-app writes use the API's service role after its own role checks (the database only restricts reads for
+members). The public judge demo handovers have no members and keep the one-click demo roles, so for those the API's role
+checks are the enforcement, as disclosed.

@@ -16,6 +16,8 @@ services:
         sync: false
       - key: SUPABASE_SECRET_KEY
         sync: false
+      - key: SUPABASE_PUBLISHABLE_KEY   # public by design; needed to validate sign-in tokens
+        sync: false
       - key: GEMINI_API_KEY
         sync: false
       - key: GITHUB_TOKEN
