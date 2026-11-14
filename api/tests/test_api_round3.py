@@ -286,3 +286,16 @@ def test_gap_questions_read_cleanly(api):
                     "question": "Who owns: The college SMTP account.?", "evidence_found": []}])
     q = [g["question"] for g in c.get(f"/handovers/{sid}/gaps", headers=L).json() if g["id"].endswith("gp_x")][0]
     assert q.endswith("account?") and ".?" not in q
+
+
+def test_signed_export_detects_any_change(api):
+    import hashlib
+    c, s, sid = api
+    text = "# Handover\n\n- [Verified] Payments moved to UPI.\n"
+    body = hashlib.sha256(text.encode()).hexdigest()
+    sig = c.post(f"/handovers/{sid}/exports", headers=C, json={"format": "markdown", "version": 1, "body_sha256": body}).json()["signature"]
+    signed = text + "\n" + sig + "\n"
+    assert c.post("/exports/verify", json={"text": signed}).json()["ok"] is True
+    assert c.post("/exports/verify", json={"text": signed.replace("UPI", "cards")}).json()["ok"] is False
+    assert c.post("/exports/verify", json={"text": signed.replace("version=1", "version=2")}).json()["ok"] is False
+    assert c.post("/exports/verify", json={"text": text}).json()["ok"] is False

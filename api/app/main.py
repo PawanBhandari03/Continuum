@@ -1648,21 +1648,78 @@ def audit_csv(hid: str, x_demo_role: Optional[str] = Header(None)):
 class ExportLog(BaseModel):
     format: str
     version: Optional[int] = None
+    body_sha256: Optional[str] = None   # SHA-256 of the exported text (Markdown), computed by the browser
+
+
+SIG_PREFIX = "Continuum-Signature:"
+
+
+def _signing_key() -> bytes:
+    """Server-side secret for export signatures. EXPORT_SIGNING_KEY if set; otherwise derived from the database key,
+    so signatures stay valid across restarts without being guessable from the outside."""
+    import hashlib
+    import os
+    k = os.environ.get("EXPORT_SIGNING_KEY") or ("derived:" + os.environ.get("SUPABASE_SECRET_KEY", "continuum-local-dev"))
+    return hashlib.sha256(k.encode()).digest()
+
+
+def _sign(hid: str, version: int, snapshot_sha: str, body_sha: str) -> str:
+    import hashlib
+    import hmac
+    msg = f"{hid}|{version}|{snapshot_sha}|{body_sha}".encode()
+    return hmac.new(_signing_key(), msg, hashlib.sha256).hexdigest()
 
 
 @app.post("/handovers/{hid}/exports")
 def log_export(hid: str, body: ExportLog, x_demo_role: Optional[str] = Header(None)):
-    """Records an export in the audit log and returns the version hash to print on it."""
+    """Records an export in the audit log. For a published version, also returns a signature line (HMAC over the
+    handover, version, snapshot hash and the exported text's hash) to append to the file."""
     role = role_of(x_demo_role)
     if role == "guest":
         raise HTTPException(403, "Guests cannot export.")
     h = get_handover_row(hid)
     v = body.version or h["version"]
     row = _version_row(hid, v) if v else None
-    audit.append(db(), hid, ACTORS[role], "export", f"Exported v{v} as {body.format}", role=role,
-                 target_type="version", target_id=str(v), meta={"format": body.format,
-                                                                 "sha256": row["sha256"] if row else None})
-    return {"version": v, "sha256": row["sha256"] if row else None, "exported_at": now()}
+    sig = None
+    if row and body.body_sha256 and len(body.body_sha256) == 64:
+        mac = _sign(hid, v, row["sha256"], body.body_sha256.lower())
+        sig = f"{SIG_PREFIX} handover={hid} version={v} snapshot={row['sha256']} body={body.body_sha256.lower()} hmac={mac}"
+    audit.append(db(), hid, ACTORS[role], "export", f"Exported v{v} as {body.format}" + (" (signed)" if sig else ""),
+                 role=role, target_type="version", target_id=str(v),
+                 meta={"format": body.format, "sha256": row["sha256"] if row else None, "signed": bool(sig)})
+    return {"version": v, "sha256": row["sha256"] if row else None, "exported_at": now(), "signature": sig}
+
+
+class VerifyExport(BaseModel):
+    text: str
+
+
+@app.post("/exports/verify")
+def verify_export(body: VerifyExport):
+    """Checks an exported Markdown file: the signature line must be genuine (made by this server), the text above it
+    must be unchanged, and the version it names must exist with the same snapshot hash."""
+    import hashlib
+    import hmac
+    import re
+    text = body.text.replace("\r\n", "\n")
+    m = re.search(r"^" + re.escape(SIG_PREFIX) + r" handover=(\S+) version=(\d+) snapshot=([0-9a-f]{64}) body=([0-9a-f]{64}) hmac=([0-9a-f]{64})\s*$",
+                  text, re.M)
+    if not m:
+        return {"ok": False, "reason": "No Continuum signature line found. Only Markdown exports of a published version are signed."}
+    hid, v, snap, body_sha, mac = m.group(1), int(m.group(2)), m.group(3), m.group(4), m.group(5)
+    signed_part = text[:m.start()].rstrip("\n") + "\n"
+    actual = hashlib.sha256(signed_part.encode("utf-8")).hexdigest()
+    if not hmac.compare_digest(_sign(hid, v, snap, body_sha), mac):
+        return {"ok": False, "reason": "The signature line was altered or was not made by this server.", "handover": hid, "version": v}
+    if actual != body_sha:
+        return {"ok": False, "reason": "The text was changed after export (its fingerprint no longer matches the signature).",
+                "handover": hid, "version": v}
+    row = db().one("handover_versions", {"handover_id": hid, "version": v})
+    if not row or row["sha256"] != snap:
+        return {"ok": False, "reason": f"Version {v} of this handover no longer exists here (for example, the demo was reset).",
+                "handover": hid, "version": v}
+    return {"ok": True, "reason": f"Genuine: unchanged export of v{v}, published by {row['published_by']}.", "handover": hid,
+            "version": v, "published_at": row["published_at"]}
 
 
 # ---------------- privacy review queue (Improvement 3) ----------------

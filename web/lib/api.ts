@@ -110,7 +110,8 @@ export interface Api {
   getNotifications(hid: string): Promise<{ version: number; status: Handover["status"]; items: NotificationItem[] }>;
   getPrivacy(hid: string, status?: string): Promise<{ items: PrivacyItem[]; counts: Record<string, number> }>;
   decidePrivacy(id: string, body: { decision: "keep_masked" | "unmask" | "escalate_lead_only" | "dismiss"; reason?: string }): Promise<PrivacyItem>;
-  logExport(hid: string, format: string, version?: number): Promise<{ version: number; sha256: string | null; exported_at: string }>;
+  logExport(hid: string, format: string, version?: number, bodySha256?: string): Promise<{ version: number; sha256: string | null; exported_at: string; signature: string | null }>;
+  verifyExport(text: string): Promise<{ ok: boolean; reason: string; handover?: string; version?: number; published_at?: string }>;
   resetDemo(hid?: string): Promise<void>;
 }
 
@@ -265,7 +266,8 @@ const realApi: Api = {
   getNotifications: (h) => http(`/handovers/${h}/notifications`),
   getPrivacy: (h, status) => http(`/handovers/${h}/redactions${status ? `?status=${status}` : ""}`),
   decidePrivacy: (id, b) => http(`/redactions/${id}/decide`, post({ reason: "", ...b })),
-  logExport: (h, format, version) => http(`/handovers/${h}/exports`, post({ format, version })),
+  logExport: (h, format, version, bodySha256) => http(`/handovers/${h}/exports`, post({ format, version, body_sha256: bodySha256 })),
+  verifyExport: (text) => http("/exports/verify", post({ text })),
   resetDemo: async (hid = "h_1") => {
     await http(`/handovers/${hid}/reset`, { method: "POST", role: "lead", body: "{}" }, 180000);
   },

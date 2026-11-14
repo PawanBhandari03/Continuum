@@ -42,7 +42,7 @@ function Frame({ children }: { children: ReactNode }) {
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6">{children}</main>
       <footer className="border-t border-[#e5dfd6] bg-[#faf7f2]">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2 px-4 py-3.5 text-xs text-[#575245]">
-          <span className="font-medium text-[#25272d]">Continuum · Team Binary Builders</span>
+          <span className="font-medium text-[#25272d]">Continuum · Team Binary Builders · <Link href="/verify" className="font-normal underline">Verify an export</Link></span>
           <span className="flex items-center gap-4">
             {target && (
               <button

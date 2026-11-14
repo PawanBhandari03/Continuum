@@ -20,7 +20,7 @@ export function ExportButtons({ hid, version }: { hid: string; version?: number 
   const make = useCallback(async (format: string) => {
     if (!role) throw new Error("Choose a role first.");
     const m = await buildExportModel(api, hid, role, version);
-    await api.logExport(hid, format, m.version || undefined); // every export is recorded in the audit log
+    if (format !== "markdown") await api.logExport(hid, format, m.version || undefined); // every export is recorded in the audit log
     return m;
   }, [hid, role, version]);
 
@@ -29,7 +29,12 @@ export function ExportButtons({ hid, version }: { hid: string; version?: number 
     setBusy("md");
     try {
       const m = await make("markdown");
-      downloadText(exportFileName(m, "md"), toMarkdown(m));
+      // sign the exact text: the server returns an HMAC line over (handover, version, snapshot hash, text hash)
+      const body = toMarkdown(m).replace(/\n+$/, "") + "\n";
+      const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(body));
+      const hex = Array.from(new Uint8Array(digest)).map((b) => b.toString(16).padStart(2, "0")).join("");
+      const r = await api.logExport(hid, "markdown", m.version || undefined, hex);
+      downloadText(exportFileName(m, "md"), r.signature ? `${body}\n${r.signature}\n` : body);
     } catch (e) {
       setErr(friendlyError(e));
     } finally {
