@@ -577,6 +577,42 @@ export default function Landing() {
         </ul>
       </section>
 
+      {/* Trust badges */}
+      <section aria-label="What Continuum guarantees">
+        <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {[
+            ["Every claim cites a source", "Click a source chip to read the original text in context."],
+            ["Nothing shown as verified without a check", "Inferred, conflicting and missing items are labelled, never hidden."],
+            ["Secrets are masked before anyone reads", "Keys, UPI IDs, PAN and Aadhaar are masked at ingestion."],
+            ["A human approves what is shared", "Review, edit, reject or redact before the successor sees it."],
+          ].map(([t, d]) => (
+            <li key={t} className="rounded-2xl border border-[#e5dfd6] bg-white p-4 shadow-2xs">
+              <p className="flex items-start gap-2 text-sm font-bold text-[#25272d]"><BadgeCheck size={16} className="mt-0.5 shrink-0 text-[#506cb8]" aria-hidden /> {t}</p>
+              <p className="mt-1.5 text-xs leading-relaxed text-[#575245]">{d}</p>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      {/* FAQ */}
+      <section aria-labelledby="faq">
+        <h2 id="faq" className="text-2xl font-bold tracking-tight text-[#25272d] sm:text-3xl">Questions judges ask</h2>
+        <div className="mt-4 space-y-2.5">
+          {[
+            ["Is this real data?", "No. CampusKart is a synthetic student project made for this demo. Each visitor gets their own copy, so nothing you do affects anyone else."],
+            ["Do I need to sign in?", "No. Pick a role on this page. Roles are demo roles, not verified logins; the real product would use Supabase Auth."],
+            ["Can the AI make things up?", "It can be wrong, which is why every claim must cite a source, the quote is checked against it, and only a passing check can be called Verified. Anything else is labelled Inferred, Conflicting or Missing."],
+            ["How is a successor kept from seeing confidential sources?", "A claim is visible only if the role may read all of its evidence. Hidden items are never sent to the browser; only a count is shown."],
+            ["What are the limits?", "Small teams and exports only, no live Slack connection, and demo roles instead of real accounts. The free server may take up to a minute to wake."],
+          ].map(([q, a]) => (
+            <details key={q} className="group rounded-xl border border-[#e5dfd6] bg-white p-4 shadow-2xs open:border-[#b8c8ee]">
+              <summary className="cursor-pointer text-sm font-semibold text-[#25272d]">{q}</summary>
+              <p className="mt-2 text-sm leading-relaxed text-[#575245]">{a}</p>
+            </details>
+          ))}
+        </div>
+      </section>
+
       {/* Final Call to Action */}
       <section className="rounded-3xl border border-[#e5dfd6] bg-[#ede9e2] p-10 text-center text-[#25272d] shadow-2xs">
         <div className="max-w-2xl mx-auto">
