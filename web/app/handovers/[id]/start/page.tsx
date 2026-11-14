@@ -7,10 +7,14 @@ import type { Role, SuccessorView, Task, VersionDiff } from "@/lib/types";
 import { Button, Card, Notice, PageTitle, fmtDate } from "@/components/ui";
 import { HandoverNav, RoleGuard, notifyChanged } from "@/components/shell";
 import { ClaimCard } from "@/components/claim-card";
+import { AttentionTiles } from "@/components/attention";
 import { ExportButtons } from "@/components/export";
 import { DiffView } from "@/components/version-diff";
 import { LoadError, SkeletonList } from "@/components/feedback";
 import { friendlyError } from "@/lib/status";
+
+const LIMIT = 5;
+const SHORT: Record<string, string> = { project: "Project", state: "State", decision_log: "Decisions", first_week: "First week", risks: "Risks", dependencies: "Dependencies", unresolved: "Unresolved" };
 
 export default function StartPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -26,6 +30,10 @@ export default function StartPage({ params }: { params: Promise<{ id: string }> 
   const [flagging, setFlagging] = useState<string | null>(null);
   const [note, setNote] = useState("");
   const [busyKey, setBusyKey] = useState<string | null>(null);
+  // Long handovers are read section by section: a section opens by default only if it is the first, changed, or the
+  // honest "still unresolved" list. The reader's own choices win afterwards.
+  const [open, setOpen] = useState<Record<string, boolean>>({});
+  const [more, setMore] = useState<Record<string, boolean>>({});
 
   const load = useCallback(async () => {
     if (!role) return;
@@ -74,6 +82,7 @@ export default function StartPage({ params }: { params: Promise<{ id: string }> 
   return (
     <RoleGuard hid={id} allow={["contributor", "lead", "guest"]}>
       <HandoverNav hid={id} />
+      <AttentionTiles hid={id} />
       <PageTitle
         title={h ? (eff === "guest" ? "Public handover (Guest view)" : `Start here, ${h.successor}`) : "Start here"}
         sub={h ? <>Handover from <span className="capitalize">{h.leaver}</span> · CampusKart · target {fmtDate(h.target_date)}. Every claim shows its evidence state; click a source to read the original.</> : undefined}
@@ -133,59 +142,98 @@ export default function StartPage({ params }: { params: Promise<{ id: string }> 
         </div>
       )}
 
-      <div className="space-y-8">
+      {view && view.sections.length > 0 && (
+        <>
+          <nav aria-label="Sections of this handover" className="mb-3 md:sticky md:top-[72px] md:z-20 md:rounded-lg md:border md:border-slate-200 md:bg-white/95 md:px-2 md:py-1 md:backdrop-blur">
+            <ul className="flex gap-1.5 overflow-x-auto py-1">
+              {view.sections.map((s, i) => (
+                <li key={s.key} className="shrink-0">
+                  <a href={`#s-${s.key}`} onClick={() => setOpen((o) => ({ ...o, [s.key]: true }))} className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-md border border-slate-200 bg-white px-2.5 py-2 text-xs font-medium text-slate-800 hover:border-blue-400 sm:py-1.5">
+                    <span className="font-bold text-blue-800">{i + 1}</span> {SHORT[s.key] ?? s.title}
+                    <span className="text-slate-500">{s.claims.length}</span>
+                    {s.ack === "acknowledged" && <CheckCircle2 size={12} className="text-emerald-600" aria-label="acknowledged" />}
+                    {s.ack === "unclear" && <Flag size={12} className="text-amber-700" aria-label="flagged unclear" />}
+                    {s.changed && <span className="rounded bg-amber-100 px-1 text-[10px] font-bold text-amber-900">changed</span>}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+          <div className="mb-3 flex justify-end gap-3 text-xs">
+            <button className="font-medium text-blue-700 underline" onClick={() => setOpen(Object.fromEntries(view.sections.map((x) => [x.key, true])))}>Expand all sections</button>
+            <button className="font-medium text-blue-700 underline" onClick={() => setOpen(Object.fromEntries(view.sections.map((x) => [x.key, false])))}>Collapse all</button>
+          </div>
+        </>
+      )}
+
+      <div className="space-y-4">
         {view?.sections.map((s, i) => {
           const myTasks = tasks.filter((t) => t.section === s.key);
+          const isOpen = s.key in open ? open[s.key] : i === 0 || s.changed || s.key === "unresolved";
+          const shown = more[s.key] ? s.claims : s.claims.slice(0, LIMIT);
+          const by = (st: string) => s.claims.filter((c) => c.state === st).length;
+          const bits = [`${s.claims.length} claim${s.claims.length === 1 ? "" : "s"}`, by("inferred") ? `${by("inferred")} inferred` : "", by("conflicting") ? `${by("conflicting")} conflicting` : "", by("missing") ? `${by("missing")} missing` : ""].filter(Boolean);
           return (
-            <section key={s.key} aria-labelledby={`s-${s.key}`} className={s.key === "unresolved" ? "rounded-lg border-2 border-amber-300 bg-amber-50/50 p-3" : ""}>
-              <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
-                <h2 id={`s-${s.key}`} className="flex items-center gap-2 text-lg font-semibold">
-                  {i + 1}. {s.title}
+            <section key={s.key} aria-labelledby={`s-${s.key}`} className={`scroll-mt-32 rounded-xl border bg-white p-2 sm:p-3 ${s.key === "unresolved" ? "border-2 border-amber-300 bg-amber-50/50" : "border-slate-200"}`}>
+              <h2 id={`s-${s.key}`} className="text-lg font-semibold">
+                <button type="button" aria-expanded={isOpen} aria-controls={`b-${s.key}`} onClick={() => setOpen((o) => ({ ...o, [s.key]: !isOpen }))} className="flex w-full flex-wrap items-center gap-x-2 gap-y-1 rounded-lg px-1 py-2 text-left hover:bg-slate-100/70">
+                  <ChevronDown size={18} aria-hidden className={`shrink-0 text-slate-500 transition-transform ${isOpen ? "" : "-rotate-90"}`} />
+                  <span>{i + 1}. {s.title}</span>
                   {s.changed && <span className="rounded-full border border-amber-400 bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-900">Changed in v{view.version}</span>}
-                </h2>
-                {s.ack !== "none" && (
-                  <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-semibold ${s.ack === "acknowledged" ? "border-emerald-300 bg-emerald-50 text-emerald-900" : "border-amber-400 bg-amber-100 text-amber-900"}`}>
-                    {s.ack === "acknowledged" ? <><CheckCircle2 size={12} aria-hidden /> {s.carried_over ? "Acknowledged (carried over)" : "Acknowledged"}</> : <><Flag size={12} aria-hidden /> Flagged unclear</>}
-                  </span>
-                )}
-              </div>
-              {s.key === "unresolved" && <p className="mb-2 text-sm text-slate-700">Honest list of what nobody could confirm. Please follow these up; do not assume an answer.</p>}
-              <div className="space-y-2.5">
-                {s.claims.length === 0 && <p className="text-sm text-slate-600">Nothing visible to {eff === role ? "your role" : "this role"} in this section.</p>}
-                {s.claims.map((c) => <ClaimCard key={c.id} claim={c} />)}
-              </div>
+                  <span className="text-xs font-normal text-slate-500">{bits.join(" · ")}</span>
+                  {s.ack !== "none" && (
+                    <span className={`ml-auto inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-semibold ${s.ack === "acknowledged" ? "border-emerald-300 bg-emerald-50 text-emerald-900" : "border-amber-400 bg-amber-100 text-amber-900"}`}>
+                      {s.ack === "acknowledged" ? <><CheckCircle2 size={12} aria-hidden /> {s.carried_over ? "Acknowledged (carried over)" : "Acknowledged"}</> : <><Flag size={12} aria-hidden /> Flagged unclear</>}
+                    </span>
+                  )}
+                </button>
+              </h2>
+              {isOpen && (
+                <div id={`b-${s.key}`} className="px-1 pb-1 pt-1">
+                  {s.key === "unresolved" && <p className="mb-2 text-sm text-slate-700">Honest list of what nobody could confirm. Please follow these up; do not assume an answer.</p>}
+                  <div className="space-y-2.5">
+                    {s.claims.length === 0 && <p className="text-sm text-slate-600">Nothing visible to {eff === role ? "your role" : "this role"} in this section.</p>}
+                    {shown.map((c) => <ClaimCard key={c.id} claim={c} />)}
+                  </div>
+                  {s.claims.length > LIMIT && (
+                    <button className="mt-2 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-blue-800 hover:bg-blue-50" aria-expanded={!!more[s.key]} onClick={() => setMore((m) => ({ ...m, [s.key]: !m[s.key] }))}>
+                      {more[s.key] ? `Show fewer (first ${LIMIT})` : `Show all ${s.claims.length} claims (${s.claims.length - LIMIT} more)`}
+                    </button>
+                  )}
 
-              {myTasks.length > 0 && (
-                <ul className="mt-3 space-y-2" aria-label="Your questions about this section">
-                  {myTasks.map((t) => (
-                    <li key={t.id} className="rounded-md border border-slate-200 bg-white p-2.5 text-sm">
-                      <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-600"><MessageCircleQuestion size={13} aria-hidden /> You asked (v{t.version_raised}):</div>
-                      <p className="text-slate-900">“{t.text}”</p>
-                      {t.status === "open" && <p className="mt-1 text-xs text-slate-600">Waiting for an answer from the leaver or the reviewer.</p>}
-                      {t.answer && <p className="mt-1 rounded bg-emerald-50 p-1.5 text-slate-900"><b>{t.answer_by}:</b> “{t.answer}”</p>}
-                      {t.status === "resolved" && <p className="mt-1 text-xs font-medium text-emerald-800">Resolved{t.version_resolved ? ` in v${t.version_resolved}` : ""}{t.resolution_note ? `: ${t.resolution_note}` : ""}</p>}
-                      {t.status === "wont_fix" && <p className="mt-1 text-xs text-slate-600">Closed by the reviewer{t.resolution_note ? `: ${t.resolution_note}` : ""}</p>}
-                    </li>
-                  ))}
-                </ul>
-              )}
+                  {myTasks.length > 0 && (
+                    <ul className="mt-3 space-y-2" aria-label="Your questions about this section">
+                      {myTasks.map((t) => (
+                        <li key={t.id} className="rounded-md border border-slate-200 bg-white p-2.5 text-sm">
+                          <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-600"><MessageCircleQuestion size={13} aria-hidden /> You asked (v{t.version_raised}):</div>
+                          <p className="text-slate-900">“{t.text}”</p>
+                          {t.status === "open" && <p className="mt-1 text-xs text-slate-600">Waiting for an answer from the leaver or the reviewer.</p>}
+                          {t.answer && <p className="mt-1 rounded bg-emerald-50 p-1.5 text-slate-900"><b>{t.answer_by}:</b> “{t.answer}”</p>}
+                          {t.status === "resolved" && <p className="mt-1 text-xs font-medium text-emerald-800">Resolved{t.version_resolved ? ` in v${t.version_resolved}` : ""}{t.resolution_note ? `: ${t.resolution_note}` : ""}</p>}
+                          {t.status === "wont_fix" && <p className="mt-1 text-xs text-slate-600">Closed by the reviewer{t.resolution_note ? `: ${t.resolution_note}` : ""}</p>}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
 
-              {canAck && (
-                <div className="mt-3">
-                  {flagging === s.key ? (
-                    <Card>
-                      <label className="block text-sm font-medium">What is unclear? It goes to the leaver and the reviewer.
-                        <textarea className="mt-1 w-full rounded-md border border-slate-300 p-2 text-sm font-normal" rows={2} value={note} onChange={(e) => setNote(e.target.value)} placeholder="e.g. Who do I ask for the deploy credentials?" />
-                      </label>
-                      <div className="mt-2 flex gap-2">
-                        <Button variant="primary" disabled={busyKey === s.key || note.trim().length < 5} onClick={() => ack(s.key, "unclear", note)}>Send to reviewer and leaver</Button>
-                        <Button onClick={() => setFlagging(null)}>Cancel</Button>
-                      </div>
-                    </Card>
-                  ) : (
-                    <div className="flex flex-wrap gap-2">
-                      <Button onClick={() => ack(s.key, "acknowledged")} disabled={s.ack === "acknowledged" || busyKey === s.key}><CheckCircle2 size={14} aria-hidden /> I have read this</Button>
-                      <Button onClick={() => setFlagging(s.key)} disabled={busyKey === s.key}><Flag size={14} aria-hidden /> This is unclear</Button>
+                  {canAck && (
+                    <div className="mt-3">
+                      {flagging === s.key ? (
+                        <Card>
+                          <label className="block text-sm font-medium">What is unclear? It goes to the leaver and the reviewer.
+                            <textarea className="mt-1 w-full rounded-md border border-slate-300 p-2 text-sm font-normal" rows={2} value={note} onChange={(e) => setNote(e.target.value)} placeholder="e.g. Who do I ask for the deploy credentials?" />
+                          </label>
+                          <div className="mt-2 flex gap-2">
+                            <Button variant="primary" disabled={busyKey === s.key || note.trim().length < 5} onClick={() => ack(s.key, "unclear", note)}>Send to reviewer and leaver</Button>
+                            <Button onClick={() => setFlagging(null)}>Cancel</Button>
+                          </div>
+                        </Card>
+                      ) : (
+                        <div className="flex flex-wrap gap-2">
+                          <Button onClick={() => ack(s.key, "acknowledged")} disabled={s.ack === "acknowledged" || busyKey === s.key}><CheckCircle2 size={14} aria-hidden /> I have read this</Button>
+                          <Button onClick={() => setFlagging(s.key)} disabled={busyKey === s.key}><Flag size={14} aria-hidden /> This is unclear</Button>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
