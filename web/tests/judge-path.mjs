@@ -84,7 +84,7 @@ try {
 
   // 4. publish v2
   await page.goto(`${BASE}/handovers/${hid}/ledger`);
-  const remaining = page.getByRole("button", { name: /Approve all remaining/ });
+  const remaining = page.getByRole("button", { name: /Approve remaining/ });
   await remaining.waitFor({ timeout: T });
   if (await remaining.isEnabled()) {
     await remaining.click();
