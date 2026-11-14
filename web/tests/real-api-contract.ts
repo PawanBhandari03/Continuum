@@ -2,6 +2,7 @@
 // Usage (from web/): NEXT_PUBLIC_API_URL=http://localhost:8000 npx --yes tsx tests/real-api-contract.ts
 import { api } from "../lib/api";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const need = (name: string, obj: any, keys: string[]) => {
   const missing = keys.filter((k) => !(k in (obj ?? {})));
   console.log(`${missing.length ? "FAIL" : "PASS"}  ${name}${missing.length ? "  missing: " + missing.join(", ") : ""}`);

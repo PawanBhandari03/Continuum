@@ -126,7 +126,7 @@ function TaskCard({ task: t, claims, onChanged }: { task: Task; claims: Claim[];
             </div>
           )}
           {mode === "new_claim" && (
-            <label className="mt-3 block text-sm">New claim (Confirmed, cites the leaver's answer)
+            <label className="mt-3 block text-sm">New claim (Confirmed, cites the leaver&apos;s answer)
               <textarea className="mt-1 w-full rounded-md border border-slate-300 p-2 text-sm" rows={2} value={statement} onChange={(e) => setStatement(e.target.value)} />
             </label>
           )}

@@ -31,7 +31,6 @@ try {
   // 1. Reviewer opens the ledger with real claims
   await asRole("lead", "/handovers/h_1/ledger");
   await page.getByRole("heading", { name: "Claim ledger" }).waitFor({ timeout: 120000 });
-  const cards = await page.locator("article, [data-claim], li").count();
   const body1 = await page.locator("body").innerText();
   check("ledger shows real claims from the API", /Verified/.test(body1) && /Inferred/.test(body1) && body1.length > 3000, `chars=${body1.length}`);
   check("readiness score shown", await page.getByText(/readiness/i).first().waitFor({ timeout: 30000 }).then(() => true).catch(() => false));
