@@ -109,44 +109,80 @@ export default function LedgerPage({ params }: { params: Promise<{ id: string }>
       {emptyState && <EmptyState title="No claims yet" hint={<><Link className="underline" href={`/handovers/${id}/connect`}>Connect sources</Link> and run Reconstruct first.</>} />}
 
       {ready && (
-        <Card className="mb-4">
-          <div className="flex flex-wrap items-center gap-x-8 gap-y-3">
-            <div>
-              <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">Handover readiness</div>
-              <div className="flex items-baseline gap-1"><span className="text-3xl font-bold">{ready.score}</span><span className="text-slate-500">/ 100</span></div>
-              <button className="mt-0.5 inline-flex items-center gap-1 text-xs text-indigo-700 hover:underline" onClick={() => setShowFormula(!showFormula)} aria-expanded={showFormula}>
-                How is this calculated? {showFormula ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
-              </button>
+        <Card className="mb-6 border-zinc-200 bg-white">
+          <div className="flex flex-wrap items-center justify-between gap-6">
+            <div className="flex items-center gap-4">
+              <div className="relative flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-zinc-900 text-white shadow-2xs">
+                <div className="text-center">
+                  <span className="text-2xl font-black leading-none">{ready.score}</span>
+                  <span className="block text-[10px] font-semibold text-zinc-400">/ 100</span>
+                </div>
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold uppercase tracking-wider text-zinc-700">Handover Readiness</span>
+                  <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${ready.score >= 80 ? "bg-emerald-100 text-emerald-800" : ready.score >= 50 ? "bg-zinc-100 text-zinc-800" : "bg-amber-100 text-amber-800"}`}>
+                    {ready.score >= 80 ? "High Ready" : ready.score >= 50 ? "In Progress" : "Needs Review"}
+                  </span>
+                </div>
+                <div className="mt-1.5 h-2 w-48 overflow-hidden rounded-full bg-zinc-100">
+                  <div className="h-full bg-emerald-600 transition-all duration-500" style={{ width: `${Math.min(100, Math.max(0, ready.score))}%` }} />
+                </div>
+                <button className="mt-1 inline-flex items-center gap-1 text-xs font-medium text-zinc-700 hover:text-zinc-900 hover:underline" onClick={() => setShowFormula(!showFormula)} aria-expanded={showFormula}>
+                  Calculation formula {showFormula ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+                </button>
+              </div>
             </div>
-            <dl className="grid grid-cols-3 gap-6 text-sm">
-              <div><dt className="text-slate-500">Slots filled</dt><dd className="font-semibold">{ready.slots_filled} / {ready.slots_total}</dd></div>
-              <div><dt className="text-slate-500">Open conflicts</dt><dd className="font-semibold">{ready.open_conflicts} {ready.open_conflicts > 0 && <Link className="tap text-xs font-normal text-indigo-700 underline" href={`/handovers/${id}/conflicts`}>resolve</Link>}</dd></div>
-              <div><dt className="text-slate-500">Open gaps</dt><dd className="font-semibold">{ready.open_gaps} {ready.open_gaps > 0 && <Link className="tap text-xs font-normal text-indigo-700 underline" href={`/handovers/${id}/interview`}>interview</Link>}</dd></div>
+
+            <dl className="grid grid-cols-3 gap-3 text-center sm:gap-6 sm:text-left">
+              <div className="rounded-xl border border-zinc-200 bg-zinc-50/50 p-3 shadow-2xs">
+                <dt className="text-xs font-medium text-zinc-500">Slots filled</dt>
+                <dd className="mt-0.5 text-base font-bold text-zinc-900">{ready.slots_filled} <span className="text-xs text-zinc-400 font-normal">/ {ready.slots_total}</span></dd>
+              </div>
+              <div className="rounded-xl border border-zinc-200 bg-zinc-50/50 p-3 shadow-2xs">
+                <dt className="text-xs font-medium text-zinc-500">Open conflicts</dt>
+                <dd className="mt-0.5 text-base font-bold text-zinc-900">
+                  {ready.open_conflicts} {ready.open_conflicts > 0 && <Link className="tap ml-1 text-xs font-semibold text-rose-700 underline" href={`/handovers/${id}/conflicts`}>resolve</Link>}
+                </dd>
+              </div>
+              <div className="rounded-xl border border-zinc-200 bg-zinc-50/50 p-3 shadow-2xs">
+                <dt className="text-xs font-medium text-zinc-500">Open gaps</dt>
+                <dd className="mt-0.5 text-base font-bold text-zinc-900">
+                  {ready.open_gaps} {ready.open_gaps > 0 && <Link className="tap ml-1 text-xs font-semibold text-zinc-800 underline" href={`/handovers/${id}/interview`}>interview</Link>}
+                </dd>
+              </div>
             </dl>
-            <div className="ml-auto flex flex-col items-end gap-1">
+
+            <div className="flex flex-col sm:items-end gap-1.5 w-full sm:w-auto">
               {latest && (
-                <span className="inline-flex items-center gap-1 rounded-md border border-emerald-300 bg-emerald-50 px-3 py-1.5 text-xs font-medium text-emerald-900" title={`SHA-256 ${latest.sha256}`}>
-                  <Lock size={13} aria-hidden /> Successor reads v{latest.version} · signed {latest.sha256.slice(0, 10)}…
+                <span className="inline-flex items-center gap-1.5 rounded-lg border border-emerald-300 bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-950 shadow-2xs" title={`SHA-256 ${latest.sha256}`}>
+                  <Lock size={13} className="text-emerald-700" aria-hidden /> Successor reads v{latest.version} · <span className="font-mono text-[11px]">{latest.sha256.slice(0, 10)}…</span>
                 </span>
               )}
               {published ? (
-                <span className="text-xs text-slate-600">No changes since v{h?.version}. Any edit starts draft v{(h?.version ?? 0) + 1}.</span>
+                <span className="text-xs font-medium text-zinc-600">No changes since v{h?.version}. Any edit starts draft v{(h?.version ?? 0) + 1}.</span>
               ) : (
-                <>
-                  <Button variant="primary" disabled={reasons.length > 0} onClick={publish}>Publish v{(h?.version ?? 0) + 1}</Button>
-                  <Button variant="ghost" onClick={bulk} className="text-xs">Approve all Verified claims</Button>
-                  <Button variant="ghost" onClick={approveRest} disabled={pending === 0} className="text-xs">Approve all remaining ({pending})</Button>
-                </>
+                <div className="flex flex-wrap items-center gap-2">
+                  <Button variant="primary" disabled={reasons.length > 0} onClick={publish} className="shadow-2xs">
+                    Publish v{(h?.version ?? 0) + 1}
+                  </Button>
+                  <Button variant="secondary" onClick={bulk} className="text-xs">
+                    Approve Verified
+                  </Button>
+                  <Button variant="ghost" onClick={approveRest} disabled={pending === 0} className="text-xs">
+                    Approve remaining ({pending})
+                  </Button>
+                </div>
               )}
             </div>
           </div>
-          {showFormula && <p className="mt-3 rounded bg-slate-50 p-2 text-xs text-slate-700"><code>{ready.formula}</code>. It measures how much of the handover is backed by evidence or a human, not whether the content is correct.</p>}
+          {showFormula && <p className="mt-3 rounded-xl border border-slate-200 bg-slate-50 p-2.5 text-xs text-slate-700 font-mono"><code>{ready.formula}</code></p>}
           {!published && reasons.length > 0 && (
-            <ul className="mt-3 list-disc pl-5 text-sm text-amber-900" aria-label="Why publishing is blocked">
-              {reasons.map((r) => <li key={r}>Publish blocked: {r}</li>)}
+            <ul className="mt-3.5 space-y-1 rounded-xl border border-amber-200 bg-amber-50/80 p-3 text-xs font-medium text-amber-900" aria-label="Why publishing is blocked">
+              {reasons.map((r) => <li key={r} className="flex items-center gap-1.5">⚠️ Publish blocked: {r}</li>)}
             </ul>
           )}
-          {blocked.length > 0 && <div className="mt-2"><Notice tone="error">Publish refused: {blocked.join(" ")}</Notice></div>}
+          {blocked.length > 0 && <div className="mt-3"><Notice tone="error">Publish refused: {blocked.join(" ")}</Notice></div>}
         </Card>
       )}
 

@@ -70,7 +70,7 @@ export default function ReconstructPage({ params }: { params: Promise<{ id: stri
       {job?.status === "done" && job.error && <Notice tone="warn"><b>Finished with warnings.</b> Some parts did not complete, so the handover may be missing claims: {job.error}</Notice>}
       <Card className="mt-3">
         <div className="mb-3 h-2 overflow-hidden rounded-full bg-slate-200" role="progressbar" aria-valuenow={job?.progress ?? 0} aria-valuemin={0} aria-valuemax={100} aria-label="Reconstruction progress">
-          <div className="h-full bg-indigo-600 transition-all" style={{ width: `${job?.progress ?? 0}%` }} />
+          <div className="h-full bg-zinc-900 transition-all" style={{ width: `${job?.progress ?? 0}%` }} />
         </div>
         <ol className="space-y-3">
           {STAGES.map((s, i) => {
@@ -79,7 +79,7 @@ export default function ReconstructPage({ params }: { params: Promise<{ id: stri
             const failed = job?.status === "failed" && job.stage === s.key;
             return (
               <li key={s.key} className="flex items-start gap-3">
-                {failed ? <XCircle className="mt-0.5 text-rose-600" size={18} aria-hidden /> : done ? <CheckCircle2 className="mt-0.5 text-emerald-600" size={18} aria-hidden /> : active ? <Loader2 className="mt-0.5 animate-spin text-indigo-600" size={18} aria-hidden /> : <Circle className="mt-0.5 text-slate-300" size={18} aria-hidden />}
+                {failed ? <XCircle className="mt-0.5 text-rose-600" size={18} aria-hidden /> : done ? <CheckCircle2 className="mt-0.5 text-emerald-600" size={18} aria-hidden /> : active ? <Loader2 className="mt-0.5 animate-spin text-zinc-900" size={18} aria-hidden /> : <Circle className="mt-0.5 text-slate-300" size={18} aria-hidden />}
                 <div>
                   <div className="font-medium">{i + 1}. {s.title} <span className="text-xs font-normal text-slate-500">{done ? "done" : active ? "running…" : failed ? "failed" : "waiting"}</span></div>
                   <div className="text-sm text-slate-600">{s.desc}</div>
@@ -92,7 +92,7 @@ export default function ReconstructPage({ params }: { params: Promise<{ id: stri
       {job?.status === "done" && (
         <div className="mt-4 flex flex-wrap items-center gap-3">
           <Notice>Reconstruction finished. Claims are ready for review.</Notice>
-          <Link href={`/handovers/${id}/ledger`} className="rounded-md bg-indigo-700 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-800">Open the claim ledger →</Link>
+          <Link href={`/handovers/${id}/ledger`} className="rounded-md bg-zinc-900 px-3 py-2 text-sm font-medium text-white hover:bg-zinc-800">Open the claim ledger →</Link>
         </div>
       )}
     </RoleGuard>

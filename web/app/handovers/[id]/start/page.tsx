@@ -11,6 +11,7 @@ import { AttentionTiles } from "@/components/attention";
 import { ExportButtons } from "@/components/export";
 import { DiffView } from "@/components/version-diff";
 import { LoadError, SkeletonList } from "@/components/feedback";
+import { UserAvatar } from "@/components/avatar";
 import { friendlyError } from "@/lib/status";
 
 const LIMIT = 5;
@@ -137,8 +138,18 @@ export default function StartPage({ params }: { params: Promise<{ id: string }> 
       )}
 
       {view && role === "contributor" && !view.not_published && (
-        <div className="mb-4 flex flex-wrap items-center gap-3 text-sm text-slate-700" aria-live="polite">
-          <span><b>{acked}</b> of {view.sections.length} sections acknowledged for v{view.version}{carried ? ` (${carried} carried over from an earlier version)` : ""}</span>
+        <div className="mb-5 rounded-2xl border border-zinc-200 bg-white p-4 shadow-2xs" aria-live="polite">
+          <div className="flex items-center justify-between text-xs font-bold text-zinc-700">
+            <span className="flex items-center gap-2">
+              <UserAvatar name="Karan Verma" role="contributor" size={20} />
+              <CheckCircle2 size={15} className="text-emerald-600" />
+              Successor Acknowledgement Progress (v{view.version})
+            </span>
+            <span className="font-extrabold text-zinc-900">{acked} of {view.sections.length} Acknowledged{carried ? ` (${carried} carried over)` : ""}</span>
+          </div>
+          <div className="mt-2.5 h-2 w-full overflow-hidden rounded-full bg-zinc-100">
+            <div className="h-full bg-emerald-600 transition-all duration-300" style={{ width: `${Math.round((acked / Math.max(1, view.sections.length)) * 100)}%` }} />
+          </div>
         </div>
       )}
 

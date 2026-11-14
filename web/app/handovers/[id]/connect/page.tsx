@@ -111,7 +111,7 @@ export default function ConnectPage({ params }: { params: Promise<{ id: string }
                     <option value="lead_only">Lead only (never shown to the successor)</option>
                   </select>
                 </label>
-                <label className={`mt-3 inline-flex cursor-pointer items-center gap-1.5 rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium hover:bg-slate-50 focus-within:outline focus-within:outline-2 focus-within:outline-indigo-600 ${uploading ? "pointer-events-none opacity-60" : ""}`}>
+                <label className={`mt-3 inline-flex cursor-pointer items-center gap-1.5 rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium hover:bg-slate-50 focus-within:outline focus-within:outline-2 focus-within:outline-zinc-800 ${uploading ? "pointer-events-none opacity-60" : ""}`}>
                   {uploading === k.type ? <><Loader2 size={14} className="animate-spin" aria-hidden /> Uploading…</> : <><Upload size={14} aria-hidden /> Choose file</>}
                   <input type="file" className="sr-only" accept={k.accept} aria-label={`Upload ${k.title}`} disabled={!!uploading} onChange={(e) => { const f = e.target.files?.[0]; if (f) upload(k.type, f); e.target.value = ""; }} />
                 </label>

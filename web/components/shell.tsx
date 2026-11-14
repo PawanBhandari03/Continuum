@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
-import { Bell, RotateCcw } from "lucide-react";
+import { Bell, RotateCcw, Sparkles } from "lucide-react";
 import { LogoMark } from "./logo";
 import { api } from "@/lib/api";
 import { ROLE_META, SessionProvider, useSession } from "@/lib/session";
@@ -40,13 +40,13 @@ function Frame({ children }: { children: ReactNode }) {
       <Header />
       <ServerBanner />
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6">{children}</main>
-      <footer className="border-t border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2 px-4 py-3 text-xs text-slate-500">
-          <span>Continuum · Team Binary Builders</span>
+      <footer className="border-t border-[#e5dfd6] bg-[#faf7f2]">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2 px-4 py-3.5 text-xs text-[#575245]">
+          <span className="font-medium text-[#25272d]">Continuum · Team Binary Builders</span>
           <span className="flex items-center gap-4">
             {target && (
               <button
-                className="inline-flex items-center gap-1 underline"
+                className="inline-flex items-center gap-1 font-medium text-[#25272d] underline hover:text-[#506cb8]"
                 onClick={async () => {
                   if (!window.confirm("Reset your copy of the demo to its starting point (v1 published)? Your review work in this copy will be lost.")) return;
                   await api.resetDemo(target);
@@ -58,7 +58,7 @@ function Frame({ children }: { children: ReactNode }) {
             )}
             {demoId && (
               <button
-                className="underline"
+                className="font-medium text-[#25272d] underline hover:text-[#506cb8]"
                 onClick={async () => {
                   if (!window.confirm("Start a brand-new copy of the demo?")) return;
                   const id = await newDemo();
@@ -146,24 +146,35 @@ function Header() {
   const router = useRouter();
   const hid = useHid();
   return (
-    <header className="sticky top-0 z-30 border-b border-slate-200 bg-white">
+    <header className="sticky top-0 z-40 border-b border-[#e5dfd6] bg-[#f4efea]/95 backdrop-blur-md shadow-2xs">
       <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-3">
-        <Link href="/" className="flex items-center gap-2 py-2 font-bold text-slate-900">
-          <LogoMark size={36} /> <span className="text-lg tracking-tight">Continuum</span>
-        </Link>
-        <nav className="flex flex-wrap items-center gap-2 text-sm">
-          <span className="hidden items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs text-slate-600 md:inline-flex" title="Your own copy of the synthetic CampusKart demo. Nothing you do affects other visitors.">
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" aria-hidden /> Demo: CampusKart (synthetic data)
+        <Link href="/" className="flex items-center gap-2.5 py-1 text-[#25272d] group">
+          <LogoMark size={34} />
+          <span className="text-xl font-bold tracking-tight text-[#25272d] group-hover:text-[#506cb8] transition-colors">
+            Continuum
           </span>
-          <Link href="/tour" className="rounded px-2 py-2.5 font-medium text-current hover:bg-slate-500/15 sm:py-1">Judge&apos;s tour</Link>
+        </Link>
+        <nav className="flex flex-wrap items-center gap-2.5 text-sm">
+          <span className="hidden items-center gap-2 rounded-full border border-[#b8c8ee] bg-[#eef3fd] px-3 py-1 text-xs font-semibold text-[#2b3e70] shadow-2xs md:inline-flex" title="Your own copy of the synthetic CampusKart demo. Nothing you do affects other visitors.">
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#92a9e1] opacity-75"></span>
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-[#506cb8]"></span>
+            </span>
+            CampusKart demo
+          </span>
+          <Link href="/tour" className="inline-flex items-center gap-1.5 rounded-full border border-[#e5dfd6] bg-white px-3 py-1 text-xs font-semibold text-[#25272d] shadow-2xs transition hover:border-[#92a9e1] hover:bg-[#eef3fd] active:scale-95">
+            <Sparkles size={13} className="text-[#506cb8]" aria-hidden /> Judge&apos;s tour
+          </Link>
           <HelpButton />
           {role && hid && role !== "guest" && <NotificationBell hid={hid} />}
           {role && (
             <>
-              <Link href="/handovers" className="rounded px-2 py-2.5 text-current hover:bg-slate-500/15 sm:py-1">Handovers</Link>
-              <span className="rounded-full border border-indigo-200 bg-indigo-50 px-2.5 py-1 text-xs font-semibold text-indigo-900">Viewing as: {ROLE_META[role].label}</span>
+              <Link href="/handovers" className="rounded-lg px-2.5 py-1 text-xs font-semibold text-[#575245] hover:bg-[#eef3fd] hover:text-[#25272d] transition">Handovers</Link>
+              <span className="rounded-full border border-[#e5dfd6] bg-white px-3 py-1 text-xs font-semibold text-[#25272d] shadow-2xs">
+                Role: <span className="font-bold text-[#25272d]">{ROLE_META[role].label}</span>
+              </span>
               <button
-                className="rounded px-2 py-1 text-current hover:bg-slate-500/15"
+                className="rounded-lg border border-[#e5dfd6] bg-white px-2.5 py-1 text-xs font-medium text-[#575245] shadow-2xs transition hover:border-[#92a9e1] hover:bg-[#eef3fd] hover:text-[#25272d] active:scale-95"
                 onClick={() => {
                   setRole(null);
                   router.push("/");
@@ -211,15 +222,15 @@ export function HandoverNav({ hid }: { hid: string }) {
   if (!role) return null;
   const count = (keys?: string[]) => (keys ?? []).reduce((n, k) => n + (items.find((i) => i.key === k)?.count ?? 0), 0);
   return (
-    <nav aria-label="Handover steps" className="mb-5 flex gap-1 overflow-x-auto whitespace-nowrap border-b border-slate-200 pb-2 sm:flex-wrap sm:overflow-visible">
+    <nav aria-label="Handover steps" className="mb-6 flex gap-1.5 overflow-x-auto whitespace-nowrap border-b border-[#e5dfd6] pb-2.5 sm:flex-wrap sm:overflow-visible">
       {TABS.filter((t) => t.roles.includes(role)).map((t) => {
         const href = `/handovers/${hid}/${t.seg}`;
         const on = path === href;
         const n = count(t.badge);
         return (
-          <Link key={t.seg} href={href} aria-current={on ? "page" : undefined} className={`inline-flex items-center gap-1.5 rounded-md px-3 py-2.5 text-sm font-medium sm:py-1.5 ${on ? "bg-indigo-700 text-white" : "text-slate-700 hover:bg-slate-100"}`}>
+          <Link key={t.seg} href={href} aria-current={on ? "page" : undefined} className={`inline-flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-semibold transition active:scale-95 sm:py-1.5 sm:text-sm ${on ? "bg-[#25272d] text-white shadow-xs" : "text-[#575245] hover:bg-[#eef3fd] hover:text-[#25272d]"}`}>
             {t.label}
-            {n > 0 && <span aria-label={`${n} need attention`} className={`rounded-full px-1.5 text-[11px] font-bold ${on ? "bg-white/25 text-white" : "bg-rose-100 text-rose-800"}`}>{n}</span>}
+            {n > 0 && <span aria-label={`${n} need attention`} className={`rounded-full px-2 py-0.5 text-[11px] font-bold ${on ? "bg-[#92a9e1] text-[#191b1f]" : "bg-rose-100 text-rose-800"}`}>{n}</span>}
           </Link>
         );
       })}

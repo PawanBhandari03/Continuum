@@ -9,6 +9,7 @@ import { HandoverNav, RoleGuard, notifyChanged } from "@/components/shell";
 import { AttentionTiles } from "@/components/attention";
 import { SECTION_TITLE } from "@/components/version-diff";
 import { EmptyState, LoadError, SkeletonList } from "@/components/feedback";
+import { UserAvatar } from "@/components/avatar";
 import { friendlyError } from "@/lib/status";
 
 export default function InterviewPage({ params }: { params: Promise<{ id: string }> }) {
@@ -68,16 +69,25 @@ export default function InterviewPage({ params }: { params: Promise<{ id: string
   const total = gaps?.length ?? 0;
   const done = gaps?.filter((g) => g.status !== "open").length ?? 0;
   const openTasks = tasks?.filter((t) => t.status === "open").length ?? 0;
-  const tabCls = (on: boolean) => `rounded-md px-3 py-1.5 text-sm font-medium ${on ? "bg-slate-900 text-white" : "border border-slate-300 bg-white text-slate-800 hover:bg-slate-50"}`;
+  const tabCls = (on: boolean) =>
+    `inline-flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-bold transition-all shadow-2xs active:scale-95 ${
+      on
+        ? "bg-zinc-900 text-white shadow-2xs"
+        : "border border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50 hover:text-zinc-900"
+    }`;
 
   return (
     <RoleGuard hid={id} allow={["leaver", "lead"]}>
       <HandoverNav hid={id} />
       <AttentionTiles hid={id} />
       <PageTitle title="Gap Interview" sub="Continuum read the project and asks you only what the evidence cannot answer, plus any question the successor has after reading the handover. Short answers are enough. Each answer is saved as new citable evidence (“Exit Q&A”) and the reviewer decides how to use it." />
-      <div className="mb-4 flex flex-wrap gap-2" role="tablist" aria-label="Question lists">
-        <button role="tab" aria-selected={tab === "gaps"} className={tabCls(tab === "gaps")} onClick={() => setTab("gaps")}>Gap questions ({total - done} open)</button>
-        <button role="tab" aria-selected={tab === "successor"} className={tabCls(tab === "successor")} onClick={() => setTab("successor")}>From your successor ({openTasks} waiting)</button>
+      <div className="mb-5 flex flex-wrap gap-2.5" role="tablist" aria-label="Question lists">
+        <button role="tab" aria-selected={tab === "gaps"} className={tabCls(tab === "gaps")} onClick={() => setTab("gaps")}>
+          <UserAvatar name="Aditi" role="leaver" size={18} /> Gap questions ({total - done} open)
+        </button>
+        <button role="tab" aria-selected={tab === "successor"} className={tabCls(tab === "successor")} onClick={() => setTab("successor")}>
+          <UserAvatar name="Karan" role="contributor" size={18} /> From your successor ({openTasks} waiting)
+        </button>
       </div>
       {err && <div className="mb-3"><Notice tone="error">{err}</Notice></div>}
       {loadErr && <LoadError message={loadErr} onRetry={load} />}
@@ -85,9 +95,19 @@ export default function InterviewPage({ params }: { params: Promise<{ id: string
 
       {tab === "gaps" && gaps && (
         <>
-          <div className="mb-4" aria-live="polite">
-            <div className="flex justify-between text-sm"><span>{done} of {total} handled</span>{total > 0 && done === total && <span className="font-medium text-emerald-800">All done. Thank you.</span>}</div>
-            <div className="mt-1 h-2 overflow-hidden rounded-full bg-slate-200"><div className="h-full bg-emerald-600" style={{ width: total ? `${(done / total) * 100}%` : "0%" }} /></div>
+          <div className="mb-5 rounded-2xl border border-zinc-200 bg-white p-4 shadow-2xs" aria-live="polite">
+            <div className="flex items-center justify-between text-xs font-bold text-zinc-700">
+              <span className="flex items-center gap-2">
+                <UserAvatar name="Aditi" role="leaver" size={20} />
+                Exit Interview Progress
+              </span>
+              <span className="font-extrabold text-zinc-900">
+                {done} of {total} Handled {total > 0 && done === total && <span className="text-emerald-700 font-bold ml-1.5">✓ All done</span>}
+              </span>
+            </div>
+            <div className="mt-2.5 h-2.5 overflow-hidden rounded-full bg-zinc-100">
+              <div className="h-full bg-emerald-600 transition-all duration-300" style={{ width: total ? `${(done / total) * 100}%` : "0%" }} />
+            </div>
           </div>
           {gaps.length === 0 && <EmptyState title="No open questions" hint="Run Reconstruct first if you expected some." />}
           <div className="space-y-4">

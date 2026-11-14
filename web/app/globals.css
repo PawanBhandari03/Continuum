@@ -4,30 +4,110 @@
   color-scheme: light;
 }
 
-/* One accent for the whole app: every "indigo" utility resolves to blue. */
+/* Lavender Haze (#92A9E1) & Soft Graphite (#25272D) Theme */
 @theme {
-  --color-indigo-50: #eff6ff;
-  --color-indigo-100: #dbeafe;
-  --color-indigo-200: #bfdbfe;
-  --color-indigo-300: #93c5fd;
-  --color-indigo-400: #60a5fa;
-  --color-indigo-500: #3b82f6;
-  --color-indigo-600: #2563eb;
-  --color-indigo-700: #1d4ed8;
-  --color-indigo-800: #1e40af;
-  --color-indigo-900: #1e3a8a;
+  --color-lavender: #92a9e1;
+  --color-lavender-haze: #92a9e1;
+  --color-lavender-50: #f7f9ff;
+  --color-lavender-100: #eef3fd;
+  --color-lavender-200: #d8e3fb;
+  --color-lavender-300: #b8c8ee;
+  --color-lavender-400: #92a9e1;
+  --color-lavender-500: #6f8bd4;
+  --color-lavender-600: #506cb8;
+  --color-lavender-700: #3b5394;
+  --color-lavender-800: #2b3e70;
+  --color-lavender-900: #1c2a4d;
+
+  --color-graphite: #25272d;
+  --color-graphite-soft: #25272d;
+  --color-graphite-50: #f7f6f4;
+  --color-graphite-100: #ede9e2;
+  --color-graphite-200: #ded8cd;
+  --color-graphite-300: #c0b8a9;
+  --color-graphite-400: #898170;
+  --color-graphite-500: #575245;
+  --color-graphite-600: #3a372e;
+  --color-graphite-700: #2c2923;
+  --color-graphite-800: #25272d;
+  --color-graphite-900: #191b1f;
+
+  --color-sand-50: #fcfbf9;
+  --color-sand-100: #f8f5f0;
+  --color-sand-200: #f4efea;
+  --color-sand-300: #e5dfd6;
+  --color-sand-400: #d6ccbf;
+  --color-sand-500: #baaea0;
+
+  --color-indigo-50: #f7f9ff;
+  --color-indigo-100: #eef3fd;
+  --color-indigo-200: #d8e3fb;
+  --color-indigo-300: #b8c8ee;
+  --color-indigo-400: #92a9e1;
+  --color-indigo-500: #6f8bd4;
+  --color-indigo-600: #25272d;
+  --color-indigo-700: #25272d;
+  --color-indigo-800: #191b1f;
+  --color-indigo-900: #101114;
+
+  --color-git-orange: #ea580c;
+  --color-git-green: #16a34a;
+  --color-git-purple: #92a9e1;
+  --color-git-amber: #d97706;
 }
 
-html { scroll-behavior: smooth; }
-@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition: none !important; } }
+html { 
+  scroll-behavior: smooth; 
+}
+
+@media (prefers-reduced-motion: reduce) { 
+  html { scroll-behavior: auto; } 
+  * { transition: none !important; animation: none !important; } 
+}
 
 body {
-  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background-color: #f4efea;
+  background-image: radial-gradient(rgba(37, 39, 45, 0.05) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: #25272d;
 }
 
 :focus-visible {
-  outline: 2px solid #2563eb;
+  outline: 2px solid #92a9e1;
   outline-offset: 2px;
+}
+
+/* Developer workbench & code panel styling */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid #e5dfd6;
+}
+
+.code-window {
+  border-radius: 12px;
+  border: 1px solid #e5dfd6;
+  background: #ffffff;
+  box-shadow: 0 4px 6px -1px rgba(37, 39, 45, 0.04), 0 2px 4px -2px rgba(37, 39, 45, 0.04);
+}
+
+.code-window-dark {
+  border-radius: 14px;
+  border: 1px solid #363942;
+  background: #25272d;
+  color: #f4efea;
+  box-shadow: 0 10px 25px -5px rgba(37, 39, 45, 0.25);
+}
+
+@keyframes pulse-subtle {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.85; transform: scale(1.02); }
+}
+
+.animate-pulse-subtle {
+  animation: pulse-subtle 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
 /* Print / Save as PDF: only the generated printable handover is printed (see components/export.tsx). */
