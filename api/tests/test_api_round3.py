@@ -299,3 +299,46 @@ def test_signed_export_detects_any_change(api):
     assert c.post("/exports/verify", json={"text": signed.replace("UPI", "cards")}).json()["ok"] is False
     assert c.post("/exports/verify", json={"text": signed.replace("version=1", "version=2")}).json()["ok"] is False
     assert c.post("/exports/verify", json={"text": text}).json()["ok"] is False
+
+
+# ---------- real accounts: membership decides the role, private handovers stay private ----------
+def _tokens(monkeypatch, users):
+    from app import auth
+    monkeypatch.setattr(auth, "verify_token", lambda jwt: users.get(jwt))
+
+
+def test_private_handover_needs_membership_and_role_comes_from_it(api, monkeypatch):
+    c, s, sid = api
+    users = {"t-lead": {"id": "u1", "email": "pawan@example.com", "jwt": "t-lead"},
+             "t-succ": {"id": "u2", "email": "karan@example.com", "jwt": "t-succ"},
+             "t-out": {"id": "u3", "email": "stranger@example.com", "jwt": "t-out"}}
+    _tokens(monkeypatch, users)
+    A = lambda t: {"Authorization": f"Bearer {t}"}  # noqa: E731
+    h = c.post("/handovers", headers=A("t-lead"), json={"leaver": "a", "successor": "b", "target_date": "2026-12-01"}).json()["id"]
+    assert [m["email"] for m in c.get(f"/handovers/{h}/members", headers=A("t-lead")).json()] == ["pawan@example.com"]
+    # anonymous and strangers cannot see it, and it is not listed publicly
+    assert c.get(f"/handovers/{h}").status_code == 401
+    assert c.get(f"/handovers/{h}", headers=A("t-out")).status_code == 404
+    assert h not in {x["id"] for x in c.get("/handovers").json()}
+    # a forged demo-role header cannot lift a stranger or a member above their membership
+    assert c.get(f"/handovers/{h}/claims", headers={**A("t-out"), "X-Demo-Role": "lead"}).status_code == 404
+    # invite the successor as contributor; they cannot invite or act as lead even with a lead header
+    assert c.post(f"/handovers/{h}/members", headers=A("t-lead"), json={"email": "Karan@Example.com", "role": "contributor"}).status_code == 200
+    assert c.get(f"/handovers/{h}/audit", headers={**A("t-succ"), "X-Demo-Role": "lead"}).status_code == 403
+    assert c.post(f"/handovers/{h}/members", headers={**A("t-succ"), "X-Demo-Role": "lead"}, json={"email": "x@y.com", "role": "lead"}).status_code == 403
+    me = c.get(f"/handovers/{h}/me", headers=A("t-succ")).json()
+    assert me["role"] == "contributor" and me["private"] and me["email"] == "karan@example.com"
+    assert c.get("/me", headers=A("t-succ")).json()["handovers"][0]["my_role"] == "contributor"
+    # the invited person's first request links their account
+    assert s.one("handover_members", {"handover_id": h, "email": "karan@example.com"})["user_id"] == "u2"
+    # bad or expired tokens are refused, demo handovers still work without sign-in
+    assert c.get(f"/handovers/{h}", headers=A("nope")).status_code == 401
+    assert c.get(f"/handovers/{sid}/view", headers=C).status_code == 200
+
+
+def test_actor_is_the_signed_in_email(api, monkeypatch):
+    c, s, sid = api
+    _tokens(monkeypatch, {"t": {"id": "u1", "email": "pawan@example.com", "jwt": "t"}})
+    h = c.post("/handovers", headers={"Authorization": "Bearer t"}, json={"leaver": "a", "successor": "b", "target_date": "2026-12-01"}).json()["id"]
+    rows = c.get(f"/handovers/{h}/audit", headers={"Authorization": "Bearer t"}).json()
+    assert rows and rows[0]["actor"] == "pawan@example.com"

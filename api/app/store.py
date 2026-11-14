@@ -15,12 +15,17 @@ class StoreError(RuntimeError):
 
 
 class Store:
-    def __init__(self) -> None:
+    def __init__(self, user_jwt: str | None = None) -> None:
+        """Service store by default. With `user_jwt`, requests run AS that signed-in user (publishable key +
+        their token), so the database's row-level-security policies decide what comes back."""
         self.url = os.environ.get("SUPABASE_URL", "").rstrip("/")
-        key = os.environ.get("SUPABASE_SECRET_KEY", "")
+        key = os.environ.get("SUPABASE_PUBLISHABLE_KEY" if user_jwt else "SUPABASE_SECRET_KEY", "")
         if not self.url or not key:
-            raise StoreError("SUPABASE_URL / SUPABASE_SECRET_KEY not configured")
-        self.http = httpx.Client(timeout=30, headers={"apikey": key, "Content-Type": "application/json"})
+            raise StoreError("SUPABASE_URL / SUPABASE keys not configured")
+        headers = {"apikey": key, "Content-Type": "application/json"}
+        if user_jwt:
+            headers["Authorization"] = f"Bearer {user_jwt}"
+        self.http = httpx.Client(timeout=30, headers=headers)
 
     def _req(self, method: str, table: str, params: dict | None = None, json: Any = None,
              prefer: str | None = None) -> httpx.Response:

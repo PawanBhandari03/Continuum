@@ -23,10 +23,11 @@ from typing import Optional
 
 from fastapi import FastAPI, File, Form, Header, HTTPException, Query, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import PlainTextResponse
+from fastapi.responses import JSONResponse, PlainTextResponse
+from starlette.concurrency import run_in_threadpool
 from pydantic import BaseModel
 
-from . import audit, config, snapshots
+from . import audit, auth, config, snapshots
 from .models import Claim, Conflict, EvidenceUnit, Gap, Redaction, LABEL_RANK
 from .protect import redact_text, scan
 from .visibility import can_read, claim_visible, visible_claims
@@ -63,6 +64,42 @@ def db():
             from .store import Store
             _store = Store()
     return _store
+
+
+USER_READ_TABLES = {"evidence_units", "claims", "sources"}
+
+
+class _AsUser:
+    """Reads of the content tables go through the signed-in user's token, so Postgres row-level security filters
+    them; everything else (and every write, after the API's own checks) uses the service store."""
+
+    def __init__(self, base, user_store):
+        self.base, self.user = base, user_store
+
+    def sel(self, table, *a, **k):
+        return (self.user if table in USER_READ_TABLES else self.base).sel(table, *a, **k)
+
+    def one(self, table, match):
+        return (self.user if table in USER_READ_TABLES else self.base).one(table, match)
+
+    def __getattr__(self, name):
+        return getattr(self.base, name)
+
+
+_user_stores: dict = {}
+
+
+def scoped_db():
+    """db() for the current request: as the signed-in user when there is one (real database only)."""
+    base = db()
+    u = auth.user_ctx.get()
+    if not u or base.__class__.__name__ == "MemStore":
+        return base
+    st = _user_stores.get(u["jwt"])
+    if st is None:
+        from .store import Store
+        st = _user_stores[u["jwt"]] = Store(user_jwt=u["jwt"])
+    return _AsUser(base, st)
 
 
 def offline() -> bool:
@@ -141,12 +178,17 @@ def cache_clear() -> None:
     _cache.clear()
 
 
+def _who() -> str:
+    u = auth.user_ctx.get()
+    return u["id"] if u else "service"
+
+
 def units_all(hid: str) -> list[dict]:
-    return cached(("units", hid), lambda: db().sel("evidence_units", {"handover_id": hid}))
+    return cached(("units", hid, _who()), lambda: scoped_db().sel("evidence_units", {"handover_id": hid}))
 
 
 def sources_all(hid: str) -> dict[str, dict]:
-    return cached(("sources", hid), lambda: {r["id"]: r for r in db().sel("sources", {"handover_id": hid})})
+    return cached(("sources", hid, _who()), lambda: {r["id"]: r for r in scoped_db().sel("sources", {"handover_id": hid})})
 
 
 def P(hid: str) -> str:
@@ -163,10 +205,18 @@ def short(x: str | None) -> str:
 
 
 def role_of(x_demo_role: Optional[str]) -> str:
+    member = auth.role_ctx.get()
+    if member:
+        return member  # signed-in member of a private handover: the role comes from the membership, never the client
     r = (x_demo_role or "contributor").lower()
     if r not in ROLES:
         raise HTTPException(400, f"Unknown role '{r}'")
     return r
+
+
+def actor_name(role: str) -> str:
+    u = auth.user_ctx.get()
+    return u["email"] if (u and auth.role_ctx.get()) else ACTORS[role]
 
 
 def need(role: str, *allowed: str) -> None:
@@ -265,7 +315,7 @@ def claim_row(cid: str) -> dict:
 
 
 def claims_of(hid: str) -> list[dict]:
-    return db().sel("claims", {"handover_id": hid}, order="id.asc")
+    return scoped_db().sel("claims", {"handover_id": hid}, order="id.asc")
 
 
 def visible_live_claims(hid: str, role: str) -> list[Claim]:
@@ -273,6 +323,137 @@ def visible_live_claims(hid: str, role: str) -> list[Claim]:
     if role == "lead":
         return claims
     return visible_claims(role, claims, labels_of(hid))[0]
+
+
+# ---------------- accounts and membership ----------------
+import re as _re
+
+_PATH_TABLE = {"claims": "claims", "conflicts": "conflicts", "tasks": "tasks", "gaps": "gaps",
+               "redactions": "redaction_reviews", "evidence": "evidence_units", "jobs": "jobs"}
+
+
+def members_of(hid: str) -> list[dict]:
+    return cached(("members", hid), lambda: db().sel("handover_members", {"handover_id": hid}), ttl=20)
+
+
+def _handover_of_path(path: str) -> str | None:
+    m = _re.match(r"^/handovers/([^/?]+)", path)
+    if m:
+        return m.group(1)
+    m = _re.match(r"^/(claims|conflicts|tasks|gaps|redactions|evidence|jobs)/([^/?]+)", path)
+    if m:
+        row = cached(("owner", m.group(1), m.group(2)),
+                     lambda: db().one(_PATH_TABLE[m.group(1)], {"id": m.group(2)}), ttl=300)
+        return (row or {}).get("handover_id")
+    return None
+
+
+def _member_match(members: list[dict], user: dict) -> dict | None:
+    return next((x for x in members if x.get("user_id") == user["id"] or x["email"].lower() == user["email"]), None)
+
+
+def _authorise(path: str, authz: str | None):
+    """Returns (user, member_role, error_response)."""
+    user = None
+    if authz and authz.lower().startswith("bearer "):
+        user = auth.verify_token(authz[7:].strip())
+        if user is None:
+            return None, None, JSONResponse({"detail": "Your sign-in has expired. Please sign in again."}, status_code=401)
+    hid = _handover_of_path(path)
+    if not hid:
+        return user, None, None
+    members = members_of(hid)
+    if not members:
+        return user, None, None  # demo or open handover: demo roles apply
+    if not user:
+        return None, None, JSONResponse({"detail": "This handover is private. Please sign in."}, status_code=401)
+    m = _member_match(members, user)
+    if not m:
+        return user, None, JSONResponse({"detail": "Not found"}, status_code=404)
+    if not m.get("user_id"):
+        db().upd("handover_members", {"handover_id": hid, "email": m["email"]}, {"user_id": user["id"]})
+        _cache.pop(("members", hid), None)
+    return user, m["role"], None
+
+
+@app.middleware("http")
+async def membership(request, call_next):
+    if request.method == "OPTIONS":
+        return await call_next(request)
+    try:
+        user, role, err = await run_in_threadpool(_authorise, request.url.path, request.headers.get("authorization"))
+    except Exception:  # never let the auth layer take the API down (e.g. migration not applied yet)
+        user, role, err = None, None, None
+    if err is not None:
+        return err
+    t1, t2 = auth.user_ctx.set(user), auth.role_ctx.set(role)
+    try:
+        return await call_next(request)
+    finally:
+        auth.user_ctx.reset(t1)
+        auth.role_ctx.reset(t2)
+
+
+def require_user() -> dict:
+    u = auth.user_ctx.get()
+    if not u:
+        raise HTTPException(401, "Please sign in.")
+    return u
+
+
+@app.get("/auth/config")
+def auth_config():
+    """Public values the browser needs to send a magic-link sign-in email."""
+    return auth.public_config()
+
+
+@app.get("/me")
+def me():
+    u = require_user()
+    rows = [r for r in db().sel("handover_members", {}) if r.get("user_id") == u["id"] or r["email"].lower() == u["email"]]
+    out = []
+    for r in rows:
+        h = db().one("handovers", {"id": r["handover_id"]})
+        if h:
+            out.append({**handover_out(h), "my_role": r["role"]})
+    return {"id": u["id"], "email": u["email"], "handovers": out}
+
+
+@app.get("/handovers/{hid}/me")
+def my_role(hid: str, x_demo_role: Optional[str] = Header(None)):
+    get_handover_row(hid)
+    member = auth.role_ctx.get()
+    u = auth.user_ctx.get()
+    return {"private": bool(members_of(hid)), "role": member or role_of(x_demo_role), "signed_in": bool(u),
+            "email": u["email"] if u else None}
+
+
+class Member(BaseModel):
+    email: str
+    role: str
+
+
+@app.get("/handovers/{hid}/members")
+def list_members(hid: str, x_demo_role: Optional[str] = Header(None)):
+    need(role_of(x_demo_role), "lead")
+    return [{k: m.get(k) for k in ("email", "role", "invited_by", "created_at")} | {"joined": bool(m.get("user_id"))}
+            for m in members_of(hid)]
+
+
+@app.post("/handovers/{hid}/members")
+def add_member(hid: str, body: Member, x_demo_role: Optional[str] = Header(None)):
+    """Lead invites someone by email with a role. They sign in with that email and see only what the role allows."""
+    u = require_user()
+    if role_of(x_demo_role) != "lead" or not auth.role_ctx.get():
+        raise HTTPException(403, "Only a signed-in lead of this handover can invite people.")
+    email = body.email.strip().lower()
+    if not _re.match(r"^[^@\s]+@[^@\s]+\.[^@\s]+$", email) or body.role not in ROLES:
+        raise HTTPException(400, "Give a valid email and one of: lead, contributor, leaver, guest.")
+    db().ins("handover_members", [{"handover_id": hid, "email": email, "role": body.role, "invited_by": u["email"],
+                                   "user_id": None}], upsert=True)
+    _cache.pop(("members", hid), None)
+    log(hid, u["email"], "invite", f"Invited {email} as {body.role}", role="lead", target_type="member", target_id=email)
+    return list_members(hid, x_demo_role)
 
 
 # ---------------- basic ----------------
@@ -298,7 +479,11 @@ class NewHandover(BaseModel):
 def list_handovers(include: Optional[str] = None):
     """Real handovers plus (optionally) the caller's own demo copy. Other visitors' demo copies are not listed."""
     rows = db().sel("handovers", order="created_at.asc")
-    return [handover_out(h) for h in rows if not h["id"].endswith("_seed")
+    try:
+        private = {m["handover_id"] for m in db().sel("handover_members", {}, select="handover_id")}
+    except Exception:
+        private = set()
+    return [handover_out(h) for h in rows if not h["id"].endswith("_seed") and h["id"] not in private
             and (not h.get("template_id") or h["id"] == include)]
 
 
@@ -306,7 +491,13 @@ def list_handovers(include: Optional[str] = None):
 def create_handover(body: NewHandover):
     hid = f"h_{uuid.uuid4().hex[:8]}"
     db().ins("handovers", [{"id": hid, **body.model_dump(), "version": 0, "revision": 1}])
-    log(hid, "Reviewer (lead)", "create", "Handover created.", role="lead", target_type="handover", target_id=hid)
+    u = auth.user_ctx.get()
+    if u:  # a signed-in creator owns a private handover; anonymous creation stays an open demo handover
+        db().ins("handover_members", [{"handover_id": hid, "email": u["email"], "user_id": u["id"], "role": "lead",
+                                       "invited_by": u["email"]}])
+        _cache.pop(("members", hid), None)
+    log(hid, u["email"] if u else "Reviewer (lead)", "create",
+        "Handover created" + (" (private: members only)." if u else "."), role="lead", target_type="handover", target_id=hid)
     return handover_out(get_handover_row(hid))
 
 
@@ -394,7 +585,7 @@ def add_source(hid: str, body: NewSource, x_demo_role: Optional[str] = Header(No
     if body.type == "github":
         ingest_github(hid, body.ref or "", body.name or (body.ref or "GitHub repo"), sid)
         build_privacy_queue(hid)
-        log(hid, ACTORS[role], "connect", f"Connected GitHub repo {body.ref}", role=role, target_type="source",
+        log(hid, actor_name(role), "connect", f"Connected GitHub repo {body.ref}", role=role, target_type="source",
             target_id=sid)
         return {"ok": True}
     reason = ("This source type is not wired to the live API in this build. Use the sample sources, "
@@ -459,7 +650,7 @@ async def upload_source(hid: str, type: str = Form(...), file: UploadFile = File
         if units:
             db().ins("evidence_units", [unit_row(u, hid) for u in units])
             build_privacy_queue(hid)
-        bump(hid, ACTORS[role], "upload", f"Uploaded {name}: {rep['status']}, {len(units)} evidence units",
+        bump(hid, actor_name(role), "upload", f"Uploaded {name}: {rep['status']}, {len(units)} evidence units",
              role=role, target_type="source", target_id=sid)
         return {"id": sid, "type": type, "name": name, "status": rep["status"], "status_reason": rep.get("reason"),
                 "default_label": label, "unit_count": len(units)}
@@ -853,7 +1044,7 @@ class ClaimPatch(BaseModel):
 def patch_claim(cid: str, body: ClaimPatch, x_demo_role: Optional[str] = Header(None)):
     role = role_of(x_demo_role)
     need(role, "lead")
-    actor = ACTORS[role]
+    actor = actor_name(role)
     r = claim_row(cid)
     c = to_claim(r)
     before = {"statement": c.statement, "review_status": c.review_status, "sensitive": c.sensitive, "state": c.state}
@@ -893,7 +1084,7 @@ def bulk_review(hid: str, body: BulkReview, x_demo_role: Optional[str] = Header(
     if body.action != "approve":
         raise HTTPException(400, "Only bulk approve is supported.")
     get_handover_row(hid)
-    actor = ACTORS[role]
+    actor = actor_name(role)
     rows = db().sel("claims", {"handover_id": hid}, select="id,state,review_status")
     todo = [r["id"] for r in rows if r["review_status"] == "pending"
             and (not body.state or r["state"] == body.state) and (body.ids is None or r["id"] in set(body.ids))]
@@ -916,7 +1107,7 @@ def log_view(hid: str, role: str, action: str, target_type: str, target_id: str,
         return
     _seen[key] = t + 600
     try:
-        audit.append(db(), hid, ACTORS.get(role, role), action, summary, role=role, target_type=target_type,
+        audit.append(db(), hid, actor_name(role) if role in ACTORS else role, action, summary, role=role, target_type=target_type,
                      target_id=target_id)
     except Exception:
         pass  # a failed view log never blocks reading
@@ -1028,7 +1219,7 @@ RESULT = {"keep": "kept", "both_true": "both_true", "correct": "corrected", "def
 def resolve_conflict(cfid: str, body: Resolve, x_demo_role: Optional[str] = Header(None)):
     role = role_of(x_demo_role)
     need(role, "lead")
-    actor = ACTORS[role]
+    actor = actor_name(role)
     cf = db().one("conflicts", {"id": cfid})
     if not cf:
         raise not_found("Conflict not found")
@@ -1187,7 +1378,7 @@ class Answer(BaseModel):
 def answer_gap(gid: str, body: Answer, x_demo_role: Optional[str] = Header(None)):
     role = role_of(x_demo_role)
     need(role, "lead", "leaver")
-    actor = ACTORS[role]
+    actor = actor_name(role)
     g = db().one("gaps", {"id": gid})
     if not g:
         raise not_found("Gap not found")
@@ -1229,9 +1420,9 @@ def _new_task(hid: str, kind: str, section: Optional[str], text: str, role: str,
     tid = f"{P(hid)}task_{uuid.uuid4().hex[:6]}"
     assigned = "both" if h.get("leaver_available", True) else "lead"
     row = {"id": tid, "handover_id": hid, "kind": kind, "section": section, "claim_id": claim_id, "text": text,
-           "raised_by": ACTORS[role], "raised_role": role, "assigned_to": assigned, "version_raised": h["version"]}
+           "raised_by": actor_name(role), "raised_role": role, "assigned_to": assigned, "version_raised": h["version"]}
     db().ins("tasks", [row])
-    audit.append(db(), hid, ACTORS[role], "flag_unclear" if kind == "unclear_flag" else "ask_question",
+    audit.append(db(), hid, actor_name(role), "flag_unclear" if kind == "unclear_flag" else "ask_question",
                  f"{'Flagged unclear' if kind == 'unclear_flag' else 'Asked'}: {section or ''} — {text}", role=role,
                  target_type="task", target_id=tid)
     return db().one("tasks", {"id": tid})
@@ -1263,7 +1454,7 @@ def list_tasks(hid: str, status: Optional[str] = None, x_demo_role: Optional[str
     if role == "leaver":
         rows = [r for r in rows if r["assigned_to"] in ("leaver", "both")]
     elif role == "contributor":
-        rows = [r for r in rows if r["raised_by"] == ACTORS["contributor"]]
+        rows = [r for r in rows if r["raised_by"] == actor_name("contributor")]
     return [task_out(r) for r in rows if not status or r["status"] == status]
 
 
@@ -1281,10 +1472,10 @@ def answer_task(tid: str, body: Answer, x_demo_role: Optional[str] = Header(None
     text = body.answer.strip()
     if not text:
         raise HTTPException(400, "Answer cannot be empty.")
-    evid = _add_exit_qa(t["handover_id"], ACTORS[role], text)
+    evid = _add_exit_qa(t["handover_id"], actor_name(role), text)
     db().upd("tasks", {"id": tid}, {"status": "answered", "answer": redact_text(text, scan(text)),
-                                    "answer_by": ACTORS[role], "answer_evidence_id": evid, "updated_at": now()})
-    audit.append(db(), t["handover_id"], ACTORS[role], "answer_task",
+                                    "answer_by": actor_name(role), "answer_evidence_id": evid, "updated_at": now()})
+    audit.append(db(), t["handover_id"], actor_name(role), "answer_task",
                  "Answered the successor's question (new Exit Q&A evidence)", role=role, target_type="task",
                  target_id=tid)
     return task_out(db().one("tasks", {"id": tid}))
@@ -1301,7 +1492,7 @@ class TaskResolve(BaseModel):
 def resolve_task(tid: str, body: TaskResolve, x_demo_role: Optional[str] = Header(None)):
     role = role_of(x_demo_role)
     need(role, "lead")
-    actor = ACTORS[role]
+    actor = actor_name(role)
     t = db().one("tasks", {"id": tid})
     if not t:
         raise not_found("Task not found")
@@ -1374,9 +1565,9 @@ def notifications(hid: str, x_demo_role: Optional[str] = Header(None)):
                   sum(t["status"] == "open" and t["assigned_to"] in ("leaver", "both") for t in tasks), "interview"),
                  ("gaps", "Gap Interview questions", sum(g["status"] == "open" for g in gaps), "interview")]
     elif role == "contributor":
-        mine = [t for t in tasks if t["raised_by"] == ACTORS["contributor"]]
+        mine = [t for t in tasks if t["raised_by"] == actor_name("contributor")]
         acked = {a["section"] for a in db().sel("acknowledgements", {"handover_id": hid, "version": h["version"],
-                                                                      "actor": ACTORS["contributor"]})
+                                                                      "actor": actor_name("contributor")})
                  if a["status"] == "acknowledged"}
         items = [("answers", "Your questions that were answered",
                   sum(t["status"] in ("answered", "resolved") for t in mine), "start"),
@@ -1464,7 +1655,7 @@ def publish(hid: str, x_demo_role: Optional[str] = Header(None)):
     reasons = _publish_blockers(hid)
     if reasons:
         raise HTTPException(400, " ".join(reasons))
-    return _publish(hid, ACTORS[role], role)
+    return _publish(hid, actor_name(role), role)
 
 
 @app.get("/handovers/{hid}/versions")
@@ -1545,7 +1736,7 @@ def view(hid: str, version: Optional[int] = None, draft: bool = False, as_: Opti
         snap, v_out, is_draft = row["snapshot"], v, False
     claims, hidden = snapshots.visible(snap, eff, labels)
     _with_project(claims)
-    actor = ACTORS.get(eff, eff)
+    actor = actor_name(eff) if eff == role else ACTORS.get(eff, eff)
     acks = {a["section"]: a for a in db().sel("acknowledgements", {"handover_id": hid, "version": v_out, "actor": actor})}
     mine = db().sel("acknowledgements", {"handover_id": hid, "actor": actor}, select="version,status")
     # the last version this reader engaged with (read it, or flagged part of it as unclear)
@@ -1600,7 +1791,7 @@ def ack(hid: str, body: Ack, x_demo_role: Optional[str] = Header(None)):
         raise HTTPException(400, "Bad status")
     if body.section not in {k for k, _ in SECTIONS}:
         raise HTTPException(400, "Unknown section")
-    actor = ACTORS[role]
+    actor = actor_name(role)
     db().ins("acknowledgements", [{"handover_id": hid, "section": body.section, "status": body.status,
                                    "note": body.note, "actor": actor, "version": h["version"],
                                    "carried_over": False}], upsert=True)
@@ -1684,7 +1875,7 @@ def log_export(hid: str, body: ExportLog, x_demo_role: Optional[str] = Header(No
     if row and body.body_sha256 and len(body.body_sha256) == 64:
         mac = _sign(hid, v, row["sha256"], body.body_sha256.lower())
         sig = f"{SIG_PREFIX} handover={hid} version={v} snapshot={row['sha256']} body={body.body_sha256.lower()} hmac={mac}"
-    audit.append(db(), hid, ACTORS[role], "export", f"Exported v{v} as {body.format}" + (" (signed)" if sig else ""),
+    audit.append(db(), hid, actor_name(role), "export", f"Exported v{v} as {body.format}" + (" (signed)" if sig else ""),
                  role=role, target_type="version", target_id=str(v),
                  meta={"format": body.format, "sha256": row["sha256"] if row else None, "signed": bool(sig)})
     return {"version": v, "sha256": row["sha256"] if row else None, "exported_at": now(), "signature": sig}
@@ -1801,7 +1992,7 @@ class Decide(BaseModel):
 def decide_redaction(rid: str, body: Decide, x_demo_role: Optional[str] = Header(None)):
     role = role_of(x_demo_role)
     need(role, "lead")
-    actor = ACTORS[role]
+    actor = actor_name(role)
     r = db().one("redaction_reviews", {"id": rid})
     if not r:
         raise not_found("Item not found")
@@ -1855,10 +2046,10 @@ def manual_redact(eid: str, body: ManualMask, x_demo_role: Optional[str] = Heade
                                     "start_pos": body.start, "end_pos": body.end, "detector": "manual", "kind": "manual",
                                     "preview": _preview(u["text"], body.start, body.end,
                                                         [Redaction(**x) for x in reds]),
-                                    "decision": "added_manual", "decided_by": ACTORS[role], "decided_at": now(),
+                                    "decision": "added_manual", "decided_by": actor_name(role), "decided_at": now(),
                                     "reason": body.reason.strip()}], upsert=True)
     cache_clear()
-    bump(u["handover_id"], ACTORS[role], "privacy_decision", f"Privacy: reviewer masked part of a passage. Reason: {body.reason.strip()}",
+    bump(u["handover_id"], actor_name(role), "privacy_decision", f"Privacy: reviewer masked part of a passage. Reason: {body.reason.strip()}",
          role, target_type="evidence", target_id=eid)
     return {"ok": True}
 
