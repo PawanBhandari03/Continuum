@@ -1128,8 +1128,11 @@ def _reopen(cf: dict, actor: str, role: str) -> dict:
 
 # ---------------- gaps + Exit Q&A ----------------
 def gap_out(r: dict) -> dict:
-    return {k: r.get(k) for k in ("id", "claim_id", "question", "evidence_found", "status", "answer",
-                                  "answer_evidence_id")}
+    out = {k: r.get(k) for k in ("id", "claim_id", "question", "evidence_found", "status", "answer",
+                                 "answer_evidence_id")}
+    import re
+    out["question"] = re.sub(r"[.!]+\s*\?$", "?", (out["question"] or "").strip())  # stored questions like "...account.?"
+    return out
 
 
 @app.get("/handovers/{hid}/gaps")

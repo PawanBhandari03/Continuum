@@ -278,3 +278,11 @@ def test_privacy_queue_lists_detectors_without_raw_values_and_escalation_hides_c
         if any(i["kind"] == "secret" for i in c.get(f"/handovers/{sid}/redactions", headers=L).json()["items"]) else None
     if sec:
         assert c.post(f"/redactions/{sec['id']}/decide", headers=L, json={"decision": "unmask", "reason": "testing"}).status_code == 400
+
+
+def test_gap_questions_read_cleanly(api):
+    c, s, sid = api
+    s.ins("gaps", [{"id": f"{sid}__gp_x", "handover_id": sid, "claim_id": f"{sid}__cl_3",
+                    "question": "Who owns: The college SMTP account.?", "evidence_found": []}])
+    q = [g["question"] for g in c.get(f"/handovers/{sid}/gaps", headers=L).json() if g["id"].endswith("gp_x")][0]
+    assert q.endswith("account?") and ".?" not in q
