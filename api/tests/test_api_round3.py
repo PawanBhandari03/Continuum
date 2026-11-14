@@ -56,6 +56,7 @@ def api():
     s = MemStore()
     _seed(s)
     main.use_store(s)
+    main._readme_date["v"] = None  # no network lookups in tests
     c = TestClient(main.app)
     sid = c.post("/demo/sandbox").json()["handover_id"]
     return c, s, sid

@@ -560,7 +560,77 @@ def _restore(hid: str) -> tuple[int, int, int]:
     tpl = template_of(hid)
     n = _copy_claimset(seed_id(tpl), hid, strip=SEED_PREFIX, add=P(hid), ev_add="" if hid == tpl else P(hid))
     db().upd("handovers", {"id": hid}, {"status": "in_review", "approved_by": None, "published_at": None})
-    return n
+    fix_readme_date(hid)
+    k = redetect_conflicts(hid)
+    return n[0], k, n[2]
+
+
+def redetect_conflicts(hid: str) -> int:
+    """Re-run conflict detection on stored claims with the current deterministic rules (no AI call): one conflict
+    per disagreement, history/preview statements excluded, documentation-vs-activity marked as staleness.
+    A claim that drops out of a conflict becomes Inferred until a reviewer confirms it (its pre-conflict state
+    was not stored, so we do not claim it was verified)."""
+    from .analysis import detect_conflicts, _SECTION
+    from .rules import RuleProvider
+    rows = claims_of(hid)
+    claims = [to_claim(r) for r in rows if r["type"] != "gap" and r["review_status"] not in ("rejected", "superseded")]
+    was = {c.id for c in claims if c.state == "conflicting"}
+    units = {u["id"]: to_unit(u) for u in units_all(hid)}
+    for c in claims:
+        if c.state == "conflicting":
+            c.state, c.conflict_id = "inferred", None
+    pubs = [c for c in claims if c.label != "lead_only"]
+    leads = [c for c in claims if c.label == "lead_only"]
+    found = detect_conflicts(pubs, RuleProvider(), units)
+    for cf in detect_conflicts(leads, RuleProvider(), units):
+        cf.id = cf.id.replace("cf_", "cf_L")
+        for c in leads:
+            if c.conflict_id and c.conflict_id.startswith("cf_") and c.id in cf.claim_ids:
+                c.conflict_id = cf.id
+        found.append(cf)
+    p = P(hid)
+    db().delete("conflicts", {"handover_id": hid})
+    db().ins("conflicts", [{**cf.model_dump(), "id": p + cf.id, "handover_id": hid} for cf in found])
+    now_in = {cid for cf in found for cid in cf.claim_ids}
+    for c in claims:
+        if c.id in now_in:
+            cfid = next(p + cf.id for cf in found if c.id in cf.claim_ids)
+            db().upd("claims", {"id": c.id}, {"state": "conflicting", "conflict_id": cfid, "section": "unresolved",
+                                             "confidence_reason": "Conflicts with another claim; not auto-resolved"})
+        elif c.id in was:
+            db().upd("claims", {"id": c.id}, {
+                "state": "inferred", "conflict_id": None, "section": _SECTION.get(c.type, "state"),
+                "confidence_reason": "An earlier check flagged a disagreement; the current check found none. "
+                                     "Shown as inference until a reviewer confirms it."})
+    for cf in found:
+        db().ins("conflict_events", [{"conflict_id": p + cf.id, "handover_id": hid, "actor": "system",
+                                      "action": "detected", "payload": {"kind": cf.kind, "by": cf.detected_by}}])
+    return len(found)
+
+
+_readme_date: dict = {}
+
+
+def fix_readme_date(hid: str) -> None:
+    """Units ingested before the Round 3 date fix carry the ingest day as the README date; use the date of the
+    README's last commit instead (looked up once)."""
+    eid = f"{P(hid)}gh_readme"
+    u = db().one("evidence_units", {"id": eid})
+    if not u:
+        return
+    if "v" not in _readme_date:
+        try:
+            import httpx
+            from .github import parse_repo
+            owner, repo = parse_repo(SAMPLE_REPO)
+            r = httpx.get(f"https://api.github.com/repos/{owner}/{repo}/commits", params={"path": "README.md", "per_page": 1},
+                          headers={"User-Agent": "continuum-connector"}, timeout=20)
+            _readme_date["v"] = r.json()[0]["commit"]["author"]["date"] if r.status_code == 200 and r.json() else None
+        except Exception:
+            _readme_date["v"] = None
+    if _readme_date["v"] and u["ts"][:10] != _readme_date["v"][:10]:
+        db().upd("evidence_units", {"id": eid}, {"ts": _readme_date["v"]})
+        cache_clear()
 
 
 DEMO_TABLES = ("acknowledgements", "review_actions", "tasks", "handover_versions", "redaction_reviews",
@@ -1439,7 +1509,8 @@ def view(hid: str, version: Optional[int] = None, draft: bool = False, as_: Opti
     actor = ACTORS.get(eff, eff)
     acks = {a["section"]: a for a in db().sel("acknowledgements", {"handover_id": hid, "version": v_out, "actor": actor})}
     mine = db().sel("acknowledgements", {"handover_id": hid, "actor": actor}, select="version,status")
-    last_ack = max([a["version"] for a in mine if a["status"] == "acknowledged" and a["version"] < v_out] or [0])
+    # the last version this reader engaged with (read it, or flagged part of it as unclear)
+    last_ack = max([a["version"] for a in mine if a["status"] in ("acknowledged", "unclear") and a["version"] < v_out] or [0])
     changed: set = set()
     if last_ack and not is_draft:
         old = _version_row(hid, last_ack)
