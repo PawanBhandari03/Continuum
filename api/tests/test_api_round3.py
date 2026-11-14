@@ -12,8 +12,8 @@ LEAD_SECRET = "frequently misses deadlines"
 
 def _seed(store: MemStore) -> None:
     store.ins("handovers", [{"id": "h_1", "leaver": "aditi", "successor": "karan", "successor_role": "contributor",
-                             "target_date": "2026-11-30", "version": 0, "status": "in_review"},
-                            {"id": "h_1_seed", "leaver": "aditi", "successor": "karan",
+                             "target_date": "2026-11-30", "version": 0, "status": "in_review"}])
+    store.ins("handovers", [{"id": "h_1_seed", "leaver": "aditi", "successor": "karan",
                              "successor_role": "contributor", "target_date": "2026-11-30"}])
     store.ins("sources", [
         {"id": "src_github", "handover_id": "h_1", "type": "github", "name": "repo", "status": "ok",

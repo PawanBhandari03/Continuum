@@ -91,6 +91,8 @@ class MemStore:
         return rows[0] if rows else None
 
     def ins(self, table, rows, upsert=False):
+        if len({frozenset(r) for r in rows}) > 1:  # PostgREST rejects a batch whose rows have different keys
+            raise RuntimeError(f"insert into {table}: all rows in one batch must have the same keys")
         pk = PK.get(table, ("id",))
         for r in rows:
             r = {**_DEFAULTS.get(table, dict)(), **copy.deepcopy(r)}

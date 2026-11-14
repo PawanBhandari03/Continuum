@@ -1704,7 +1704,7 @@ def build_privacy_queue(hid: str) -> int:
                     rows.append({"id": rid, "handover_id": hid, "evidence_id": u["id"], "start_pos": s, "end_pos": e,
                                  "detector": "people_sensitive", "kind": "suggestion",
                                  "preview": _preview(u["text"], max(0, s - 60), min(len(u["text"]), e + 60), reds),
-                                 "decision": "pending"})
+                                 "decision": "pending", "decided_by": None})
     if rows:
         db().ins("redaction_reviews", rows)
     return len(rows)
