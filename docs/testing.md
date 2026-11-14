@@ -190,3 +190,18 @@ See `docs/user-research.md` (6 survey responses recorded; interviews optional, n
 - Writes were slow on 9 Nov (6 to 10 s) and were measured at about 1.3 to 2.3 s on 10 Nov (single samples, section 2b); free-tier hosting can still be slower after idle (the API took 33 s to answer its first health check after a long idle on 10 Nov).
 - Tests in sections 1 and 2 are automated; real-device and real-user testing is still open.
 - Accessibility: automated axe checks pass locally and on the deployed site (sections 1b and 1d); no screen-reader audit; no dark mode.
+
+## 8. Round 3 automated tests (local, run 14 Nov 2026)
+The old mock-based specs were removed when the mock backend was removed. The new suite in `web/tests/e2e/` runs in Chrome against the **local in-memory API** (`python api/dev.py`, rules mode, no keys) and a production build of the web app. Run it with `npm run test:e2e` (see `web/playwright.config.ts`).
+
+| Test | What it checks | Result (local, 14 Nov) |
+|---|---|---|
+| judge journey | conflict kept with a reason and shown in history; privacy page shows no raw PAN/UPI/Aadhaar and a people remark goes lead-only; leaver's answer becomes a claim; publish v2; successor sees "what changed" and no lead-only text; acknowledge; flag unclear; leaver answers; audit chain verifies; Views filter; Guest sees hidden count | passed |
+| refresh as reviewer | privacy, activity and conflicts open after a hard refresh (the role race bug) | passed |
+| contributor blocked | a Successor opening a lead page is sent back to Start here | passed |
+| judge's tour | the tour button switches role and opens Conflicts | passed |
+| API down | the audit request is aborted: a Retry button shows, no stack trace | passed (about 80 s, because the app retries 6 times with back-off before giving up) |
+| axe, every screen and role | no serious or critical WCAG A/AA violations on landing, tour, 9 reviewer screens, leaver, successor, guest | passed after fixing text contrast in 3 places |
+| 375 px | no sideways page scroll on landing, 6 handover screens and the tour; header and tab controls at least 24 px tall | passed after fixing the tour page width |
+
+Limits: this is a local run against the rules-mode API, not the deployed site and not a real phone. 375 px here is a Chrome viewport with touch. Not yet run: real-phone judge path, cold-start timing, and sessions with real people (see `docs/usability-sessions.md` for the sheet).
