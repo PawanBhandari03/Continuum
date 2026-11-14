@@ -156,7 +156,19 @@ async function limitedFetch(url: string, init: RequestInit, timeoutMs = 30000): 
   }, priority);
 }
 
-let currentRole: Role | null = null;
+// The role is read from storage the moment this module loads (in the browser), not later in a React effect.
+// Pages start their first API calls in their own effects, which run BEFORE the session provider's effect; without
+// this, a refresh or a pasted link would call the API as the default role and show "not permitted".
+const ROLES: Role[] = ["lead", "contributor", "leaver", "guest"];
+let currentRole: Role | null = (() => {
+  try {
+    if (typeof window === "undefined") return null;
+    const r = window.localStorage.getItem("continuum-role") as Role | null;
+    return r && ROLES.includes(r) ? r : null;
+  } catch {
+    return null;
+  }
+})();
 /** Called by the session provider so every API call carries the viewer's role. */
 export function setApiRole(r: Role | null) {
   currentRole = r;
