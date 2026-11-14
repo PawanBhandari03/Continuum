@@ -32,6 +32,7 @@ import type {
   VersionsInfo,
 } from "./types";
 import { beginWaking } from "./status";
+import { accessToken } from "./auth";
 
 /** Kept for older imports: the in-browser mock was retired in Round 3 (the in-memory API replaces it). */
 export const USE_MOCKS = false;
@@ -113,6 +114,10 @@ export interface Api {
   logExport(hid: string, format: string, version?: number, bodySha256?: string): Promise<{ version: number; sha256: string | null; exported_at: string; signature: string | null }>;
   verifyExport(text: string): Promise<{ ok: boolean; reason: string; handover?: string; version?: number; published_at?: string }>;
   resetDemo(hid?: string): Promise<void>;
+  getMe(): Promise<{ id: string; email: string; handovers: (Handover & { my_role: Role })[] }>;
+  getMyRole(hid: string): Promise<{ private: boolean; role: Role; signed_in: boolean; email: string | null }>;
+  listMembers(hid: string): Promise<{ email: string; role: Role; invited_by: string | null; created_at: string; joined: boolean }[]>;
+  addMember(hid: string, email: string, role: Role): Promise<{ email: string; role: Role; invited_by: string | null; created_at: string; joined: boolean }[]>;
 }
 
 // ---------- real backend (thin fetch wrapper; shapes are the contracts in types.ts) ----------
@@ -186,7 +191,9 @@ async function detailOf(res: Response): Promise<string> {
 async function http<T>(path: string, init?: RequestInit & { role?: Role }, timeoutMs?: number): Promise<T> {
   const headers: Record<string, string> = { "Content-Type": "application/json" };
   const role = init?.role ?? currentRole;
-  if (role) headers["X-Demo-Role"] = role; // demo roles; real accounts would send a verified token instead
+  if (role) headers["X-Demo-Role"] = role; // demo roles (ignored by the API for private handovers: membership decides)
+  const token = await accessToken();
+  if (token) headers.Authorization = `Bearer ${token}`;
   const res = await limitedFetch(`${API_URL}${path}`, { ...init, headers: { ...headers, ...(init?.headers as Record<string, string>) } }, timeoutMs);
   if (!res.ok) throw new Error(await detailOf(res));
   return (res.status === 204 ? undefined : await res.json()) as T;
@@ -216,6 +223,8 @@ const realApi: Api = {
     fd.append("file", b.file);
     const headers: Record<string, string> = {};
     if (currentRole) headers["X-Demo-Role"] = currentRole; // no Content-Type: the browser sets the multipart boundary
+    const token = await accessToken();
+    if (token) headers.Authorization = `Bearer ${token}`;
     const res = await limitedFetch(`${API_URL}/handovers/${h}/sources/upload`, { method: "POST", body: fd, headers }, 120000);
     if (!res.ok) throw new Error(await detailOf(res));
     return (await res.json()) as Source;
@@ -268,6 +277,10 @@ const realApi: Api = {
   decidePrivacy: (id, b) => http(`/redactions/${id}/decide`, post({ reason: "", ...b })),
   logExport: (h, format, version, bodySha256) => http(`/handovers/${h}/exports`, post({ format, version, body_sha256: bodySha256 })),
   verifyExport: (text) => http("/exports/verify", post({ text })),
+  getMe: () => http("/me"),
+  getMyRole: (h) => http(`/handovers/${h}/me`),
+  listMembers: (h) => http(`/handovers/${h}/members`),
+  addMember: (h, email, role) => http(`/handovers/${h}/members`, post({ email, role })),
   resetDemo: async (hid = "h_1") => {
     await http(`/handovers/${hid}/reset`, { method: "POST", role: "lead", body: "{}" }, 180000);
   },

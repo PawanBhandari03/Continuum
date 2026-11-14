@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef, useState, type ReactNode } from "react"
 import { Bell, RotateCcw, Sparkles } from "lucide-react";
 import { LogoMark } from "./logo";
 import { api } from "@/lib/api";
+import { getSession } from "@/lib/auth";
 import { ROLE_META, SessionProvider, useSession } from "@/lib/session";
 import type { NotificationItem, Role } from "@/lib/types";
 import { EvidenceProvider } from "./evidence";
@@ -141,6 +142,22 @@ function NotificationBell({ hid }: { hid: string }) {
   );
 }
 
+/** Sign in (real accounts) or the signed-in email. The judge demo never needs it. */
+function AccountLink() {
+  const [email, setEmail] = useState<string | null>(null);
+  useEffect(() => {
+    const read = () => setEmail(getSession()?.email ?? null);
+    read();
+    window.addEventListener("continuum:auth", read);
+    return () => window.removeEventListener("continuum:auth", read);
+  }, []);
+  return (
+    <Link href="/signin" className="rounded-lg px-2.5 py-1 text-xs font-semibold text-[#575245] hover:bg-[#eef3fd] hover:text-[#25272d] transition" title={email ? "Your account and private handovers" : "Optional: sign in to run your own private handovers"}>
+      {email ? email : "Sign in"}
+    </Link>
+  );
+}
+
 function Header() {
   const { role, setRole } = useSession();
   const router = useRouter();
@@ -165,6 +182,7 @@ function Header() {
           <Link href="/tour" className="inline-flex items-center gap-1.5 rounded-full border border-[#e5dfd6] bg-white px-3 py-1 text-xs font-semibold text-[#25272d] shadow-2xs transition hover:border-[#92a9e1] hover:bg-[#eef3fd] active:scale-95">
             <Sparkles size={13} className="text-[#506cb8]" aria-hidden /> Judge&apos;s tour
           </Link>
+          <AccountLink />
           <HelpButton />
           {role && hid && role !== "guest" && <NotificationBell hid={hid} />}
           {role && (
@@ -199,6 +217,7 @@ const TABS: { seg: string; label: string; roles: Role[]; badge?: string[] }[] = 
   { seg: "privacy", label: "Privacy", roles: ["lead"], badge: ["privacy"] },
   { seg: "interview", label: "Gap Interview", roles: ["leaver", "lead"], badge: ["tasks", "gaps"] },
   { seg: "activity", label: "Activity", roles: ["lead"] },
+  { seg: "people", label: "People", roles: ["lead"] },
   { seg: "start", label: "5 · Start here", roles: ["contributor", "lead", "guest"], badge: ["to_ack"] },
 ];
 
