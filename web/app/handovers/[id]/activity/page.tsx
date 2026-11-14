@@ -44,6 +44,11 @@ const GROUP_CLS: Record<Group, string> = {
   view: "border-sky-300 bg-sky-50 text-sky-900",
   privacy: "border-teal-300 bg-teal-50 text-teal-900",
 };
+const CATS: { key: string; label: string; test: (a: string) => boolean }[] = [
+  { key: "views", label: "Views", test: (a) => a === "view_handover" || a === "view_evidence" },
+  { key: "exports", label: "Exports", test: (a) => a === "export" },
+  { key: "decisions", label: "Decisions", test: (a) => ["approve", "edit", "reject", "redact", "mark_sensitive", "resolve_conflict", "reopen_conflict", "privacy_decision", "resolve_task", "publish"].includes(a) },
+];
 const meta = (a: string) => ACTIONS[a] ?? { label: a.replace(/_/g, " "), group: "system" as Group };
 
 export default function ActivityPage({ params }: { params: Promise<{ id: string }> }) {
@@ -53,6 +58,9 @@ export default function ActivityPage({ params }: { params: Promise<{ id: string 
   const [loadErr, setLoadErr] = useState<string | null>(null);
   const [action, setAction] = useState("");
   const [actor, setActor] = useState("");
+  const [cat, setCat] = useState("");
+  const [from, setFrom] = useState("");
+  const [to, setTo] = useState("");
   const [check, setCheck] = useState<{ ok: boolean; entries: number; broken_at: number | null; head?: string } | null>(null);
   const [checking, setChecking] = useState(false);
   async function verify() {
@@ -82,7 +90,15 @@ export default function ActivityPage({ params }: { params: Promise<{ id: string 
 
   const actors = useMemo(() => [...new Set((rows ?? []).map((r) => r.actor))].sort(), [rows]);
   const actions = useMemo(() => [...new Set((rows ?? []).map((r) => r.action))].sort(), [rows]);
-  const shown = (rows ?? []).filter((r) => (!action || r.action === action) && (!actor || r.actor === actor));
+  const day = (r: AuditEntry) => r.at.slice(0, 10);
+  const shown = (rows ?? []).filter(
+    (r) =>
+      (!action || r.action === action) &&
+      (!actor || r.actor === actor) &&
+      (!cat || CATS.find((c) => c.key === cat)?.test(r.action)) &&
+      (!from || day(r) >= from) &&
+      (!to || day(r) <= to),
+  );
   const sel = "rounded-md border border-slate-300 bg-white px-2 py-1 text-sm";
 
   return (
@@ -123,7 +139,14 @@ export default function ActivityPage({ params }: { params: Promise<{ id: string 
               <option value="">Everyone</option>
               {actors.map((a) => <option key={a} value={a}>{a}</option>)}
             </select>
-            {(action || actor) && <button className="text-indigo-700 underline" onClick={() => { setAction(""); setActor(""); }}>Clear</button>}
+            <span role="group" aria-label="Category" className="flex gap-1">
+              {CATS.map((c) => (
+                <button key={c.key} aria-pressed={cat === c.key} onClick={() => setCat(cat === c.key ? "" : c.key)} className={`rounded-full border px-3 py-1 text-xs font-semibold ${cat === c.key ? "border-[#25272d] bg-[#25272d] text-white" : "border-slate-300 bg-white text-slate-800 hover:bg-slate-50"}`}>{c.label}</button>
+              ))}
+            </span>
+            <label className="flex items-center gap-1 text-slate-600">From <input type="date" className={sel} value={from} onChange={(e) => setFrom(e.target.value)} /></label>
+            <label className="flex items-center gap-1 text-slate-600">To <input type="date" className={sel} value={to} onChange={(e) => setTo(e.target.value)} /></label>
+            {(action || actor || cat || from || to) && <button className="text-indigo-700 underline" onClick={() => { setAction(""); setActor(""); setCat(""); setFrom(""); setTo(""); }}>Clear</button>}
             <span className="ml-auto text-slate-500">{shown.length} of {rows.length} entries</span>
           </div>
           <ol className="divide-y divide-slate-200 rounded-lg border border-slate-200 bg-white" aria-label="Activity log">
