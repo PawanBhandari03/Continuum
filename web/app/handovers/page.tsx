@@ -9,10 +9,10 @@ import { Button, Card, Notice, PageTitle, fmtDate } from "@/components/ui";
 import { EmptyState, LoadError, SkeletonList } from "@/components/feedback";
 import { friendlyError } from "@/lib/status";
 
-const STATUS: Record<Handover["status"], string> = { draft: "Draft — sources not yet reconstructed", in_review: "In review", published: "Published" };
+const STATUS: Record<Handover["status"], string> = { draft: "Draft: sources not yet reconstructed", in_review: "Draft in review", published: "Published, no pending changes" };
 
 export default function HandoversPage() {
-  const { role, ready } = useSession();
+  const { role, ready, demoId } = useSession();
   const router = useRouter();
   const [list, setList] = useState<Handover[] | null>(null);
   const [err, setErr] = useState<string | null>(null);
@@ -25,8 +25,9 @@ export default function HandoversPage() {
   const [loadErr, setLoadErr] = useState<string | null>(null);
   const load = useCallback(() => {
     setLoadErr(null);
-    api.listHandovers().then(setList).catch((e) => setLoadErr(friendlyError(e)));
-  }, []);
+    // the shared template (h_1) is hidden once this browser has its own demo copy
+    api.listHandovers(demoId).then((l) => setList(demoId ? l.filter((h) => h.id !== "h_1") : l)).catch((e) => setLoadErr(friendlyError(e)));
+  }, [demoId]);
   useEffect(() => {
     load();
   }, [load]);
@@ -48,7 +49,7 @@ export default function HandoversPage() {
 
   return (
     <>
-      <PageTitle title="Handovers" sub="Each handover is one leaver → one successor. Open the pre-seeded CampusKart handover to see a finished example." />
+      <PageTitle title="Handovers" sub="Each handover is one leaver → one successor. The CampusKart demo below is your own copy: nothing you do affects other visitors." />
       {err && <Notice tone="error">{err}</Notice>}
       <div className="grid gap-4 md:grid-cols-5">
         <div className="space-y-3 md:col-span-3">
@@ -59,23 +60,9 @@ export default function HandoversPage() {
             <Card key={h.id}>
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
-                  <h2 className="font-semibold capitalize">{h.leaver} → {h.successor} <span className="text-sm font-normal normal-case text-slate-500">(CampusKart{h.id === "h_1" ? "" : " · new"})</span></h2>
-                  <p className="text-sm text-slate-600">{STATUS[h.status]} · v{h.version} · target {fmtDate(h.target_date)} · successor role: {h.successor_role}</p>
-                  {h.published_at && <p className="text-xs text-slate-500">Approved by {h.approved_by} on {fmtDate(h.published_at)}</p>}
-                  {h.id === "h_1" && h.status === "published" && (
-                    <p className="mt-2 max-w-md text-sm text-amber-900">
-                      This demo handover was already published, so it is locked. To walk through the review steps again, reset the demo.{" "}
-                      <button
-                        className="font-semibold underline"
-                        onClick={async () => {
-                          await api.resetDemo();
-                          window.location.reload();
-                        }}
-                      >
-                        Reset demo
-                      </button>
-                    </p>
-                  )}
+                  <h2 className="font-semibold capitalize">{h.leaver} → {h.successor} <span className="text-sm font-normal normal-case text-slate-500">({h.is_demo ? (h.id === demoId ? "CampusKart demo · your copy" : "CampusKart demo template") : "new"})</span></h2>
+                  <p className="text-sm text-slate-600">{h.version ? `Published v${h.version}` : "Not published yet"} · {STATUS[h.status]} · target {fmtDate(h.target_date)} · successor role: {h.successor_role}</p>
+                  {h.published_at && <p className="text-xs text-slate-500">Last published by {h.approved_by} on {fmtDate(h.published_at)}</p>}
                 </div>
                 <Link href={ROLE_META[role].home(h.id)} className="inline-flex items-center rounded-md bg-indigo-700 px-3 py-2.5 text-sm font-medium text-white hover:bg-indigo-800 sm:py-1.5">
                   Open as {ROLE_META[role].label}

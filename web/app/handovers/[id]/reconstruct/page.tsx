@@ -1,9 +1,9 @@
 "use client";
 import Link from "next/link";
 import { use, useEffect, useRef, useState } from "react";
-import { CheckCircle2, Circle, Loader2, XCircle } from "lucide-react";
+import { Bot, CheckCircle2, Circle, Cog, Loader2, XCircle } from "lucide-react";
 import { api } from "@/lib/api";
-import type { JobStatus } from "@/lib/types";
+import type { AiStatus, JobStatus } from "@/lib/types";
 import { Button, Card, Notice, PageTitle } from "@/components/ui";
 import { HandoverNav, RoleGuard } from "@/components/shell";
 import { friendlyError } from "@/lib/status";
@@ -21,6 +21,10 @@ export default function ReconstructPage({ params }: { params: Promise<{ id: stri
   const [job, setJob] = useState<JobStatus | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [ai, setAi] = useState<AiStatus | null>(null);
+  useEffect(() => {
+    api.getAiStatus().then(setAi).catch(() => setAi(null));
+  }, [job?.status]);
 
   async function start() {
     setErr(null);
@@ -50,6 +54,16 @@ export default function ReconstructPage({ params }: { params: Promise<{ id: stri
     <RoleGuard hid={id} allow={["lead"]}>
       <HandoverNav hid={id} />
       <PageTitle title="Reconstruct" sub="Runs the pipeline on the connected sources. Failures are shown with a reason, never hidden." right={<Button variant="primary" onClick={start} disabled={job?.status === "running" || job?.status === "queued"}>{job ? "Run again" : "Start reconstruction"}</Button>} />
+      {ai && (
+        <div className="mb-4 flex flex-wrap items-center gap-2 text-sm">
+          {ai.mode === "rules" || !ai.model_configured ? (
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-300 bg-slate-50 px-2.5 py-1 text-xs font-medium text-slate-800"><Cog size={13} aria-hidden /> Rules mode: no AI is used. Claims come from deterministic patterns and are labelled “Rule”.</span>
+          ) : (
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-300 bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-900"><Bot size={13} aria-hidden /> AI available, with automatic rules fallback if it fails</span>
+          )}
+          {(ai.calls.rules ?? 0) > 0 && ai.mode !== "rules" && <span className="text-xs text-amber-900">{ai.calls.rules} step(s) fell back to rules because the AI was unavailable.</span>}
+        </div>
+      )}
       {err && <Notice tone="error">{err}</Notice>}
       {err && <div className="mt-2"><Button onClick={start}>Retry</Button></div>}
       {job?.status === "failed" && <Notice tone="error">Reconstruction failed: {job.error ?? "unknown error"}. Nothing was published; you can run it again.</Notice>}

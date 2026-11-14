@@ -10,19 +10,18 @@ import type { Role } from "@/lib/types";
 interface Step {
   title: string;
   body: string;
-  go?: { label: string; role: Role; href: string };
+  go?: { label: string; role: Role; path: string };
 }
 
-const H = "/handovers/h_1";
+// The judge path: about 5 minutes, each step switches role and opens the right screen of YOUR demo copy.
 const STEPS: Step[] = [
-  { title: "Pick a role", body: "Continuum has three roles. You are starting as the Reviewer (team lead), who checks and approves the handover. You can switch role at any time from the top bar.", go: { label: "Enter as Reviewer", role: "lead", href: "/handovers" } },
-  { title: "Open the CampusKart handover", body: "CampusKart is a synthetic project. Aditi is leaving and Karan takes over. Open the handover to see the claim ledger: every statement is a claim with an evidence state.", go: { label: "Open the claim ledger", role: "lead", href: `${H}/ledger` } },
-  { title: "Check a claim against its source", body: "Click any source chip (for example “PR #87”) under a claim. The original text opens with the cited quote highlighted. Try one Verified and one Inferred claim and compare their badges.", go: { label: "Show the ledger", role: "lead", href: `${H}/ledger` } },
-  { title: "Resolve the conflict", body: "The README says Render, but later commits configure Vercel. Continuum never picks the newest. Choose a side and write a note, or mark it “unresolved — successor to follow up”.", go: { label: "Open Conflicts", role: "lead", href: `${H}/conflicts` } },
-  { title: "Answer a Gap Interview question", body: "Switch to the Leaver. Continuum asks only what the evidence cannot answer, such as who owns the college SMTP account. Type a short answer and save it, or skip.", go: { label: "Go to the Gap Interview as Leaver", role: "leaver", href: `${H}/interview` } },
-  { title: "Approve and publish", body: "Back as Reviewer: press “Approve all Verified claims”, then “Approve all remaining” (or approve claims one by one). Publish stays disabled, and says why, until conflicts are handled and every claim is reviewed.", go: { label: "Back to the ledger as Reviewer", role: "lead", href: `${H}/ledger` } },
-  { title: "See what the Successor sees", body: "Switch to the Successor (Contributor). They see only claims whose evidence their role may read. Look for “items hidden by your access level”: a count, never the content.", go: { label: "Open Start here as Successor", role: "contributor", href: `${H}/start` } },
-  { title: "Acknowledge or flag", body: "Under any section press “I have read this”, or “This is unclear” to send a flag back to the reviewer and leaver. That is the end of the handover loop. You can export the handover from this page.", go: { label: "Show Start here", role: "contributor", href: `${H}/start` } },
+  { title: "Your own copy of the demo", body: "CampusKart is a synthetic student project: Aditi is leaving and Karan takes over. You get your own copy, already at a published v1, so nothing you do affects anyone else. Every statement is a claim with an evidence state and a source.", go: { label: "Open the claim ledger as Reviewer", role: "lead", path: "ledger" } },
+  { title: "Settle a disagreement", body: "The README says Render, but later commits configure Vercel. Continuum shows both sides with dates and never assumes the newest is right. Keep one side and write who confirmed it. The decision is kept in the history.", go: { label: "Open Conflicts", role: "lead", path: "conflicts" } },
+  { title: "Check what was masked", body: "Before any AI or successor saw the sources, Continuum masked keys, UPI IDs, PAN and Aadhaar numbers. A remark judging a teammate waits for your decision and blocks publishing until you make it.", go: { label: "Open Privacy", role: "lead", path: "privacy" } },
+  { title: "Use the successor's question", body: "Karan flagged a section as unclear and Aditi already answered. Attach her answer to a claim (or make a new claim from it), then publish v2 from the ledger.", go: { label: "Open Questions", role: "lead", path: "tasks" } },
+  { title: "See exactly what changed", body: "As the Successor, open the latest version: a panel shows what changed since you last read, and only changed sections ask to be acknowledged again. Flag anything that is still unclear; it goes to the leaver and the reviewer.", go: { label: "Open Start here as Successor", role: "contributor", path: "start" } },
+  { title: "Answer as the leaver", body: "The leaver answers only what the evidence cannot: Gap Interview questions and the successor's questions. Answers become citable evidence. Keys and passwords are refused.", go: { label: "Open the Gap Interview as Leaver", role: "leaver", path: "interview" } },
+  { title: "Prove nothing was tampered with", body: "As Reviewer, open Activity: every decision, view and export is logged, each entry fingerprinted with the previous one. Press “Verify integrity”. You can also enter as Guest from the home page to see the public-only view.", go: { label: "Open Activity as Reviewer", role: "lead", path: "activity" } },
 ];
 
 const SEEN = "continuum-tour-seen";
@@ -35,7 +34,7 @@ const TourCtx = createContext<Ctx>({ open: () => {} });
 export const useTour = () => useContext(TourCtx);
 
 export function TourProvider({ children }: { children: ReactNode }) {
-  const { setRole, ready } = useSession();
+  const { setRole, ready, ensureDemo } = useSession();
   const router = useRouter();
   const [visible, setVisible] = useState(false);
   const [step, setStep] = useState(0);
@@ -95,9 +94,10 @@ export function TourProvider({ children }: { children: ReactNode }) {
           {cur.go && (
             <button
               className="mt-3 inline-flex w-full items-center justify-center gap-1.5 rounded-md bg-indigo-700 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-800"
-              onClick={() => {
+              onClick={async () => {
                 setRole(cur.go!.role);
-                router.push(cur.go!.href);
+                const hid = await ensureDemo();
+                router.push(`/handovers/${hid}/${cur.go!.path}`);
               }}
             >
               {cur.go.label} <ArrowRight size={14} aria-hidden />
