@@ -141,7 +141,7 @@ export default function Landing() {
         <div className="mb-4 flex flex-wrap items-center gap-2">
           <div className="inline-flex items-center gap-2 rounded-full border border-[#b8c8ee] bg-[#eef3fd] px-3.5 py-1 text-xs font-semibold text-[#2b3e70] shadow-2xs">
             <Terminal size={14} className="text-[#506cb8]" />
-            <span>CodeFrontier 2024 · Problem 01: Prevent Critical Knowledge From Leaving With People</span>
+            <span>CodeFrontier 2026 · Problem 01: Prevent Critical Knowledge From Leaving With People</span>
           </div>
           <div className="hidden sm:inline-flex items-center gap-1.5 text-xs font-medium text-[#575245]">
             <span className="rounded-full border border-[#d6ccbf] bg-white px-3 py-0.5 shadow-2xs">Calm</span>
@@ -211,12 +211,12 @@ export default function Landing() {
                   <Terminal size={14} className="text-[#92a9e1]" />
                   <span className="font-bold text-[#f4efea]">$ continuum connect --repo github.com/CampusKart/core --chat slack.zip</span>
                 </div>
-                <p className="text-emerald-400 pl-5">✓ Connected 142 commits, 28 PRs, 3 docs (CampusKart synthetic dataset)</p>
-                <p className="text-[#c0b8a9] pl-5">✓ Filtered sensitive data: 2 fake API keys masked, 1 student phone redacted</p>
+                <p className="text-emerald-400 pl-5">✓ Read 53 repo items, a 324-message chat export and 4 notes (CampusKart, synthetic)</p>
+                <p className="text-[#c0b8a9] pl-5">✓ Masked before any AI saw it: keys, UPI ID, PAN, Aadhaar, phone (all fake)</p>
                 <div className="mt-2 pt-2 border-t border-[#363942] pl-5">
                   <p className="font-semibold text-[#f4efea]">$ continuum verify --strict</p>
                   <p className="text-emerald-400">✓ 94 of 94 claims cite verbatim source quotes (rapidfuzz match: PASS)</p>
-                  <p className="text-[#c0b8a9]">✓ Cryptographic ledger frozen with SHA-256 fingerprint: <span className="text-[#92a9e1] font-bold">04e0ef3...</span></p>
+                  <p className="text-[#c0b8a9]">✓ Version frozen with a SHA-256 fingerprint: <span className="text-[#92a9e1] font-bold">04e0ef3...</span></p>
                 </div>
               </div>
               <div className="border-t border-[#e5dfd6] bg-[#faf7f2] p-3 flex items-center justify-between text-xs">
@@ -224,7 +224,7 @@ export default function Landing() {
                   <GitCommit size={14} className="text-[#6b6455]" /> Leaver: <b className="text-[#25272d]">Aditi</b> ➔ Successor: <b className="text-[#25272d]">Karan</b>
                 </span>
                 <span className="inline-flex items-center gap-1 text-[#2b3e70] font-medium bg-[#eef3fd] border border-[#b8c8ee] px-2.5 py-0.5 rounded-full">
-                  <CheckCircle2 size={12} className="text-[#506cb8]" /> 100% Deterministic Evidence
+                  <CheckCircle2 size={12} className="text-[#506cb8]" /> Every quote checked by code
                 </span>
               </div>
             </div>
@@ -321,14 +321,14 @@ export default function Landing() {
             <p className="mt-0.5 text-xs text-[#6b6455]">100% link to verbatim source text</p>
           </div>
           <div className="text-center px-4 pt-4 sm:pt-0">
-            <div className="text-3xl font-bold text-emerald-700">7 of 8</div>
+            <div className="text-3xl font-bold text-emerald-700">8 of 8</div>
             <div className="mt-1 text-xs font-bold uppercase tracking-wider text-[#575245]">Planted Facts Found</div>
-            <p className="mt-0.5 text-xs text-[#6b6455]">Automatic code evaluation pass</p>
+            <p className="mt-0.5 text-xs text-[#6b6455]">Found with AI, and with no AI at all</p>
           </div>
           <div className="text-center px-4 pt-4 sm:pt-0">
-            <div className="text-3xl font-bold text-[#25272d]">0 Leaks</div>
+            <div className="text-3xl font-bold text-[#25272d]">0 leaks</div>
             <div className="mt-1 text-xs font-bold uppercase tracking-wider text-[#575245]">Sensitive Isolation</div>
-            <p className="mt-0.5 text-xs text-[#6b6455]">Lead-only keys never reach successor</p>
+            <p className="mt-0.5 text-xs text-[#6b6455]">In every permission test: all endpoints, every role</p>
           </div>
           <div className="text-center px-4 pt-4 sm:pt-0">
             <div className="text-3xl font-bold text-[#25272d] font-mono">SHA-256</div>
@@ -377,10 +377,10 @@ export default function Landing() {
         <div className="text-center max-w-2xl mx-auto mb-10">
           <span className="text-xs font-bold uppercase tracking-wider text-[#575245]">Developer-Grade Design</span>
           <h2 className="mt-1 text-3xl font-bold tracking-tight text-[#25272d] sm:text-4xl">
-            Real code artifacts, zero AI hallucinations
+            Real code artifacts, every claim checked
           </h2>
           <p className="mt-2 text-sm text-[#575245]">
-            Generic LLMs hallucinate summaries. Continuum grounds every single sentence in real Git commits, code diffs, and citable exit interviews.
+            A generic AI summary can state things nobody wrote. Continuum marks a statement Verified only when its quote is found in the source and a second check confirms it; everything else is labelled.
           </p>
         </div>
 
@@ -433,7 +433,7 @@ export default function Landing() {
                 </p>
               </div>
               <div className="mt-4 pt-3 border-t border-[#e5dfd6] text-xs font-semibold text-[#25272d] flex items-center gap-1">
-                <CheckCircle2 size={13} className="text-emerald-700" /> Saves 80% Departing Engineer Time
+                <CheckCircle2 size={13} className="text-emerald-700" /> Asks only what the evidence cannot answer
               </div>
             </div>
           </div>
@@ -460,7 +460,7 @@ export default function Landing() {
                 </p>
               </div>
               <div className="mt-4 pt-3 border-t border-[#e5dfd6] text-xs font-semibold text-[#25272d] flex items-center gap-1">
-                <CheckCircle2 size={13} className="text-emerald-700" /> Role-Scoped Cryptographic Separation
+                <CheckCircle2 size={13} className="text-emerald-700" /> Role-scoped access, enforced in the database
               </div>
             </div>
           </div>
@@ -600,10 +600,10 @@ export default function Landing() {
         <div className="mt-4 space-y-2.5">
           {[
             ["Is this real data?", "No. CampusKart is a synthetic student project made for this demo. Each visitor gets their own copy, so nothing you do affects anyone else."],
-            ["Do I need to sign in?", "No. Pick a role on this page. Roles are demo roles, not verified logins; the real product would use Supabase Auth."],
+            ["Do I need to sign in?", "No. Pick a role on this page and you get your own copy of the demo. To run your own private handovers, sign in with an email link: invited people then see only what their role allows, enforced by the database."],
             ["Can the AI make things up?", "It can be wrong, which is why every claim must cite a source, the quote is checked against it, and only a passing check can be called Verified. Anything else is labelled Inferred, Conflicting or Missing."],
             ["How is a successor kept from seeing confidential sources?", "A claim is visible only if the role may read all of its evidence. Hidden items are never sent to the browser; only a count is shown."],
-            ["What are the limits?", "Small teams and exports only, no live Slack connection, and demo roles instead of real accounts. The free server may take up to a minute to wake."],
+            ["What are the limits?", "Built for small software teams (3 to 25 people). It reads a GitHub repo plus chat and notes exports today; live Slack sync is on the roadmap. The free server can take up to a minute to wake on the first visit."],
           ].map(([q, a]) => (
             <details key={q} className="group rounded-xl border border-[#e5dfd6] bg-white p-4 shadow-2xs open:border-[#b8c8ee]">
               <summary className="cursor-pointer text-sm font-semibold text-[#25272d]">{q}</summary>
