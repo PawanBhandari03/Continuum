@@ -183,8 +183,9 @@ def compute_readiness(claims: list[Claim], conflicts: list[Conflict], gaps: list
     filled = len({slot for slot in REQUIRED_SLOTS for c in claims
                   if c.state in ("verified", "confirmed") and fills_slot(c, slot)})
     oc = sum(1 for c in conflicts if c.resolution == "open")
+    dc = sum(1 for c in conflicts if c.resolution == "deferred")
     og = sum(1 for g in gaps if g.status == "open")
-    score = max(0, min(100, round(filled / total * 100 - 5 * oc - 3 * og)))
+    score = max(0, min(100, round(filled / total * 100 - 5 * oc - 2 * dc - 3 * og)))
     return Readiness(
-        score=score, slots_filled=filled, slots_total=total, open_conflicts=oc, open_gaps=og,
-        formula="slots_filled(verified+confirmed)/slots_total*100 - 5*open_conflicts - 3*open_gaps")
+        score=score, slots_filled=filled, slots_total=total, open_conflicts=oc, open_gaps=og, deferred_conflicts=dc,
+        formula="slots_filled(verified+confirmed)/slots_total*100 - 5*open_conflicts - 2*deferred_conflicts - 3*open_gaps")

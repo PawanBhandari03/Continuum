@@ -39,13 +39,16 @@ class Store:
 
     @staticmethod
     def _eq(match: dict) -> dict:
-        return {k: (v if isinstance(v, str) and v.startswith(("in.", "eq.", "neq.", "is.")) else f"eq.{v}")
+        return {k: (v if isinstance(v, str) and v.startswith(("in.", "eq.", "neq.", "is.", "lt.", "gt.")) else f"eq.{v}")
                 for k, v in match.items()}
 
-    def sel(self, table: str, match: dict | None = None, select: str = "*", order: str | None = None) -> list[dict]:
+    def sel(self, table: str, match: dict | None = None, select: str = "*", order: str | None = None,
+            limit: int | None = None) -> list[dict]:
         params: dict = {"select": select, **self._eq(match or {})}
         if order:
             params["order"] = order
+        if limit:
+            return self._req("GET", table, params={**params, "limit": limit}).json()
         out, offset = [], 0
         while True:  # page past PostgREST's default 1000-row cap
             p = {**params, "limit": 1000, "offset": offset}
@@ -79,3 +82,8 @@ class Store:
 
     def delete(self, table: str, match: dict) -> None:
         self._req("DELETE", table, params=self._eq(match), prefer="return=minimal")
+
+    def rpc(self, fn: str, args: dict):
+        """Call a Postgres function exposed by PostgREST (e.g. audit_reset)."""
+        r = self._req("POST", f"rpc/{fn}", json=args)
+        return r.json() if r.content else None

@@ -4,7 +4,7 @@ from typing import Literal, Optional
 from pydantic import BaseModel, Field
 
 AccessLabel = Literal["public", "contributor", "lead_only"]
-Role = Literal["lead", "contributor", "leaver"]
+Role = Literal["lead", "contributor", "leaver", "guest"]
 EvidenceState = Literal["verified", "inferred", "conflicting", "missing", "confirmed"]
 ClaimType = Literal["decision", "risk", "dependency", "owner", "next_action",
                     "open_question", "fact", "gap"]
@@ -14,13 +14,14 @@ SectionKey = Literal["project", "state", "decision_log", "first_week", "risks",
 # Higher number = more restricted.
 LABEL_RANK = {"public": 0, "contributor": 1, "lead_only": 2}
 # Highest label rank each role may read.
-ROLE_MAX_RANK = {"lead": 2, "contributor": 1, "leaver": 1}
+ROLE_MAX_RANK = {"lead": 2, "contributor": 1, "leaver": 1, "guest": 0}
 
 
 class Redaction(BaseModel):
     start: int
     end: int
     kind: Literal["secret", "pii", "manual"]
+    detector: str = ""
 
 
 class EvidenceUnit(BaseModel):
@@ -32,6 +33,7 @@ class EvidenceUnit(BaseModel):
     locator: str
     label: AccessLabel = "contributor"
     redactions: list[Redaction] = Field(default_factory=list)
+    flags: list[str] = Field(default_factory=list)
 
 
 class Citation(BaseModel):
@@ -51,7 +53,7 @@ class Claim(BaseModel):
     entity_key: str = ""
     owner: Optional[str] = None
     label: AccessLabel = "contributor"
-    review_status: Literal["pending", "approved", "edited", "rejected", "redacted"] = "pending"
+    review_status: Literal["pending", "approved", "edited", "rejected", "redacted", "superseded"] = "pending"
     sensitive: bool = False
     section: SectionKey = "state"
     date: Optional[str] = None
@@ -60,15 +62,23 @@ class Claim(BaseModel):
     version: int = 1
     confirmed_by: Optional[str] = None
     confirmed_at: Optional[str] = None
+    method: Literal["model", "rules", "human"] = "model"
 
 
 class Conflict(BaseModel):
     id: str
     claim_ids: list[str]
     summary: str
-    resolution: Literal["open", "resolved", "unresolved_followup"] = "open"
+    resolution: Literal["open", "kept", "both_true", "corrected", "deferred"] = "open"
     resolved_by: Optional[str] = None
     note: Optional[str] = None
+    entity_key: str = ""
+    kind: Literal["value", "staleness", "ownership"] = "value"
+    severity: Literal["blocking", "warning"] = "blocking"
+    detected_by: str = "model"
+    resolution_claim_id: Optional[str] = None
+    decided_at: Optional[str] = None
+    label: AccessLabel = "contributor"
 
 
 class Gap(BaseModel):
@@ -88,6 +98,7 @@ class Readiness(BaseModel):
     slots_total: int
     open_conflicts: int
     open_gaps: int
+    deferred_conflicts: int = 0
 
 
 # What the model returns before verification.

@@ -25,7 +25,7 @@ def claim_label(claim: Claim, units_by_id: dict[str, EvidenceUnit]) -> AccessLab
 def claim_visible(role: Role, claim: Claim, units_by_id: dict[str, EvidenceUnit]) -> bool:
     """Visible only if EVERY cited evidence unit is readable and the claim is
     not sensitive / rejected / redacted (for non-leads)."""
-    if claim.review_status == "rejected":
+    if claim.review_status in ("rejected", "superseded"):
         return False
     if role != "lead" and (claim.sensitive or claim.review_status == "redacted"):
         return False

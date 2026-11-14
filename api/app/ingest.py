@@ -88,7 +88,18 @@ def parse_chat_export(root: Path, source_id: str = "src_chat",
     return units, report
 
 
-def parse_notes(path: Path, source_id: str, label: AccessLabel = "contributor"):
+_DATE_IN_NAME = re.compile(r"(\d{4})-(\d{2})-(\d{2})")
+_DATE_LINE = re.compile(r"^\s*(?:\*\*)?date(?:\*\*)?\s*[:\-]\s*(\d{4})-(\d{2})-(\d{2})", re.I | re.M)
+
+
+def note_date(name: str, text: str) -> str | None:
+    """A notes file's real date: a YYYY-MM-DD in its name, else a 'Date: YYYY-MM-DD' line near the top.
+    Never the file's modification time (that is the upload or deploy time, not when the notes were written)."""
+    m = _DATE_IN_NAME.search(name or "") or _DATE_LINE.search((text or "")[:600])
+    return f"{m.group(1)}-{m.group(2)}-{m.group(3)}T12:00:00+00:00" if m else None
+
+
+def parse_notes(path: Path, source_id: str, label: AccessLabel = "contributor", display_name: str | None = None):
     path = Path(path)
     report = IngestReport(status="ok", reason=None, units=0)
     try:
@@ -100,6 +111,12 @@ def parse_notes(path: Path, source_id: str, label: AccessLabel = "contributor"):
     except Exception as e:
         report.update(status="failed", reason=f"{type(e).__name__}: {e}")
         return [], report
+    name = display_name or path.name
+    ts = note_date(name, text)
+    if ts is None:
+        ts = datetime.now(timezone.utc).isoformat()
+        report["undated"] = True
+        report["reason"] = "No date in the file name or a 'Date:' line; the upload date is used instead."
     units, n = [], 0
     for para in re.split(r"\n\s*\n", text):
         para = para.strip()
@@ -108,8 +125,7 @@ def parse_notes(path: Path, source_id: str, label: AccessLabel = "contributor"):
         n += 1
         units.append(protect(EvidenceUnit(
             id=f"ev_{source_id}_{n:03d}", source_id=source_id, author="notes",
-            timestamp=datetime.fromtimestamp(path.stat().st_mtime, tz=timezone.utc).isoformat(),
-            text=para, locator=f"notes://{path.name}#p{n}", label=label)))
+            timestamp=ts, text=para, locator=f"notes://{name}#p{n}", label=label)))
     report["units"] = len(units)
     if not units:
         report.update(status="failed", reason="No readable text in file")
