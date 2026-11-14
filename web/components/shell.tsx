@@ -155,6 +155,7 @@ function Header() {
           <span className="hidden items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs text-slate-600 md:inline-flex" title="Your own copy of the synthetic CampusKart demo. Nothing you do affects other visitors.">
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" aria-hidden /> Demo: CampusKart (synthetic data)
           </span>
+          <Link href="/tour" className="rounded px-2 py-2.5 font-medium text-current hover:bg-slate-500/15 sm:py-1">Judge&apos;s tour</Link>
           <HelpButton />
           {role && hid && role !== "guest" && <NotificationBell hid={hid} />}
           {role && (
