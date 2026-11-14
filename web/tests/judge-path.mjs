@@ -61,7 +61,10 @@ try {
   // 2. privacy
   await page.goto(`${BASE}/handovers/${hid}/privacy`);
   await page.getByText(/Judgement about a person/).first().waitFor({ timeout: T });
+  await page.getByRole("button", { name: /^Everything/ }).click(); // masked items are decided automatically
+  await page.getByText(/Aadhaar number/).first().waitFor({ timeout: T });
   const body = (await page.locator("main").innerText()).toLowerCase();
+  await page.getByRole("button", { name: /^Needs a decision/ }).click();
   check("privacy page shows India detectors, no raw values", /aadhaar/.test(body) && /pan number/.test(body) && /upi id/.test(body) && !/abcpe1234f|okaxis|9999 0000 1231/.test(body));
   await shot("privacy");
   const card = page.getByText("Judgement about a person", { exact: true }).first().locator("xpath=ancestor::section[1]");
