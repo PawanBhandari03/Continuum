@@ -1,0 +1,2908 @@
+{
+ "_comment": "Stored reconstruction of the synthetic CampusKart handover (one real Gemini run, 9 Nov 2026), used to replay the demo without AI calls. Synthetic data.",
+ "claims": [
+  {
+   "id": "seed__cl_1",
+   "handover_id": "h_1_seed",
+   "type": "risk",
+   "statement": "The search page is experiencing performance lag and requires an index.",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "data",
+   "entity_key": "search",
+   "owner": "rohan",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "risks",
+   "date": "2026-08-01",
+   "citations": [
+    {
+     "evidence_id": "ev_dev_1785559382000000",
+     "quote": "search page slow lag raha hai, index add karna padega",
+     "support": "full"
+    },
+    {
+     "evidence_id": "ev_dev_1787632904000000",
+     "quote": "search page slow lag raha hai, index add karna padega",
+     "support": "full"
+    },
+    {
+     "evidence_id": "ev_dev_1793114084000000",
+     "quote": "search page slow lag raha hai, index add karna padega",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_10",
+   "handover_id": "h_1_seed",
+   "type": "risk",
+   "statement": "Item images are not loading on staging environment.",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "storage",
+   "entity_key": "storage",
+   "owner": "dev",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "risks",
+   "date": "2026-08-12",
+   "citations": [
+    {
+     "evidence_id": "ev_dev_1786512056000000",
+     "quote": "bhai staging pe item images load nahi ho rahe, hard refresh karo",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_100",
+   "handover_id": "h_1_seed",
+   "type": "fact",
+   "statement": "Development speed will increase after mid-semester exams.",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "process",
+   "entity_key": "schedule",
+   "owner": "dev",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "state",
+   "date": "2026-10-17",
+   "citations": [
+    {
+     "evidence_id": "ev_general_1792240300000000",
+     "quote": "mid-sem ke baad speed badhate hain",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_101",
+   "handover_id": "h_1_seed",
+   "type": "open_question",
+   "statement": "Should Cash on Delivery (COD) be implemented, given the difficulty of handling returns? (AI inference \u2014 not stated in any source)",
+   "state": "inferred",
+   "confidence_reason": "Source only partially supports this; treated as inference",
+   "workstream": "payments",
+   "entity_key": "payments",
+   "owner": "rohan",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "unresolved",
+   "date": "2026-10-20",
+   "citations": [
+    {
+     "evidence_id": "ev_general_1792488600000000",
+     "quote": "COD rakhein ya nahi? returns handle karna mushkil hai.",
+     "support": "partial"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_102",
+   "handover_id": "h_1_seed",
+   "type": "decision",
+   "statement": "No decision has been made regarding COD; it will be discussed at the next meeting.",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "payments",
+   "entity_key": "payments",
+   "owner": "meera",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "decision_log",
+   "date": "2026-10-20",
+   "citations": [
+    {
+     "evidence_id": "ev_general_1792489320000000",
+     "quote": "no decision yet. Let's discuss at the next meeting.",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_103",
+   "handover_id": "h_1_seed",
+   "type": "fact",
+   "statement": "Some students prefer COD due to a lack of trust in UPI.",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "payments",
+   "entity_key": "payments",
+   "owner": "dev",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "state",
+   "date": "2026-10-20",
+   "citations": [
+    {
+     "evidence_id": "ev_general_1792489800000000",
+     "quote": "students ko COD pasand hai tho, UPI pe bharosa kam hai kuch ka",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_105",
+   "handover_id": "h_1_seed",
+   "type": "fact",
+   "statement": "Prof. Iyer has shared mentor notes on a shared sheet for the lead.",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "general",
+   "entity_key": "mentorship",
+   "owner": "aditi",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "state",
+   "date": "2026-10-30",
+   "citations": [
+    {
+     "evidence_id": "ev_general_1793331900000000",
+     "quote": "Prof. Iyer ne mentor notes shared sheet pe daale hain, lead ke liye",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_108",
+   "handover_id": "h_1_seed",
+   "type": "decision",
+   "statement": "The team decided to use UPI deep links instead of a card gateway to avoid KYC requirements. (AI inference \u2014 not stated in any source)",
+   "state": "inferred",
+   "confidence_reason": "Source only partially supports this; treated as inference",
+   "workstream": "payments",
+   "entity_key": "payments",
+   "owner": "aditi",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "decision_log",
+   "date": "2026-08-12",
+   "citations": [
+    {
+     "evidence_id": "ev_payments_1786533900000000",
+     "quote": "bhai payment wala PR merge kar diya, UPI hi chalega abhi. KYC ke chakkar mein nahi padna.",
+     "support": "partial"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_109",
+   "handover_id": "h_1_seed",
+   "type": "fact",
+   "statement": "PR #87, which removes the card gateway and adds UPI deep links, has been approved. (AI inference \u2014 not stated in any source)",
+   "state": "inferred",
+   "confidence_reason": "Source only partially supports this; treated as inference",
+   "workstream": "payments",
+   "entity_key": "payments",
+   "owner": "dev",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "state",
+   "date": "2026-08-14",
+   "citations": [
+    {
+     "evidence_id": "ev_payments_1786685700000000",
+     "quote": "PR #87 looks good, tested on two phones. Approving.",
+     "support": "partial"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_11",
+   "handover_id": "h_1_seed",
+   "type": "fact",
+   "statement": "Dark mode toggle has been added.",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "ui",
+   "entity_key": "theme",
+   "owner": "rohan",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "state",
+   "date": "2026-08-15",
+   "citations": [
+    {
+     "evidence_id": "ev_dev_1786783710000000",
+     "quote": "dark mode ka toggle add kiya",
+     "support": "full"
+    },
+    {
+     "evidence_id": "ev_dev_1789218785000000",
+     "quote": "dark mode ka toggle add kiya",
+     "support": "full"
+    },
+    {
+     "evidence_id": "ev_dev_1793285012000000",
+     "quote": "dark mode ka toggle add kiya",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_110",
+   "handover_id": "h_1_seed",
+   "type": "fact",
+   "statement": "The team decided to use integer-based paise for amount rounding instead of floats.",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "payments",
+   "entity_key": "payments",
+   "owner": "dev",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "state",
+   "date": "2026-08-29",
+   "citations": [
+    {
+     "evidence_id": "ev_payments_1788020565000000",
+     "quote": "amount rounding paise mein karo, floats nahi",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_111",
+   "handover_id": "h_1_seed",
+   "type": "risk",
+   "statement": "UPI deep links exhibit inconsistent behavior on iOS.",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "payments",
+   "entity_key": "payments",
+   "owner": "rohan",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "risks",
+   "date": "2026-09-09",
+   "citations": [
+    {
+     "evidence_id": "ev_payments_1788938314000000",
+     "quote": "iOS pe deep link thoda alag behave kar raha",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_112",
+   "handover_id": "h_1_seed",
+   "type": "next_action",
+   "statement": "Meera is writing documentation for the refund flow.",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "payments",
+   "entity_key": "payments",
+   "owner": "Meera",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "first_week",
+   "date": "2026-10-07",
+   "citations": [
+    {
+     "evidence_id": "ev_payments_1791381425000000",
+     "quote": "refund flow ka doc likh raha hu",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_113",
+   "handover_id": "h_1_seed",
+   "type": "fact",
+   "statement": "An order status badge has been added to the order status page.",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "payments",
+   "entity_key": "payments",
+   "owner": "Rohan",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "state",
+   "date": "2026-10-10",
+   "citations": [
+    {
+     "evidence_id": "ev_payments_1791604984000000",
+     "quote": "order status page pe paid badge add kiya",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_114",
+   "handover_id": "h_1_seed",
+   "type": "risk",
+   "statement": "Deep links are behaving inconsistently on iOS.",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "payments",
+   "entity_key": "payments",
+   "owner": "Meera",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "risks",
+   "date": "2026-10-11",
+   "citations": [
+    {
+     "evidence_id": "ev_payments_1791692605000000",
+     "quote": "iOS pe deep link thoda alag behave kar raha",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_115",
+   "handover_id": "h_1_seed",
+   "type": "decision",
+   "statement": "The payment failed message has been updated to be more friendly.",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "payments",
+   "entity_key": "payments",
+   "owner": "Aditi",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "decision_log",
+   "date": "2026-10-14",
+   "citations": [
+    {
+     "evidence_id": "ev_payments_1791953404000000",
+     "quote": "payment failed ka message friendly bana diya",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_116",
+   "handover_id": "h_1_seed",
+   "type": "fact",
+   "statement": "A 1 rupee test payment was successful.",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "payments",
+   "entity_key": "payments",
+   "owner": "Dev",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "state",
+   "date": "2026-10-19",
+   "citations": [
+    {
+     "evidence_id": "ev_payments_1792405544000000",
+     "quote": "test payment 1 rupee wala successful",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_117",
+   "handover_id": "h_1_seed",
+   "type": "decision",
+   "statement": "Amounts must be rounded to paise integers instead of using floats.",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "payments",
+   "entity_key": "payments",
+   "owner": "Aditi",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "decision_log",
+   "date": "2026-10-31",
+   "citations": [
+    {
+     "evidence_id": "ev_payments_1793425157000000",
+     "quote": "amount rounding paise mein karo, floats nahi",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_118",
+   "handover_id": "h_1_seed",
+   "type": "fact",
+   "statement": "The application uses a third-party object bucket for listing images.",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "storage",
+   "entity_key": "storage",
+   "owner": null,
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "state",
+   "date": "2026-11-08",
+   "citations": [
+    {
+     "evidence_id": "ev_src_architecture_003",
+     "quote": "listing images go to a third-party object bucket",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_119",
+   "handover_id": "h_1_seed",
+   "type": "dependency",
+   "statement": "Sign-up verification emails are sent through the college SMTP account.",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "email",
+   "entity_key": "email",
+   "owner": null,
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "dependencies",
+   "date": "2026-11-08",
+   "citations": [
+    {
+     "evidence_id": "ev_src_architecture_004",
+     "quote": "Sign-up verification emails are sent through the college SMTP account",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_12",
+   "handover_id": "h_1_seed",
+   "type": "fact",
+   "statement": "Loading skeletons added to the feed.",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "ui",
+   "entity_key": "feed",
+   "owner": "rohan",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "state",
+   "date": "2026-08-16",
+   "citations": [
+    {
+     "evidence_id": "ev_dev_1786882572000000",
+     "quote": "adding loading skeletons to the feed",
+     "support": "full"
+    },
+    {
+     "evidence_id": "ev_dev_1788276150000000",
+     "quote": "adding loading skeletons to the feed",
+     "support": "full"
+    },
+    {
+     "evidence_id": "ev_dev_1792478115000000",
+     "quote": "adding loading skeletons to the feed",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_120",
+   "handover_id": "h_1_seed",
+   "type": "fact",
+   "statement": "Orders are paid using UPI deep links.",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "payments",
+   "entity_key": "payments",
+   "owner": null,
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "state",
+   "date": "2026-11-08",
+   "citations": [
+    {
+     "evidence_id": "ev_src_architecture_005",
+     "quote": "Orders are paid with UPI deep links",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_121",
+   "handover_id": "h_1_seed",
+   "type": "next_action",
+   "statement": "Dev is assigned to investigate flaky image uploads on slow networks.",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "storage",
+   "entity_key": "storage",
+   "owner": "Dev",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "first_week",
+   "date": "2026-11-08",
+   "citations": [
+    {
+     "evidence_id": "ev_src_meeting-2026-10-20_003",
+     "quote": "Action: Dev to look at the flaky image upload on slow networks.",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_122",
+   "handover_id": "h_1_seed",
+   "type": "fact",
+   "statement": "The application is deployed on Render.",
+   "state": "conflicting",
+   "confidence_reason": "Conflicts with another claim; not auto-resolved",
+   "workstream": "deploy",
+   "entity_key": "deploy",
+   "owner": null,
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "unresolved",
+   "date": "2026-11-09",
+   "citations": [
+    {
+     "evidence_id": "gh_readme",
+     "quote": "The app is deployed on Render",
+     "support": "full"
+    }
+   ],
+   "conflict_id": "seed__cf_2",
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_123",
+   "handover_id": "h_1_seed",
+   "type": "fact",
+   "statement": "The project is configured for Vercel deployment.",
+   "state": "conflicting",
+   "confidence_reason": "Conflicts with another claim; not auto-resolved",
+   "workstream": "deploy",
+   "entity_key": "deploy",
+   "owner": "Dev",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "unresolved",
+   "date": "2026-10-02",
+   "citations": [
+    {
+     "evidence_id": "gh_commit_f45e1f6",
+     "quote": "configure the Vercel project for the frontend deploy",
+     "support": "full"
+    }
+   ],
+   "conflict_id": "seed__cf_2",
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_124",
+   "handover_id": "h_1_seed",
+   "type": "risk",
+   "statement": "The checkout button is not clickable on mobile devices.",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "ui",
+   "entity_key": "checkout",
+   "owner": null,
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "risks",
+   "date": "2026-07-21",
+   "citations": [
+    {
+     "evidence_id": "gh_issue_5",
+     "quote": "Checkout: button not clickable on mobile",
+     "support": "full"
+    },
+    {
+     "evidence_id": "gh_issue_15",
+     "quote": "Settings page: button not clickable on mobile",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_125",
+   "handover_id": "h_1_seed",
+   "type": "risk",
+   "statement": "The category filter layout breaks on small screens.",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "ui",
+   "entity_key": "category",
+   "owner": null,
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "risks",
+   "date": "2026-07-22",
+   "citations": [
+    {
+     "evidence_id": "gh_issue_10",
+     "quote": "Category filter: layout breaks on small screens",
+     "support": "full"
+    },
+    {
+     "evidence_id": "gh_issue_20",
+     "quote": "Cart: layout breaks on small screens",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_128",
+   "handover_id": "h_1_seed",
+   "type": "risk",
+   "statement": "UPI deep links behave inconsistently on iOS devices.",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "payments",
+   "entity_key": "payments",
+   "owner": null,
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "risks",
+   "date": "2026-08-20",
+   "citations": [
+    {
+     "evidence_id": "gh_issue_88",
+     "quote": "UPI deep link behaves inconsistently on iOS",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_129",
+   "handover_id": "h_1_seed",
+   "type": "risk",
+   "statement": "The build fails on Windows due to long paths in node_modules.",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "deploy",
+   "entity_key": "deploy",
+   "owner": null,
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "risks",
+   "date": "2026-09-03",
+   "citations": [
+    {
+     "evidence_id": "gh_issue_89",
+     "quote": "Build fails on Windows (long path inside node_modules)",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_13",
+   "handover_id": "h_1_seed",
+   "type": "next_action",
+   "statement": "Review the small PR.",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "process",
+   "entity_key": "pr",
+   "owner": "dev",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "first_week",
+   "date": "2026-08-17",
+   "citations": [
+    {
+     "evidence_id": "ev_dev_1786959991000000",
+     "quote": "can someone review my small PR?",
+     "support": "full"
+    },
+    {
+     "evidence_id": "ev_dev_1789123665000000",
+     "quote": "can someone review my small PR?",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_131",
+   "handover_id": "h_1_seed",
+   "type": "decision",
+   "statement": "Implemented a temporary hack to clear session cookies during login loops, pending refresh token rotation implementation. (AI inference \u2014 not stated in any source)",
+   "state": "inferred",
+   "confidence_reason": "Source only partially supports this; treated as inference",
+   "workstream": "auth",
+   "entity_key": "auth",
+   "owner": null,
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "decision_log",
+   "date": "2026-10-09",
+   "citations": [
+    {
+     "evidence_id": "gh_pr_91",
+     "quote": "Temporary fix for the login loop: clears the session cookie when a redirect loops.",
+     "support": "partial"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_132",
+   "handover_id": "h_1_seed",
+   "type": "risk",
+   "statement": "Item images appear broken on the staging site until a hard refresh, likely due to caching. (AI inference \u2014 not stated in any source)",
+   "state": "inferred",
+   "confidence_reason": "Source only partially supports this; treated as inference",
+   "workstream": "storage",
+   "entity_key": "storage",
+   "owner": null,
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "risks",
+   "date": "2026-10-12",
+   "citations": [
+    {
+     "evidence_id": "gh_issue_92",
+     "quote": "Item images not loading on staging",
+     "support": "partial"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_133",
+   "handover_id": "h_1_seed",
+   "type": "next_action",
+   "statement": "Update the onboarding documentation to remove references to the card gateway.",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "payments",
+   "entity_key": "payments",
+   "owner": "PawanBhandari03",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "first_week",
+   "date": "2026-10-15",
+   "citations": [
+    {
+     "evidence_id": "gh_issue_93",
+     "quote": "Onboarding doc is out of date (still mentions the card gateway). Someone should refresh it.",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_134",
+   "handover_id": "h_1_seed",
+   "type": "next_action",
+   "statement": "Add validation to the price field and design the empty state for the seller dashboard.",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "ui",
+   "entity_key": "dashboard",
+   "owner": "Aditi",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "first_week",
+   "date": "2026-10-19",
+   "citations": [
+    {
+     "evidence_id": "gh_pr_94_c1",
+     "quote": "validation is missing on the price field and the empty state needs a design",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_135",
+   "handover_id": "h_1_seed",
+   "type": "risk",
+   "statement": "The authentication session implementation contains a hack that requires removal once refresh token rotation is implemented.",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "auth",
+   "entity_key": "auth",
+   "owner": "PawanBhandari03",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "risks",
+   "date": "2026-11-09",
+   "citations": [
+    {
+     "evidence_id": "gh_todo_auth_session_ts_18",
+     "quote": "TODO: remove this hack once refresh token rotation is implemented",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_14",
+   "handover_id": "h_1_seed",
+   "type": "fact",
+   "statement": "Lint-staged hook has been added.",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "process",
+   "entity_key": "git",
+   "owner": "rohan",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "state",
+   "date": "2026-08-17",
+   "citations": [
+    {
+     "evidence_id": "ev_dev_1786977640000000",
+     "quote": "lint-staged hook add kar diya",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_15",
+   "handover_id": "h_1_seed",
+   "type": "fact",
+   "statement": "Rohan pushed a fix for the sort order.",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "ui",
+   "entity_key": "sort",
+   "owner": "rohan",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "state",
+   "date": "2026-08-24",
+   "citations": [
+    {
+     "evidence_id": "ev_dev_1787582894000000",
+     "quote": "pushed a fix for the sort order",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_17",
+   "handover_id": "h_1_seed",
+   "type": "dependency",
+   "statement": "Image uploads are stored in a third-party bucket, and Meera holds the credentials. (AI inference \u2014 not stated in any source)",
+   "state": "inferred",
+   "confidence_reason": "Source only partially supports this; treated as inference",
+   "workstream": "storage",
+   "entity_key": "storage",
+   "owner": "meera",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "dependencies",
+   "date": "2026-08-25",
+   "citations": [
+    {
+     "evidence_id": "ev_dev_1787636100000000",
+     "quote": "image uploads ab third-party bucket pe ja rahe hain. Bucket ka credential sirf mere paas hai",
+     "support": "partial"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_18",
+   "handover_id": "h_1_seed",
+   "type": "fact",
+   "statement": "Image resizing is performed on the client side.",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "ui",
+   "entity_key": "resizing",
+   "owner": null,
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "state",
+   "date": "2026-08-25",
+   "citations": [
+    {
+     "evidence_id": "ev_dev_1787636340000000",
+     "quote": "Resizing abhi bhi client side hai",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_2",
+   "handover_id": "h_1_seed",
+   "type": "next_action",
+   "statement": "Write tests for the project.",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "process",
+   "entity_key": "testing",
+   "owner": "rohan",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "first_week",
+   "date": "2026-08-04",
+   "citations": [
+    {
+     "evidence_id": "ev_dev_1785860720000000",
+     "quote": "will write tests tomorrow",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_23",
+   "handover_id": "h_1_seed",
+   "type": "fact",
+   "statement": "Pagination off-by-one error has been fixed.",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "data",
+   "entity_key": "pagination",
+   "owner": "aditi",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "state",
+   "date": "2026-08-30",
+   "citations": [
+    {
+     "evidence_id": "ev_dev_1788108639000000",
+     "quote": "pagination off by one tha, fixed",
+     "support": "full"
+    },
+    {
+     "evidence_id": "ev_dev_1789454914000000",
+     "quote": "pagination off by one tha, fixed",
+     "support": "full"
+    },
+    {
+     "evidence_id": "ev_dev_1792339427000000",
+     "quote": "pagination off by one tha, fixed",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_26",
+   "handover_id": "h_1_seed",
+   "type": "dependency",
+   "statement": "Verification emails are sent via a college SMTP account, but the password is unknown. (AI inference \u2014 not stated in any source)",
+   "state": "inferred",
+   "confidence_reason": "Source only partially supports this; treated as inference",
+   "workstream": "auth",
+   "entity_key": "auth",
+   "owner": "meera",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "dependencies",
+   "date": "2026-09-02",
+   "citations": [
+    {
+     "evidence_id": "ev_dev_1788335100000000",
+     "quote": "verification emails college SMTP account se ja rahe hain. Password mere paas nahi hai",
+     "support": "partial"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_28",
+   "handover_id": "h_1_seed",
+   "type": "decision",
+   "statement": "Migration naming must be consistent.",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "data",
+   "entity_key": "migration",
+   "owner": "rohan",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "decision_log",
+   "date": "2026-09-04",
+   "citations": [
+    {
+     "evidence_id": "ev_dev_1788535356000000",
+     "quote": "migration naming consistent rakho",
+     "support": "full"
+    },
+    {
+     "evidence_id": "ev_dev_1793613880000000",
+     "quote": "migration naming consistent rakho",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_29",
+   "handover_id": "h_1_seed",
+   "type": "risk",
+   "statement": "Build fails on Windows due to long paths in node_modules, but works on Linux.",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "deploy",
+   "entity_key": "deploy",
+   "owner": "rohan",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "risks",
+   "date": "2026-09-05",
+   "citations": [
+    {
+     "evidence_id": "ev_dev_1788612600000000",
+     "quote": "build fails on Windows path again (long path inside node_modules). Works on Linux.",
+     "support": "full"
+    },
+    {
+     "evidence_id": "ev_dev_1789800000000000",
+     "quote": "build fails on Windows path",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_3",
+   "handover_id": "h_1_seed",
+   "type": "fact",
+   "statement": "API response time is within 200ms.",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "data",
+   "entity_key": "api",
+   "owner": "rohan",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "state",
+   "date": "2026-08-05",
+   "citations": [
+    {
+     "evidence_id": "ev_dev_1785947340000000",
+     "quote": "api response 200ms ke andar aa raha hai ab",
+     "support": "full"
+    },
+    {
+     "evidence_id": "ev_dev_1788172238000000",
+     "quote": "api response 200ms ke andar aa raha hai ab",
+     "support": "full"
+    },
+    {
+     "evidence_id": "ev_dev_1788924843000000",
+     "quote": "api response 200ms ke andar aa raha hai ab",
+     "support": "full"
+    },
+    {
+     "evidence_id": "ev_dev_1790395854000000",
+     "quote": "api response 200ms ke andar aa raha hai ab",
+     "support": "full"
+    },
+    {
+     "evidence_id": "ev_dev_1792572061000000",
+     "quote": "api response 200ms ke andar aa raha hai ab",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_31",
+   "handover_id": "h_1_seed",
+   "type": "next_action",
+   "statement": "Fix typo in the listing form label.",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "ui",
+   "entity_key": "form",
+   "owner": "dev",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "first_week",
+   "date": "2026-09-09",
+   "citations": [
+    {
+     "evidence_id": "ev_dev_1788959351000000",
+     "quote": "typo in the listing form label, fixing",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_32",
+   "handover_id": "h_1_seed",
+   "type": "next_action",
+   "statement": "Add loading skeletons to the feed.",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "ui",
+   "entity_key": "feed",
+   "owner": "aditi",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "first_week",
+   "date": "2026-09-09",
+   "citations": [
+    {
+     "evidence_id": "ev_dev_1788974697000000",
+     "quote": "adding loading skeletons to the feed",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_36",
+   "handover_id": "h_1_seed",
+   "type": "next_action",
+   "statement": "Write tests.",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "ci",
+   "entity_key": "tests",
+   "owner": "rohan",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "first_week",
+   "date": "2026-09-11",
+   "citations": [
+    {
+     "evidence_id": "ev_dev_1789146488000000",
+     "quote": "will write tests tomorrow",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_38",
+   "handover_id": "h_1_seed",
+   "type": "decision",
+   "statement": "Maintain consistent migration naming.",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "data",
+   "entity_key": "migration",
+   "owner": "dev",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "decision_log",
+   "date": "2026-09-14",
+   "citations": [
+    {
+     "evidence_id": "ev_dev_1789370963000000",
+     "quote": "migration naming consistent rakho",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_4",
+   "handover_id": "h_1_seed",
+   "type": "fact",
+   "statement": "Cart total rounding issue has been fixed.",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "data",
+   "entity_key": "cart",
+   "owner": "dev",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "state",
+   "date": "2026-08-06",
+   "citations": [
+    {
+     "evidence_id": "ev_dev_1785992579000000",
+     "quote": "cart total rounding fix kar diya",
+     "support": "full"
+    },
+    {
+     "evidence_id": "ev_dev_1787749191000000",
+     "quote": "cart total rounding fix kar diya",
+     "support": "full"
+    },
+    {
+     "evidence_id": "ev_dev_1789551036000000",
+     "quote": "cart total rounding fix kar diya",
+     "support": "full"
+    },
+    {
+     "evidence_id": "ev_dev_1793417523000000",
+     "quote": "cart total rounding fix kar diya",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_40",
+   "handover_id": "h_1_seed",
+   "type": "decision",
+   "statement": "Update .env.example when adding environment variables.",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "deploy",
+   "entity_key": "deploy",
+   "owner": "meera",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "decision_log",
+   "date": "2026-09-15",
+   "citations": [
+    {
+     "evidence_id": "ev_dev_1789471769000000",
+     "quote": "reminder: update .env.example when adding vars",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_42",
+   "handover_id": "h_1_seed",
+   "type": "fact",
+   "statement": "Sort order fix pushed.",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "data",
+   "entity_key": "sort",
+   "owner": "dev",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "state",
+   "date": "2026-09-18",
+   "citations": [
+    {
+     "evidence_id": "ev_dev_1789742119000000",
+     "quote": "pushed a fix for the sort order",
+     "support": "full"
+    },
+    {
+     "evidence_id": "ev_dev_1793008091000000",
+     "quote": "pushed a fix for the sort order",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_44",
+   "handover_id": "h_1_seed",
+   "type": "open_question",
+   "statement": "Search page is slow; needs index.",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "data",
+   "entity_key": "search",
+   "owner": "meera",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "unresolved",
+   "date": "2026-09-22",
+   "citations": [
+    {
+     "evidence_id": "ev_dev_1790094731000000",
+     "quote": "search page slow lag raha hai, index add karna padega",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_45",
+   "handover_id": "h_1_seed",
+   "type": "risk",
+   "statement": "Profile page avatar crop issue.",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "ui",
+   "entity_key": "avatar",
+   "owner": "meera",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "risks",
+   "date": "2026-09-24",
+   "citations": [
+    {
+     "evidence_id": "ev_dev_1790262545000000",
+     "quote": "profile page avatar crop issue hai",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_48",
+   "handover_id": "h_1_seed",
+   "type": "risk",
+   "statement": "There is an unknown dependency that, if it fails, will block progress with no clear point of contact.",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "general",
+   "entity_key": "dependency",
+   "owner": "rohan",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "risks",
+   "date": "2026-09-30",
+   "citations": [
+    {
+     "evidence_id": "ev_dev_1790767980000000",
+     "quote": "if it stops working we are stuck, no idea who to ask",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_49",
+   "handover_id": "h_1_seed",
+   "type": "fact",
+   "statement": "Frontend is being tested on Vercel preview.",
+   "state": "conflicting",
+   "confidence_reason": "Conflicts with another claim; not auto-resolved",
+   "workstream": "deploy",
+   "entity_key": "deploy",
+   "owner": null,
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "unresolved",
+   "date": "2026-10-02",
+   "citations": [
+    {
+     "evidence_id": "ev_dev_1790930100000000",
+     "quote": "pushed vercel.json, trying the frontend on Vercel preview",
+     "support": "full"
+    }
+   ],
+   "conflict_id": "seed__cf_1",
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_5",
+   "handover_id": "h_1_seed",
+   "type": "next_action",
+   "statement": "Update .env.example when adding new environment variables.",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "deploy",
+   "entity_key": "deploy",
+   "owner": "rohan",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "first_week",
+   "date": "2026-08-06",
+   "citations": [
+    {
+     "evidence_id": "ev_dev_1785999366000000",
+     "quote": "reminder: update .env.example when adding vars",
+     "support": "full"
+    },
+    {
+     "evidence_id": "ev_dev_1787674974000000",
+     "quote": "update .env.example when adding vars",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_50",
+   "handover_id": "h_1_seed",
+   "type": "next_action",
+   "statement": "Add database index to improve search page performance.",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "data",
+   "entity_key": "search",
+   "owner": "aditi",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "first_week",
+   "date": "2026-10-02",
+   "citations": [
+    {
+     "evidence_id": "ev_dev_1790941655000000",
+     "quote": "search page slow lag raha hai, index add karna padega",
+     "support": "full"
+    },
+    {
+     "evidence_id": "gh_issue_90",
+     "quote": "Search page is slow, needs a database index",
+     "support": "partial"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_51",
+   "handover_id": "h_1_seed",
+   "type": "risk",
+   "statement": "Item images are failing to load on staging.",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "storage",
+   "entity_key": "storage",
+   "owner": "aditi",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "risks",
+   "date": "2026-10-05",
+   "citations": [
+    {
+     "evidence_id": "ev_dev_1791194994000000",
+     "quote": "bhai staging pe item images load nahi ho rahe",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_53",
+   "handover_id": "h_1_seed",
+   "type": "decision",
+   "statement": "Temporary fix for login loop implemented by clearing session cookie on redirect; proper fix tracked in auth/session.ts.",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "auth",
+   "entity_key": "auth",
+   "owner": "aditi",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "decision_log",
+   "date": "2026-10-09",
+   "citations": [
+    {
+     "evidence_id": "ev_dev_1791547200000000",
+     "quote": "login loop fix kar diya temporarily (PR #91), session cookie clear kar raha hu redirect pe. Proper fix baad mein, TODO daal diya hai auth/session.ts mein",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_54",
+   "handover_id": "h_1_seed",
+   "type": "risk",
+   "statement": "The temporary login loop fix will cause issues when refresh tokens are implemented.",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "auth",
+   "entity_key": "auth",
+   "owner": null,
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "risks",
+   "date": "2026-10-09",
+   "citations": [
+    {
+     "evidence_id": "ev_dev_1791547860000000",
+     "quote": "ok but that hack will bite us when refresh tokens come in",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_55",
+   "handover_id": "h_1_seed",
+   "type": "risk",
+   "statement": "Build fails on Windows paths, no fix identified.",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "deploy",
+   "entity_key": "deploy",
+   "owner": "meera",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "risks",
+   "date": "2026-10-14",
+   "citations": [
+    {
+     "evidence_id": "ev_dev_1791987300000000",
+     "quote": "third time now, build fails on Windows path. Still no fix.",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_56",
+   "handover_id": "h_1_seed",
+   "type": "fact",
+   "statement": "A typo in the listing form label was fixed.",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "ui",
+   "entity_key": "listing",
+   "owner": "rohan",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "state",
+   "date": "2026-10-17",
+   "citations": [
+    {
+     "evidence_id": "ev_dev_1792208039000000",
+     "quote": "typo in the listing form label, fixing",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_57",
+   "handover_id": "h_1_seed",
+   "type": "fact",
+   "statement": "The test suite is passing.",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "ci",
+   "entity_key": "tests",
+   "owner": null,
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "state",
+   "date": "2026-10-17",
+   "citations": [
+    {
+     "evidence_id": "ev_dev_1792218350000000",
+     "quote": "tests green now",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_58",
+   "handover_id": "h_1_seed",
+   "type": "next_action",
+   "statement": "PR #94 for the seller dashboard requires review.",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "ui",
+   "entity_key": "dashboard",
+   "owner": "rohan",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "first_week",
+   "date": "2026-10-18",
+   "citations": [
+    {
+     "evidence_id": "ev_dev_1792297920000000",
+     "quote": "PR #94 (seller dashboard) is up, please review",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_6",
+   "handover_id": "h_1_seed",
+   "type": "fact",
+   "statement": "Tests are passing.",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "process",
+   "entity_key": "testing",
+   "owner": "aditi",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "state",
+   "date": "2026-08-06",
+   "citations": [
+    {
+     "evidence_id": "ev_dev_1786016135000000",
+     "quote": "tests green now",
+     "support": "full"
+    },
+    {
+     "evidence_id": "ev_dev_1787840740000000",
+     "quote": "tests green now",
+     "support": "full"
+    },
+    {
+     "evidence_id": "ev_dev_1789012274000000",
+     "quote": "tests green now",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_61",
+   "handover_id": "h_1_seed",
+   "type": "next_action",
+   "statement": "Changes requested for PR #94 regarding empty-state and price validation.",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "ui",
+   "entity_key": "dashboard",
+   "owner": "aditi",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "first_week",
+   "date": "2026-10-19",
+   "citations": [
+    {
+     "evidence_id": "ev_dev_1792421040000000",
+     "quote": "left comments on #94, changes requested, mostly the empty-state and the price validation",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_69",
+   "handover_id": "h_1_seed",
+   "type": "open_question",
+   "statement": "Is there a confirmed date for demo day? (AI inference \u2014 not stated in any source)",
+   "state": "inferred",
+   "confidence_reason": "AI inference \u2014 not stated in any source",
+   "workstream": "process",
+   "entity_key": "demo",
+   "owner": null,
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "unresolved",
+   "date": "2026-08-05",
+   "citations": [
+    {
+     "evidence_id": "ev_general_1785920132000000",
+     "quote": "demo day ki date confirm hui?",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_7",
+   "handover_id": "h_1_seed",
+   "type": "fact",
+   "statement": "Branch rebased on main and conflicts resolved.",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "process",
+   "entity_key": "git",
+   "owner": "meera",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "state",
+   "date": "2026-08-08",
+   "citations": [
+    {
+     "evidence_id": "ev_dev_1786176332000000",
+     "quote": "rebased on main, conflicts fixed",
+     "support": "full"
+    },
+    {
+     "evidence_id": "ev_dev_1789102061000000",
+     "quote": "rebased on main, conflicts fixed",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_70",
+   "handover_id": "h_1_seed",
+   "type": "next_action",
+   "statement": "Posters need to be put up.",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "general",
+   "entity_key": "posters",
+   "owner": "aditi",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "first_week",
+   "date": "2026-08-07",
+   "citations": [
+    {
+     "evidence_id": "ev_general_1786080389000000",
+     "quote": "posters printed, kal lagayenge",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_71",
+   "handover_id": "h_1_seed",
+   "type": "next_action",
+   "statement": "Team needs to join the standup meeting.",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "general",
+   "entity_key": "standup",
+   "owner": "dev",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "first_week",
+   "date": "2026-08-07",
+   "citations": [
+    {
+     "evidence_id": "ev_general_1786084818000000",
+     "quote": "standup 5 min mein, link pinned hai",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_72",
+   "handover_id": "h_1_seed",
+   "type": "next_action",
+   "statement": "Meeting scheduled near the library.",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "general",
+   "entity_key": "meeting",
+   "owner": "dev",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "first_week",
+   "date": "2026-08-11",
+   "citations": [
+    {
+     "evidence_id": "ev_general_1786432242000000",
+     "quote": "meeting kal 6 baje library ke paas",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_73",
+   "handover_id": "h_1_seed",
+   "type": "decision",
+   "statement": "Pull requests should be kept small.",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "general",
+   "entity_key": "pr",
+   "owner": "rohan",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "decision_log",
+   "date": "2026-08-11",
+   "citations": [
+    {
+     "evidence_id": "ev_general_1786440942000000",
+     "quote": "let's keep PRs small please",
+     "support": "full"
+    },
+    {
+     "evidence_id": "ev_general_1790769233000000",
+     "quote": "let's keep PRs small please",
+     "support": "full"
+    },
+    {
+     "evidence_id": "ev_general_1791192417000000",
+     "quote": "let's keep PRs small please",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_74",
+   "handover_id": "h_1_seed",
+   "type": "next_action",
+   "statement": "Onboarding documentation needs to be updated.",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "general",
+   "entity_key": "onboarding",
+   "owner": "aditi",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "first_week",
+   "date": "2026-08-12",
+   "citations": [
+    {
+     "evidence_id": "ev_general_1786546257000000",
+     "quote": "onboarding doc update kar dena jab time mile",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_75",
+   "handover_id": "h_1_seed",
+   "type": "open_question",
+   "statement": "Who is in possession of the club room key?",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "auth",
+   "entity_key": "auth",
+   "owner": "meera",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "unresolved",
+   "date": "2026-08-13",
+   "citations": [
+    {
+     "evidence_id": "ev_general_1786641038000000",
+     "quote": "who has the club room key?",
+     "support": "full"
+    },
+    {
+     "evidence_id": "ev_general_1789226207000000",
+     "quote": "who has the club room key?",
+     "support": "full"
+    },
+    {
+     "evidence_id": "ev_general_1790870411000000",
+     "quote": "who has the club room key?",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_76",
+   "handover_id": "h_1_seed",
+   "type": "fact",
+   "statement": "Feedback form received 12 responses.",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "general",
+   "entity_key": "feedback",
+   "owner": "rohan",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "state",
+   "date": "2026-08-14",
+   "citations": [
+    {
+     "evidence_id": "ev_general_1786694151000000",
+     "quote": "feedback form ke 12 responses aaye hain",
+     "support": "full"
+    },
+    {
+     "evidence_id": "ev_general_1791784628000000",
+     "quote": "feedback form ke 12 responses aaye hain",
+     "support": "full"
+    },
+    {
+     "evidence_id": "ev_general_1793260972000000",
+     "quote": "feedback form ke 12 responses aaye hain",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_77",
+   "handover_id": "h_1_seed",
+   "type": "decision",
+   "statement": "Development speed will increase after mid-semester exams.",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "general",
+   "entity_key": "speed",
+   "owner": "rohan",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "decision_log",
+   "date": "2026-08-17",
+   "citations": [
+    {
+     "evidence_id": "ev_general_1786969876000000",
+     "quote": "mid-sem ke baad speed badhate hain",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_78",
+   "handover_id": "h_1_seed",
+   "type": "next_action",
+   "statement": "Request for iPhone testing.",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "general",
+   "entity_key": "testing",
+   "owner": "aditi",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "first_week",
+   "date": "2026-08-18",
+   "citations": [
+    {
+     "evidence_id": "ev_general_1787045802000000",
+     "quote": "anyone free to test on an iPhone?",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_79",
+   "handover_id": "h_1_seed",
+   "type": "fact",
+   "statement": "Sprint board has been refreshed.",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "general",
+   "entity_key": "sprint",
+   "owner": "aditi",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "state",
+   "date": "2026-08-21",
+   "citations": [
+    {
+     "evidence_id": "ev_general_1787297914000000",
+     "quote": "sprint board refresh kar diya",
+     "support": "full"
+    },
+    {
+     "evidence_id": "ev_general_1790946462000000",
+     "quote": "sprint board refresh kar diya",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_8",
+   "handover_id": "h_1_seed",
+   "type": "risk",
+   "statement": "There is an issue with avatar cropping on the profile page.",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "ui",
+   "entity_key": "profile",
+   "owner": "meera",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "risks",
+   "date": "2026-08-09",
+   "citations": [
+    {
+     "evidence_id": "ev_dev_1786253538000000",
+     "quote": "profile page avatar crop issue hai",
+     "support": "full"
+    },
+    {
+     "evidence_id": "ev_dev_1787979629000000",
+     "quote": "profile page avatar crop issue hai",
+     "support": "full"
+    },
+    {
+     "evidence_id": "ev_dev_1790500252000000",
+     "quote": "profile page avatar crop issue hai",
+     "support": "full"
+    },
+    {
+     "evidence_id": "ev_dev_1792412721000000",
+     "quote": "profile page avatar crop issue hai",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_80",
+   "handover_id": "h_1_seed",
+   "type": "open_question",
+   "statement": "Should hackathon preparation happen over the weekend?",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "general",
+   "entity_key": "hackathon",
+   "owner": "meera",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "unresolved",
+   "date": "2026-08-25",
+   "citations": [
+    {
+     "evidence_id": "ev_general_1787653324000000",
+     "quote": "weekend pe hackathon prep karenge kya",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_81",
+   "handover_id": "h_1_seed",
+   "type": "open_question",
+   "statement": "Has the demo day date been confirmed?",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "general",
+   "entity_key": "demo",
+   "owner": "rohan",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "unresolved",
+   "date": "2026-09-01",
+   "citations": [
+    {
+     "evidence_id": "ev_general_1788246840000000",
+     "quote": "demo day ki date confirm hui?",
+     "support": "full"
+    },
+    {
+     "evidence_id": "ev_general_1791024694000000",
+     "quote": "demo day ki date confirm hui?",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_82",
+   "handover_id": "h_1_seed",
+   "type": "fact",
+   "statement": "Demo day was successful. (AI inference \u2014 not stated in any source)",
+   "state": "inferred",
+   "confidence_reason": "Source only partially supports this; treated as inference",
+   "workstream": "general",
+   "entity_key": "demo",
+   "owner": "aditi",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "state",
+   "date": "2026-09-05",
+   "citations": [
+    {
+     "evidence_id": "ev_general_1788579926000000",
+     "quote": "good job on the demo everyone",
+     "support": "partial"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_83",
+   "handover_id": "h_1_seed",
+   "type": "next_action",
+   "statement": "Update the onboarding documentation.",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "process",
+   "entity_key": "onboarding",
+   "owner": "aditi",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "first_week",
+   "date": "2026-09-10",
+   "citations": [
+    {
+     "evidence_id": "ev_general_1789043363000000",
+     "quote": "onboarding doc update kar dena jab time mile",
+     "support": "full"
+    },
+    {
+     "evidence_id": "ev_general_1790863412000000",
+     "quote": "onboarding doc update kar dena jab time mile",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_85",
+   "handover_id": "h_1_seed",
+   "type": "fact",
+   "statement": "The new version of the logo is available on the drive.",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "ui",
+   "entity_key": "logo",
+   "owner": "aditi",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "state",
+   "date": "2026-09-19",
+   "citations": [
+    {
+     "evidence_id": "ev_general_1789796569000000",
+     "quote": "logo ka naya version drive pe hai",
+     "support": "full"
+    },
+    {
+     "evidence_id": "ev_general_1791188190000000",
+     "quote": "logo ka naya version drive pe hai",
+     "support": "full"
+    },
+    {
+     "evidence_id": "ev_general_1793465592000000",
+     "quote": "logo ka naya version drive pe hai",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_86",
+   "handover_id": "h_1_seed",
+   "type": "fact",
+   "statement": "Posters have been printed and are scheduled to be put up tomorrow.",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "process",
+   "entity_key": "posters",
+   "owner": "aditi",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "state",
+   "date": "2026-09-23",
+   "citations": [
+    {
+     "evidence_id": "ev_general_1790164234000000",
+     "quote": "posters printed, kal lagayenge",
+     "support": "full"
+    },
+    {
+     "evidence_id": "ev_general_1790946434000000",
+     "quote": "posters printed, kal lagayenge",
+     "support": "full"
+    },
+    {
+     "evidence_id": "ev_general_1793719550000000",
+     "quote": "posters printed, kal lagayenge",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_9",
+   "handover_id": "h_1_seed",
+   "type": "risk",
+   "statement": "Linter is failing due to an unused import.",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "process",
+   "entity_key": "linter",
+   "owner": "dev",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "risks",
+   "date": "2026-08-10",
+   "citations": [
+    {
+     "evidence_id": "ev_dev_1786370571000000",
+     "quote": "linter is failing on unused import",
+     "support": "full"
+    },
+    {
+     "evidence_id": "ev_dev_1788361699000000",
+     "quote": "linter is failing on unused import",
+     "support": "full"
+    },
+    {
+     "evidence_id": "ev_dev_1791384293000000",
+     "quote": "linter is failing on unused import",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_90",
+   "handover_id": "h_1_seed",
+   "type": "fact",
+   "statement": "The standup meeting link is pinned.",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "process",
+   "entity_key": "standup",
+   "owner": "meera",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "state",
+   "date": "2026-10-02",
+   "citations": [
+    {
+     "evidence_id": "ev_general_1790915464000000",
+     "quote": "standup 5 min mein, link pinned hai",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_91",
+   "handover_id": "h_1_seed",
+   "type": "fact",
+   "statement": "A meeting is scheduled for 6 PM near the library.",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "process",
+   "entity_key": "meeting",
+   "owner": "rohan",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "state",
+   "date": "2026-10-02",
+   "citations": [
+    {
+     "evidence_id": "ev_general_1790927256000000",
+     "quote": "meeting kal 6 baje library ke paas",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_97",
+   "handover_id": "h_1_seed",
+   "type": "open_question",
+   "statement": "The README incorrectly references Render; it needs to be updated. (AI inference \u2014 not stated in any source)",
+   "state": "inferred",
+   "confidence_reason": "Source only partially supports this; treated as inference",
+   "workstream": "deploy",
+   "entity_key": "deploy",
+   "owner": "rohan",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "unresolved",
+   "date": "2026-10-06",
+   "citations": [
+    {
+     "evidence_id": "ev_general_1791260400000000",
+     "quote": "README still says Render, will someone update it?",
+     "support": "partial"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_98",
+   "handover_id": "h_1_seed",
+   "type": "next_action",
+   "statement": "Test the application on an iPhone.",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "ui",
+   "entity_key": "testing",
+   "owner": "rohan",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "first_week",
+   "date": "2026-10-10",
+   "citations": [
+    {
+     "evidence_id": "ev_general_1791650519000000",
+     "quote": "anyone free to test on an iPhone?",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_L1",
+   "handover_id": "h_1_seed",
+   "type": "risk",
+   "statement": "The developer frequently misses deadlines and requires closer supervision.",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "people",
+   "entity_key": "performance",
+   "owner": null,
+   "label": "lead_only",
+   "review_status": "pending",
+   "sensitive": true,
+   "section": "risks",
+   "date": "2026-11-08",
+   "citations": [
+    {
+     "evidence_id": "ev_src_mentor-notes_002",
+     "quote": "Dev often misses deadlines and needs closer supervision.",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_L2",
+   "handover_id": "h_1_seed",
+   "type": "dependency",
+   "statement": "A test key is stored in the shared sheet.",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "general",
+   "entity_key": "credentials",
+   "owner": null,
+   "label": "lead_only",
+   "review_status": "pending",
+   "sensitive": true,
+   "section": "dependencies",
+   "date": "2026-11-08",
+   "citations": [
+    {
+     "evidence_id": "ev_src_mentor-notes_002",
+     "quote": "Test key [REDACTED SECRET] is in the shared sheet.",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  },
+  {
+   "id": "seed__cl_L3",
+   "handover_id": "h_1_seed",
+   "type": "fact",
+   "statement": "The mentor notes file must not be visible to contributors.",
+   "state": "verified",
+   "confidence_reason": "Quote matches source; support check: supports",
+   "workstream": "process",
+   "entity_key": "access",
+   "owner": null,
+   "label": "lead_only",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "state",
+   "date": "2026-11-08",
+   "citations": [
+    {
+     "evidence_id": "ev_src_mentor-notes_003",
+     "quote": "This file must never appear in the Contributor view.",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null,
+   "method": "model"
+  }
+ ],
+ "conflicts": [
+  {
+   "id": "seed__cf_1",
+   "claim_ids": [
+    "seed__cl_49",
+    "seed__cl_122"
+   ],
+   "summary": "Sources disagree about deploy: \"Frontend is being tested on Vercel preview.\" vs \"The application is deployed on Render.\"",
+   "resolution": "open",
+   "resolved_by": null,
+   "note": null,
+   "entity_key": "",
+   "kind": "value",
+   "severity": "blocking",
+   "detected_by": "model",
+   "resolution_claim_id": null,
+   "decided_at": null,
+   "label": "contributor"
+  },
+  {
+   "id": "seed__cf_2",
+   "claim_ids": [
+    "seed__cl_122",
+    "seed__cl_123"
+   ],
+   "summary": "Sources disagree about deploy: \"The application is deployed on Render.\" vs \"The project is configured for Vercel deployment.\"",
+   "resolution": "open",
+   "resolved_by": null,
+   "note": null,
+   "entity_key": "",
+   "kind": "value",
+   "severity": "blocking",
+   "detected_by": "model",
+   "resolution_claim_id": null,
+   "decided_at": null,
+   "label": "contributor"
+  }
+ ],
+ "gaps": [
+  {
+   "id": "seed__gp_owner_cl_119",
+   "claim_id": "seed__cl_119",
+   "question": "Who owns: Sign-up verification emails are sent through the college SMTP account.?",
+   "evidence_found": [
+    "ev_src_architecture_004"
+   ],
+   "status": "open",
+   "answer": null,
+   "answer_evidence_id": null
+  }
+ ]
+}

@@ -49,11 +49,38 @@ SANDBOX_TTL_HOURS = 24
 
 
 def db():
+    """Supabase (PostgREST) normally. CONTINUUM_STORE=memory runs the whole API in memory with the CampusKart demo
+    preloaded from demo-data/ (no database, no AI key, no network): used for tests, local development and
+    offline demos."""
     global _store
     if _store is None:
-        from .store import Store
-        _store = Store()
+        import os
+        if os.environ.get("CONTINUUM_STORE", "").lower() == "memory":
+            from .memstore import MemStore
+            _store = MemStore()
+            bootstrap_memory()
+        else:
+            from .store import Store
+            _store = Store()
     return _store
+
+
+def offline() -> bool:
+    import os
+    return os.environ.get("CONTINUUM_STORE", "").lower() == "memory" or os.environ.get("CONTINUUM_GITHUB") == "snapshot"
+
+
+def bootstrap_memory() -> None:
+    """Load the demo template (h_1) and its stored reconstruction (h_1_seed) from the fixtures in demo-data/."""
+    _readme_date["v"] = None  # fixture dates are already correct; no network
+    seed = json.loads((config.DEMO_DIR / "seed_run.json").read_text(encoding="utf-8"))
+    seed_demo()
+    db().ins("handovers", [{"id": seed_id(TEMPLATE), "leaver": "aditi", "successor": "karan",
+                            "successor_role": "contributor", "target_date": "2026-11-30"}])
+    db().ins("claims", [{**c, "handover_id": seed_id(TEMPLATE)} for c in seed["claims"]])
+    db().ins("conflicts", [{**c, "handover_id": seed_id(TEMPLATE)} for c in seed["conflicts"]])
+    db().ins("gaps", [{**g, "handover_id": seed_id(TEMPLATE)} for g in seed["gaps"]])
+    reset_demo(TEMPLATE, x_demo_role="lead")
 
 
 def use_store(store) -> None:
@@ -319,9 +346,18 @@ def ingest_sample(hid: str) -> None:
         ingest_github(hid, SAMPLE_REPO, "CampusKart repo (README, commits, PRs, issues, TODOs)", gid)
 
 
+def github_snapshot(sid: str, id_prefix: str):
+    data = json.loads((config.DEMO_DIR / "github_snapshot.json").read_text(encoding="utf-8"))
+    units = [EvidenceUnit(**{**u, "id": id_prefix + u["id"], "source_id": sid}) for u in data["units"]]
+    return units, {"status": data["report"]["status"], "reason": "Offline mode: snapshot of the public repo"}
+
+
 def ingest_github(hid: str, ref: str, name: str, sid: str) -> None:
     cache_clear()
-    units, rep = fetch_github(ref, sid, "contributor", id_prefix=P(hid))
+    if offline() and ref.rstrip("/") == SAMPLE_REPO:
+        units, rep = github_snapshot(sid, P(hid))
+    else:
+        units, rep = fetch_github(ref, sid, "contributor", id_prefix=P(hid))
     db().ins("sources", [{"id": sid, "handover_id": hid, "type": "github", "name": name,
                           "status": rep["status"], "status_reason": rep.get("reason"),
                           "default_label": "contributor", "unit_count": len(units)}])
