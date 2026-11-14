@@ -7,7 +7,7 @@ import { ArrowLeft, ArrowRight, CircleHelp, X } from "lucide-react";
 import { useSession } from "@/lib/session";
 import type { Role } from "@/lib/types";
 
-interface Step {
+export interface Step {
   title: string;
   body: string;
   go?: { label: string; role: Role; path: string };
@@ -23,6 +23,9 @@ const STEPS: Step[] = [
   { title: "Answer as the leaver", body: "The leaver answers only what the evidence cannot: Gap Interview questions and the successor's questions. Answers become citable evidence. Keys and passwords are refused.", go: { label: "Open the Gap Interview as Leaver", role: "leaver", path: "interview" } },
   { title: "Prove nothing was tampered with", body: "As Reviewer, open Activity: every decision, view and export is logged, each entry fingerprinted with the previous one. Press “Verify integrity”. You can also enter as Guest from the home page to see the public-only view.", go: { label: "Open Activity as Reviewer", role: "lead", path: "activity" } },
 ];
+
+/** The judge path, shared by this pop-up and the /tour page. */
+export const JUDGE_STEPS = STEPS;
 
 const SEEN = "continuum-tour-seen";
 const POS = "continuum-tour-step";
