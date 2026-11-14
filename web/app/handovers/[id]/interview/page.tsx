@@ -6,6 +6,7 @@ import { useSession } from "@/lib/session";
 import type { Task } from "@/lib/types";
 import { Button, Card, Notice, PageTitle, fmtDate } from "@/components/ui";
 import { HandoverNav, RoleGuard, notifyChanged } from "@/components/shell";
+import { AttentionTiles } from "@/components/attention";
 import { SECTION_TITLE } from "@/components/version-diff";
 import { EmptyState, LoadError, SkeletonList } from "@/components/feedback";
 import { friendlyError } from "@/lib/status";
@@ -72,6 +73,7 @@ export default function InterviewPage({ params }: { params: Promise<{ id: string
   return (
     <RoleGuard hid={id} allow={["leaver", "lead"]}>
       <HandoverNav hid={id} />
+      <AttentionTiles hid={id} />
       <PageTitle title="Gap Interview" sub="Continuum read the project and asks you only what the evidence cannot answer, plus any question the successor has after reading the handover. Short answers are enough. Each answer is saved as new citable evidence (“Exit Q&A”) and the reviewer decides how to use it." />
       <div className="mb-4 flex flex-wrap gap-2" role="tablist" aria-label="Question lists">
         <button role="tab" aria-selected={tab === "gaps"} className={tabCls(tab === "gaps")} onClick={() => setTab("gaps")}>Gap questions ({total - done} open)</button>

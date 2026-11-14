@@ -7,6 +7,7 @@ import { useSession } from "@/lib/session";
 import type { Claim, ClaimType, EvidenceState, Handover, Readiness, ReviewStatus, SectionKey, VersionsInfo } from "@/lib/types";
 import { Button, Card, Notice, PageTitle, fmtDateTime } from "@/components/ui";
 import { HandoverNav, RoleGuard, notifyChanged } from "@/components/shell";
+import { AttentionTiles } from "@/components/attention";
 import { ClaimCard } from "@/components/claim-card";
 import { ExportButtons } from "@/components/export";
 import { VersionCompare } from "@/components/version-diff";
@@ -94,6 +95,7 @@ export default function LedgerPage({ params }: { params: Promise<{ id: string }>
   return (
     <RoleGuard hid={id} allow={["lead"]}>
       <HandoverNav hid={id} />
+      <AttentionTiles hid={id} />
       <PageTitle
         title="Claim ledger"
         sub="Every statement below is a claim with an evidence state and clickable sources. Nothing reaches the successor until you approve it and publish."
