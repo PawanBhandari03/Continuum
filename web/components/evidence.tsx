@@ -72,7 +72,7 @@ export function SourceChips({ claim }: { claim: Claim }) {
       live = false;
     };
   }, [claim.id, claim.citations.length, role, near]);
-  if (!claim.citations.length) return <span className="text-xs italic text-slate-500">No citations</span>;
+  if (!claim.citations.length) return <span className="text-xs italic text-slate-600">No citations</span>;
   return (
     <div ref={box} className="flex flex-wrap gap-1.5" aria-label="Sources">
       {claim.citations.map((c, i) => {
@@ -145,7 +145,7 @@ function Drawer({ claim, evidenceId, onClose }: { claim: Claim; evidenceId?: str
       <>
         <header className="sticky top-0 z-10 flex items-start justify-between gap-3 border-b border-slate-200 bg-white p-4">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Evidence for this claim</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-600">Evidence for this claim</p>
             <p className="mt-1 text-sm font-medium text-slate-900">{claim.statement}</p>
             {claim.confidence_reason && <p className="mt-1 text-xs text-slate-600">Why this state: {claim.confidence_reason}</p>}
           </div>
@@ -153,7 +153,7 @@ function Drawer({ claim, evidenceId, onClose }: { claim: Claim; evidenceId?: str
         </header>
         <div className="space-y-5 p-4">
           {err && <p className="rounded border border-rose-300 bg-rose-50 p-2 text-sm text-rose-900">{err}</p>}
-          {!details && !err && <p className="text-sm text-slate-500">Loading original text…</p>}
+          {!details && !err && <p className="text-sm text-slate-600">Loading original text…</p>}
           {details && ordered.length === 0 && <p className="text-sm text-slate-600">No readable evidence for your role.</p>}
           {ordered.map((d, i) => {
             const Icon = sourceIcon(d.source.type);
@@ -173,12 +173,12 @@ function Drawer({ claim, evidenceId, onClose }: { claim: Claim; evidenceId?: str
                   {d.context.map((u) => {
                     const main = u.id === d.unit.id;
                     return (
-                      <li key={u.id} className={main ? "rounded bg-slate-50 p-2" : "text-slate-500"}>
-                        <div className="text-xs text-slate-500">
+                      <li key={u.id} className={main ? "rounded bg-slate-50 p-2" : "text-slate-600"}>
+                        <div className="text-xs text-slate-600">
                           <span className="font-semibold">{u.author}</span> · {fmtDateTime(u.timestamp)}
                           {main && (
                             <a href={u.locator.startsWith("http") ? u.locator : undefined} target="_blank" rel="noreferrer" className="ml-2 inline-flex items-center gap-0.5 text-indigo-700 hover:underline">
-                              {u.locator.startsWith("http") ? <>open original <ExternalLink size={11} /></> : <code className="text-slate-500">{u.locator}</code>}
+                              {u.locator.startsWith("http") ? <>open original <ExternalLink size={11} /></> : <code className="text-slate-600">{u.locator}</code>}
                             </a>
                           )}
                         </div>
@@ -187,7 +187,7 @@ function Drawer({ claim, evidenceId, onClose }: { claim: Claim; evidenceId?: str
                     );
                   })}
                 </ol>
-                <p className="mt-2 text-xs text-slate-500">Quoted span: “{d.citation.quote}”</p>
+                <p className="mt-2 text-xs text-slate-600">Quoted span: “{d.citation.quote}”</p>
               </article>
             );
           })}

@@ -81,7 +81,7 @@ export default function ReconstructPage({ params }: { params: Promise<{ id: stri
               <li key={s.key} className="flex items-start gap-3">
                 {failed ? <XCircle className="mt-0.5 text-rose-600" size={18} aria-hidden /> : done ? <CheckCircle2 className="mt-0.5 text-emerald-600" size={18} aria-hidden /> : active ? <Loader2 className="mt-0.5 animate-spin text-zinc-900" size={18} aria-hidden /> : <Circle className="mt-0.5 text-slate-300" size={18} aria-hidden />}
                 <div>
-                  <div className="font-medium">{i + 1}. {s.title} <span className="text-xs font-normal text-slate-500">{done ? "done" : active ? "running…" : failed ? "failed" : "waiting"}</span></div>
+                  <div className="font-medium">{i + 1}. {s.title} <span className="text-xs font-normal text-slate-600">{done ? "done" : active ? "running…" : failed ? "failed" : "waiting"}</span></div>
                   <div className="text-sm text-slate-600">{s.desc}</div>
                 </div>
               </li>

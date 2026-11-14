@@ -137,7 +137,7 @@ export default function LedgerPage({ params }: { params: Promise<{ id: string }>
             <dl className="grid grid-cols-3 gap-3 text-center sm:gap-6 sm:text-left">
               <div className="rounded-xl border border-zinc-200 bg-zinc-50/50 p-3 shadow-2xs">
                 <dt className="text-xs font-medium text-zinc-500">Slots filled</dt>
-                <dd className="mt-0.5 text-base font-bold text-zinc-900">{ready.slots_filled} <span className="text-xs text-zinc-400 font-normal">/ {ready.slots_total}</span></dd>
+                <dd className="mt-0.5 text-base font-bold text-zinc-900">{ready.slots_filled} <span className="text-xs text-zinc-600 font-normal">/ {ready.slots_total}</span></dd>
               </div>
               <div className="rounded-xl border border-zinc-200 bg-zinc-50/50 p-3 shadow-2xs">
                 <dt className="text-xs font-medium text-zinc-500">Open conflicts</dt>
@@ -203,7 +203,7 @@ export default function LedgerPage({ params }: { params: Promise<{ id: string }>
               <option value="">Any review status</option>{["pending", "approved", "edited", "rejected", "redacted"].map((s) => <option key={s} value={s}>{s}</option>)}
             </select>
             {(f.state || f.type || f.review || f.ws) && <button className="text-indigo-700 underline" onClick={() => setF({ state: "", type: "", review: "", ws: "" })}>Clear</button>}
-            <span className="ml-auto text-slate-500">{shown.length} of {open.length} claims</span>
+            <span className="ml-auto text-slate-600">{shown.length} of {open.length} claims</span>
           </div>
 
           <div className="space-y-6">
@@ -275,7 +275,7 @@ export default function LedgerPage({ params }: { params: Promise<{ id: string }>
                   {versions.published.map((v) => (
                     <li key={v.version} className="rounded border border-slate-200 p-2 text-sm">
                       <b>v{v.version}</b> · {fmtDateTime(v.published_at)} · {v.published_by}
-                      <div className="break-all font-mono text-[11px] text-slate-500">SHA-256 {v.sha256}</div>
+                      <div className="break-all font-mono text-[11px] text-slate-600">SHA-256 {v.sha256}</div>
                     </li>
                   ))}
                 </ul>
@@ -285,7 +285,7 @@ export default function LedgerPage({ params }: { params: Promise<{ id: string }>
             <h3 className="mt-5 text-sm font-semibold">Draft changes since the beginning (newest first)</h3>
             <ol className="mt-2 space-y-3 border-l-2 border-slate-200 pl-4">
               {versions?.draft?.log.map((v, i) => (
-                <li key={i}><div className="text-xs text-slate-500">rev {v.revision ?? "–"} · {fmtDateTime(v.at)} · <b>{v.actor}</b></div><div className="text-sm">{v.summary}</div></li>
+                <li key={i}><div className="text-xs text-slate-600">rev {v.revision ?? "–"} · {fmtDateTime(v.at)} · <b>{v.actor}</b></div><div className="text-sm">{v.summary}</div></li>
               ))}
             </ol>
           </div>

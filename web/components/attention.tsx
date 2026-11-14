@@ -41,7 +41,7 @@ export function AttentionTiles({ hid }: { hid: string }) {
             <li key={i.key}>
               <Link
                 href={`/handovers/${hid}/${i.tab}`}
-                className={`group flex h-full min-h-[90px] flex-col justify-between rounded-xl border p-3.5 transition-all hover:-translate-y-0.5 hover:shadow-md active:translate-y-0 ${todo ? "border-[#b8c8ee] bg-[#eef3fd] shadow-xs hover:border-[#92a9e1]" : "border-[#e5dfd6] bg-white text-[#898170] hover:border-[#d6ccbf]"}`}
+                className={`group flex h-full min-h-[90px] flex-col justify-between rounded-xl border p-3.5 transition-all hover:-translate-y-0.5 hover:shadow-md active:translate-y-0 ${todo ? "border-[#b8c8ee] bg-[#eef3fd] shadow-xs hover:border-[#92a9e1]" : "border-[#e5dfd6] bg-white text-[#6b6455] hover:border-[#d6ccbf]"}`}
               >
                 <span className="flex items-center justify-between">
                   <span className={`text-2xl font-extrabold tracking-tight ${todo ? "text-[#25272d]" : "text-[#c0b8a9]"}`}>{i.count}</span>

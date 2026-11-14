@@ -121,7 +121,7 @@ function ItemCard({ item: i, onChanged }: { item: PrivacyItem; onChanged: () => 
     <Card className={pending ? "border-amber-300" : ""}>
       <div className="flex flex-wrap items-center gap-2 text-xs">
         <span className={`rounded-full border px-2 py-0.5 font-semibold ${i.kind === "secret" ? "border-rose-300 bg-rose-50 text-rose-900" : i.kind === "suggestion" ? "border-amber-300 bg-amber-50 text-amber-900" : "border-slate-300 bg-slate-50 text-slate-800"}`}>{i.detector_name}</span>
-        <span className="text-slate-500">{i.author} · {fmtDate(i.ts)} · readable by {i.label === "lead_only" ? "the lead only" : i.label === "public" ? "everyone" : "contributors"}</span>
+        <span className="text-slate-600">{i.author} · {fmtDate(i.ts)} · readable by {i.label === "lead_only" ? "the lead only" : i.label === "public" ? "everyone" : "contributors"}</span>
         <span className={`ml-auto font-semibold ${pending ? "text-amber-800" : "text-emerald-800"}`}>{DECISION[i.decision]}</span>
       </div>
       <div className="mt-2"><Preview text={i.preview} /></div>
@@ -136,7 +136,7 @@ function ItemCard({ item: i, onChanged }: { item: PrivacyItem; onChanged: () => 
             {i.kind === "suggestion" && <Button disabled={busy || needReason} onClick={() => decide("dismiss")}>Fine for a successor to read</Button>}
             <Button variant="primary" disabled={busy || needReason} onClick={() => decide("escalate_lead_only")}><ShieldAlert size={14} aria-hidden /> Make this passage lead-only</Button>
           </div>
-          {i.kind === "secret" && <p className="text-xs text-slate-500">Secrets can never be unmasked. Only “keep masked” or “lead-only” are possible.</p>}
+          {i.kind === "secret" && <p className="text-xs text-slate-600">Secrets can never be unmasked. Only “keep masked” or “lead-only” are possible.</p>}
           {err && <Notice tone="error">{err}</Notice>}
         </div>
       )}

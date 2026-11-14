@@ -161,7 +161,7 @@ export default function StartPage({ params }: { params: Promise<{ id: string }> 
                 <li key={s.key} className="shrink-0">
                   <a href={`#s-${s.key}`} onClick={() => setOpen((o) => ({ ...o, [s.key]: true }))} className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-md border border-slate-200 bg-white px-2.5 py-2 text-xs font-medium text-slate-800 hover:border-blue-400 sm:py-1.5">
                     <span className="font-bold text-blue-800">{i + 1}</span> {SHORT[s.key] ?? s.title}
-                    <span className="text-slate-500">{s.claims.length}</span>
+                    <span className="text-slate-600">{s.claims.length}</span>
                     {s.ack === "acknowledged" && <CheckCircle2 size={12} className="text-emerald-600" aria-label="acknowledged" />}
                     {s.ack === "unclear" && <Flag size={12} className="text-amber-700" aria-label="flagged unclear" />}
                     {s.changed && <span className="rounded bg-amber-100 px-1 text-[10px] font-bold text-amber-900">changed</span>}
@@ -188,10 +188,10 @@ export default function StartPage({ params }: { params: Promise<{ id: string }> 
             <section key={s.key} aria-labelledby={`s-${s.key}`} className={`scroll-mt-32 rounded-xl border bg-white p-2 sm:p-3 ${s.key === "unresolved" ? "border-2 border-amber-300 bg-amber-50/50" : "border-slate-200"}`}>
               <h2 id={`s-${s.key}`} className="text-lg font-semibold">
                 <button type="button" aria-expanded={isOpen} aria-controls={`b-${s.key}`} onClick={() => setOpen((o) => ({ ...o, [s.key]: !isOpen }))} className="flex w-full flex-wrap items-center gap-x-2 gap-y-1 rounded-lg px-1 py-2 text-left hover:bg-slate-100/70">
-                  <ChevronDown size={18} aria-hidden className={`shrink-0 text-slate-500 transition-transform ${isOpen ? "" : "-rotate-90"}`} />
+                  <ChevronDown size={18} aria-hidden className={`shrink-0 text-slate-600 transition-transform ${isOpen ? "" : "-rotate-90"}`} />
                   <span>{i + 1}. {s.title}</span>
                   {s.changed && <span className="rounded-full border border-amber-400 bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-900">Changed in v{view.version}</span>}
-                  <span className="text-xs font-normal text-slate-500">{bits.join(" · ")}</span>
+                  <span className="text-xs font-normal text-slate-600">{bits.join(" · ")}</span>
                   {s.ack !== "none" && (
                     <span className={`ml-auto inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-semibold ${s.ack === "acknowledged" ? "border-emerald-300 bg-emerald-50 text-emerald-900" : "border-amber-400 bg-amber-100 text-amber-900"}`}>
                       {s.ack === "acknowledged" ? <><CheckCircle2 size={12} aria-hidden /> {s.carried_over ? "Acknowledged (carried over)" : "Acknowledged"}</> : <><Flag size={12} aria-hidden /> Flagged unclear</>}

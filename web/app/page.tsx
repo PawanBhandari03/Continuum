@@ -105,11 +105,11 @@ function Example({ state, text, src, cls, Icon }: { state: string; text: string;
         <span className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-semibold ${cls}`}>
           <Icon size={13} aria-hidden /> {state}
         </span>
-        <span className="font-mono text-[11px] text-[#898170]">git:campuskart</span>
+        <span className="font-mono text-[11px] text-[#6b6455]">git:campuskart</span>
       </div>
       <p className="mt-3 text-sm font-semibold leading-relaxed text-[#25272d]">{text}</p>
       <div className="mt-3.5 inline-flex items-center gap-1.5 rounded-lg border border-[#e5dfd6] bg-[#faf7f2] px-2.5 py-1 text-xs font-medium text-[#575245]">
-        <MessageSquareText size={12} className="text-[#898170]" aria-hidden /> {src}
+        <MessageSquareText size={12} className="text-[#6b6455]" aria-hidden /> {src}
       </div>
     </div>
   );
@@ -221,7 +221,7 @@ export default function Landing() {
               </div>
               <div className="border-t border-[#e5dfd6] bg-[#faf7f2] p-3 flex items-center justify-between text-xs">
                 <span className="flex items-center gap-1.5 text-[#575245]">
-                  <GitCommit size={14} className="text-[#898170]" /> Leaver: <b className="text-[#25272d]">Aditi</b> ➔ Successor: <b className="text-[#25272d]">Karan</b>
+                  <GitCommit size={14} className="text-[#6b6455]" /> Leaver: <b className="text-[#25272d]">Aditi</b> ➔ Successor: <b className="text-[#25272d]">Karan</b>
                 </span>
                 <span className="inline-flex items-center gap-1 text-[#2b3e70] font-medium bg-[#eef3fd] border border-[#b8c8ee] px-2.5 py-0.5 rounded-full">
                   <CheckCircle2 size={12} className="text-[#506cb8]" /> 100% Deterministic Evidence
@@ -272,11 +272,11 @@ export default function Landing() {
                       )}
                     </div>
                     <span className="min-w-0 flex-1">
-                      <span className="block text-[11px] font-bold uppercase tracking-wider text-[#898170]">{info.step}</span>
+                      <span className="block text-[11px] font-bold uppercase tracking-wider text-[#6b6455]">{info.step}</span>
                       <span className="block font-bold text-[#25272d] sm:text-base">{info.title}</span>
                       <span className="block text-xs leading-snug text-[#575245] font-normal">{info.blurb}</span>
                     </span>
-                    <ArrowRight className="shrink-0 text-[#898170] transition group-hover:translate-x-1 group-hover:text-[#25272d]" size={18} aria-hidden />
+                    <ArrowRight className="shrink-0 text-[#6b6455] transition group-hover:translate-x-1 group-hover:text-[#25272d]" size={18} aria-hidden />
                   </button>
                 );
               })}
@@ -305,7 +305,7 @@ export default function Landing() {
                 Tour guide
               </Link>
             </div>
-            <p className="mt-3 text-[11px] leading-relaxed text-[#898170]">
+            <p className="mt-3 text-[11px] leading-relaxed text-[#6b6455]">
               Deterministic fallback enabled: finds all 8 planted facts in this demo even if external AI is unreachable.
             </p>
           </div>
@@ -318,22 +318,22 @@ export default function Landing() {
           <div className="text-center px-4">
             <div className="text-3xl font-bold text-[#25272d]">94 / 94</div>
             <div className="mt-1 text-xs font-bold uppercase tracking-wider text-[#575245]">Claims Cited</div>
-            <p className="mt-0.5 text-xs text-[#898170]">100% link to verbatim source text</p>
+            <p className="mt-0.5 text-xs text-[#6b6455]">100% link to verbatim source text</p>
           </div>
           <div className="text-center px-4 pt-4 sm:pt-0">
             <div className="text-3xl font-bold text-emerald-700">7 of 8</div>
             <div className="mt-1 text-xs font-bold uppercase tracking-wider text-[#575245]">Planted Facts Found</div>
-            <p className="mt-0.5 text-xs text-[#898170]">Automatic code evaluation pass</p>
+            <p className="mt-0.5 text-xs text-[#6b6455]">Automatic code evaluation pass</p>
           </div>
           <div className="text-center px-4 pt-4 sm:pt-0">
             <div className="text-3xl font-bold text-[#25272d]">0 Leaks</div>
             <div className="mt-1 text-xs font-bold uppercase tracking-wider text-[#575245]">Sensitive Isolation</div>
-            <p className="mt-0.5 text-xs text-[#898170]">Lead-only keys never reach successor</p>
+            <p className="mt-0.5 text-xs text-[#6b6455]">Lead-only keys never reach successor</p>
           </div>
           <div className="text-center px-4 pt-4 sm:pt-0">
             <div className="text-3xl font-bold text-[#25272d] font-mono">SHA-256</div>
             <div className="mt-1 text-xs font-bold uppercase tracking-wider text-[#575245]">Signed & Frozen</div>
-            <p className="mt-0.5 text-xs text-[#898170]">Tamper-evident audit ledger</p>
+            <p className="mt-0.5 text-xs text-[#6b6455]">Tamper-evident audit ledger</p>
           </div>
         </div>
       </section>
@@ -345,7 +345,7 @@ export default function Landing() {
             <p className="text-xs font-bold uppercase tracking-wider text-[#575245]">Honest Evidence States</p>
             <h2 className="mt-1 text-2xl font-bold tracking-tight text-[#25272d] sm:text-3xl">What a handover looks like</h2>
           </div>
-          <p className="text-xs text-[#898170]">Every statement can be checked line-by-line.</p>
+          <p className="text-xs text-[#6b6455]">Every statement can be checked line-by-line.</p>
         </div>
         <div className="mt-5 grid gap-4 md:grid-cols-3">
           <Example
@@ -388,7 +388,7 @@ export default function Landing() {
           {/* Pillar 1: Real GitHub PR & Citation */}
           <div className="rounded-2xl border border-[#e5dfd6] bg-white shadow-2xs overflow-hidden flex flex-col hover:border-[#b8c8ee] transition-colors">
             <div className="border-b border-[#e5dfd6] bg-[#faf7f2] p-3 font-mono text-xs">
-              <div className="flex items-center justify-between text-[#898170] mb-1">
+              <div className="flex items-center justify-between text-[#6b6455] mb-1">
                 <span className="flex items-center gap-1.5"><GitPullRequest size={13} className="text-[#506cb8]" /> Pull Request #87</span>
                 <span className="rounded bg-[#eef3fd] text-[#2b3e70] border border-[#b8c8ee] px-1.5 py-0.2 font-semibold">Merged</span>
               </div>
@@ -400,7 +400,7 @@ export default function Landing() {
             </div>
             <div className="p-5 flex-1 flex flex-col justify-between">
               <div>
-                <span className="text-[11px] font-bold uppercase tracking-wider text-[#898170]">Truth & Traceability</span>
+                <span className="text-[11px] font-bold uppercase tracking-wider text-[#6b6455]">Truth & Traceability</span>
                 <h3 className="text-base font-bold text-[#25272d] mt-1">Claims, not fluffy summaries</h3>
                 <p className="mt-2 text-xs leading-relaxed text-[#575245]">
                   Every handover statement is an atomic claim tied to verified repository lines, commit hashes, or issue comments.
@@ -415,7 +415,7 @@ export default function Landing() {
           {/* Pillar 2: Real Gap Interview Q&A */}
           <div className="rounded-2xl border border-[#e5dfd6] bg-white shadow-2xs overflow-hidden flex flex-col hover:border-[#b8c8ee] transition-colors">
             <div className="border-b border-[#e5dfd6] bg-[#faf7f2] p-3 font-mono text-xs">
-              <div className="flex items-center justify-between text-[#898170] mb-1">
+              <div className="flex items-center justify-between text-[#6b6455] mb-1">
                 <span className="flex items-center gap-1.5"><FileText size={13} className="text-amber-600" /> Gap Interview #01</span>
                 <span className="rounded bg-amber-100 text-amber-800 px-1.5 py-0.2 font-semibold">Answered</span>
               </div>
@@ -426,7 +426,7 @@ export default function Landing() {
             </div>
             <div className="p-5 flex-1 flex flex-col justify-between">
               <div>
-                <span className="text-[11px] font-bold uppercase tracking-wider text-[#898170]">Effort Reduction</span>
+                <span className="text-[11px] font-bold uppercase tracking-wider text-[#6b6455]">Effort Reduction</span>
                 <h3 className="text-base font-bold text-[#25272d] mt-1">Targeted Gap Interview</h3>
                 <p className="mt-2 text-xs leading-relaxed text-[#575245]">
                   Leavers don&apos;t waste hours writing stale wiki pages. Continuum asks ONLY what repository evidence cannot answer.
@@ -441,7 +441,7 @@ export default function Landing() {
           {/* Pillar 3: Real Privacy & Secret Masking */}
           <div className="rounded-2xl border border-[#e5dfd6] bg-white shadow-2xs overflow-hidden flex flex-col hover:border-[#b8c8ee] transition-colors">
             <div className="border-b border-[#e5dfd6] bg-[#faf7f2] p-3 font-mono text-xs">
-              <div className="flex items-center justify-between text-[#898170] mb-1">
+              <div className="flex items-center justify-between text-[#6b6455] mb-1">
                 <span className="flex items-center gap-1.5"><Lock size={13} className="text-rose-600" /> Masking Engine</span>
                 <span className="rounded bg-[#ded8cd] text-[#25272d] px-1.5 py-0.2 font-semibold">Protected</span>
               </div>
@@ -453,7 +453,7 @@ export default function Landing() {
             </div>
             <div className="p-5 flex-1 flex flex-col justify-between">
               <div>
-                <span className="text-[11px] font-bold uppercase tracking-wider text-[#898170]">Zero-Leak Architecture</span>
+                <span className="text-[11px] font-bold uppercase tracking-wider text-[#6b6455]">Zero-Leak Architecture</span>
                 <h3 className="text-base font-bold text-[#25272d] mt-1">Permission before generation</h3>
                 <p className="mt-2 text-xs leading-relaxed text-[#575245]">
                   Lead-only architectural notes and credentials are automatically masked before any model or successor sees them.
@@ -501,12 +501,12 @@ export default function Landing() {
           </div>
 
           <div className="rounded-2xl border border-[#363942] bg-[#191b1f] p-4 font-mono text-xs text-[#ded8cd] space-y-3">
-            <div className="flex items-center justify-between border-b border-[#363942] pb-2 text-[#898170] text-[11px]">
+            <div className="flex items-center justify-between border-b border-[#363942] pb-2 text-[#a69d8b] text-[11px]">
               <span>git:campuskart/handover.diff</span>
               <span className="text-[#92a9e1] font-bold">v1 ➔ v2 Diff</span>
             </div>
             <div className="space-y-1 text-[11px]">
-              <div className="text-[#898170]">## Section 5: External Dependencies</div>
+              <div className="text-[#a69d8b]">## Section 5: External Dependencies</div>
               <div className="text-rose-400">- SMTP: college mail relay owner unknown [FLAGGED UNCLEAR BY KARAN]</div>
               <div className="text-emerald-400">+ SMTP: Prof. Sharma (CSE Dept) owns account, Dean IT handles renewal</div>
               <div className="text-[#c0b8a9] pl-2">↳ Exit Q&A ID: ev_qa_03 · Answered by @aditi · Confirmed by @lead</div>
@@ -545,12 +545,12 @@ export default function Landing() {
                     <s.systemIcon size={20} />
                   </div>
                 ) : null}
-                <span className="font-mono text-xs font-bold text-[#898170]">{s.stepNum}</span>
+                <span className="font-mono text-xs font-bold text-[#6b6455]">{s.stepNum}</span>
               </div>
-              <div className="mt-3 text-[11px] font-bold uppercase tracking-wider text-[#898170]">{s.role}</div>
+              <div className="mt-3 text-[11px] font-bold uppercase tracking-wider text-[#6b6455]">{s.role}</div>
               <h3 className="mt-1 font-bold text-[#25272d] text-base">{s.t}</h3>
               <p className="mt-1.5 text-xs leading-relaxed text-[#575245]">{s.d}</p>
-              <div className="mt-3 pt-2 border-t border-[#e5dfd6] font-mono text-[10px] text-[#898170]">
+              <div className="mt-3 pt-2 border-t border-[#e5dfd6] font-mono text-[10px] text-[#6b6455]">
                 {s.action}
               </div>
             </li>

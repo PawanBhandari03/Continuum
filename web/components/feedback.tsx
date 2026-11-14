@@ -45,11 +45,11 @@ export function SkeletonList({ rows = 3, label = "Loading" }: { rows?: number; l
 export function EmptyState({ title, hint }: { title: string; hint?: React.ReactNode }) {
   return (
     <div className="rounded-2xl border-2 border-dashed border-slate-200 bg-white/80 p-8 text-center text-sm text-slate-600 shadow-xs">
-      <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-100 text-slate-500 shadow-xs">
+      <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-100 text-slate-600 shadow-xs">
         <Inbox size={24} aria-hidden />
       </div>
       <p className="font-bold text-slate-900">{title}</p>
-      {hint && <p className="mt-1 text-xs text-slate-500 max-w-sm mx-auto">{hint}</p>}
+      {hint && <p className="mt-1 text-xs text-slate-600 max-w-sm mx-auto">{hint}</p>}
     </div>
   );
 }

@@ -118,8 +118,8 @@ export default function ConnectPage({ params }: { params: Promise<{ id: string }
               </Card>
             ))}
           </div>
-          <p className="text-xs text-slate-500">Use synthetic, public or permissioned data only. Do not upload confidential material. Files are limited to 25 MB.</p>
-          <p className="text-xs text-slate-500">Task-board data comes from the issues of the GitHub repository; Trello and Word (.docx) imports are not built.</p>
+          <p className="text-xs text-slate-600">Use synthetic, public or permissioned data only. Do not upload confidential material. Files are limited to 25 MB.</p>
+          <p className="text-xs text-slate-600">Task-board data comes from the issues of the GitHub repository; Trello and Word (.docx) imports are not built.</p>
 
           {lastUpload && (
             <div aria-live="polite">
@@ -155,7 +155,7 @@ export default function ConnectPage({ params }: { params: Promise<{ id: string }
               })}
             </ul>
             {hasProblems && <div className="mt-3"><Notice tone="warn">Some sources are incomplete. The handover will say so instead of pretending coverage is complete.</Notice></div>}
-            <Link href={`/handovers/${id}/reconstruct`} className={`mt-4 inline-flex w-full items-center justify-center rounded-md px-3 py-2 text-sm font-medium ${sources?.length ? "bg-indigo-700 text-white hover:bg-indigo-800" : "pointer-events-none bg-slate-200 text-slate-500"}`} aria-disabled={!sources?.length}>
+            <Link href={`/handovers/${id}/reconstruct`} className={`mt-4 inline-flex w-full items-center justify-center rounded-md px-3 py-2 text-sm font-medium ${sources?.length ? "bg-indigo-700 text-white hover:bg-indigo-800" : "pointer-events-none bg-slate-200 text-slate-600"}`} aria-disabled={!sources?.length}>
               Continue to Reconstruct →
             </Link>
           </Card>

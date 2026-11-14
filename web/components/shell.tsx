@@ -127,7 +127,7 @@ function NotificationBell({ hid }: { hid: string }) {
       </button>
       {open && (
         <div role="menu" className="absolute right-0 z-40 mt-1 w-72 rounded-lg border border-slate-200 bg-white p-2 text-sm text-slate-800 shadow-lg">
-          <p className="px-2 pb-1 text-xs font-semibold uppercase tracking-wide text-slate-500">Needs your attention</p>
+          <p className="px-2 pb-1 text-xs font-semibold uppercase tracking-wide text-slate-600">Needs your attention</p>
           {items.length === 0 && <p className="px-2 py-2 text-slate-600">Nothing right now.</p>}
           {items.map((i) => (
             <Link role="menuitem" key={i.key} href={`/handovers/${hid}/${i.tab}`} onClick={() => setOpen(false)} className="flex items-center justify-between rounded px-2 py-2 hover:bg-slate-100">
@@ -211,7 +211,7 @@ export function RoleGuard({ hid, allow, children }: { hid: string; allow: Role[]
     if (!role) router.replace("/");
     else if (!allow.includes(role)) router.replace(ROLE_META[role].home(hid));
   }, [ready, role, allow, hid, router]);
-  if (!ready || !role || !allow.includes(role)) return <p className="text-sm text-slate-500">Checking your access…</p>;
+  if (!ready || !role || !allow.includes(role)) return <p className="text-sm text-slate-600">Checking your access…</p>;
   return <>{children}</>;
 }
 

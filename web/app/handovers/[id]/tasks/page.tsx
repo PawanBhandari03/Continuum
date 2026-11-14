@@ -87,9 +87,9 @@ function TaskCard({ task: t, claims, onChanged }: { task: Task; claims: Claim[];
       <div className="flex flex-wrap items-center gap-2">
         <span className={`rounded-full border px-2 py-0.5 text-xs font-semibold ${STATUS[t.status].cls}`}>{STATUS[t.status].label}</span>
         {t.section && <span className="text-xs text-slate-600">Section: <b>{SECTION_TITLE[t.section]}</b></span>}
-        <span className="text-xs text-slate-500">raised on v{t.version_raised} · {fmtDateTime(t.created_at)}</span>
+        <span className="text-xs text-slate-600">raised on v{t.version_raised} · {fmtDateTime(t.created_at)}</span>
       </div>
-      <p className="mt-2 flex gap-2 text-sm text-slate-900"><MessageCircleQuestion size={16} className="mt-0.5 shrink-0 text-slate-500" aria-hidden /><span><b>{t.raised_by}:</b> “{t.text}”</span></p>
+      <p className="mt-2 flex gap-2 text-sm text-slate-900"><MessageCircleQuestion size={16} className="mt-0.5 shrink-0 text-slate-600" aria-hidden /><span><b>{t.raised_by}:</b> “{t.text}”</span></p>
       {t.answer ? (
         <p className="mt-2 rounded-md bg-emerald-50 p-2 text-sm text-slate-900"><b>{t.answer_by}:</b> “{t.answer}” <span className="text-xs text-slate-600">(saved as Exit Q&A evidence)</span></p>
       ) : (

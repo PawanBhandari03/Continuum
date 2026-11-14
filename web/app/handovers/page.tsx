@@ -60,9 +60,9 @@ export default function HandoversPage() {
             <Card key={h.id}>
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
-                  <h2 className="font-semibold capitalize">{h.leaver} → {h.successor} <span className="text-sm font-normal normal-case text-slate-500">({h.is_demo ? (h.id === demoId ? "CampusKart demo · your copy" : "CampusKart demo template") : "new"})</span></h2>
+                  <h2 className="font-semibold capitalize">{h.leaver} → {h.successor} <span className="text-sm font-normal normal-case text-slate-600">({h.is_demo ? (h.id === demoId ? "CampusKart demo · your copy" : "CampusKart demo template") : "new"})</span></h2>
                   <p className="text-sm text-slate-600">{h.version ? `Published v${h.version}` : "Not published yet"} · {STATUS[h.status]} · target {fmtDate(h.target_date)} · successor role: {h.successor_role}</p>
-                  {h.published_at && <p className="text-xs text-slate-500">Last published by {h.approved_by} on {fmtDate(h.published_at)}</p>}
+                  {h.published_at && <p className="text-xs text-slate-600">Last published by {h.approved_by} on {fmtDate(h.published_at)}</p>}
                 </div>
                 <Link href={ROLE_META[role].home(h.id)} className="inline-flex items-center rounded-md bg-indigo-700 px-3 py-2.5 text-sm font-medium text-white hover:bg-indigo-800 sm:py-1.5">
                   Open as {ROLE_META[role].label}

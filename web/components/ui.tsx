@@ -64,10 +64,10 @@ export function LabelTag({ label }: { label: AccessLabel }) {
 
 export function Button({ variant = "secondary", className = "", ...p }: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: "primary" | "secondary" | "danger" | "ghost" }) {
   const v = {
-    primary: "bg-[#25272d] text-white shadow-xs hover:bg-[#191b1f] active:scale-[0.98] disabled:bg-[#ded8cd] disabled:text-[#898170] disabled:opacity-60 disabled:shadow-none focus-visible:outline-[#92a9e1]",
-    secondary: "border border-[#d6ccbf] bg-white text-[#25272d] shadow-2xs hover:border-[#92a9e1] hover:bg-[#faf7f2] active:scale-[0.98] disabled:text-[#898170]",
-    danger: "border border-rose-300 bg-white text-rose-800 shadow-2xs hover:bg-rose-50 hover:border-rose-400 active:scale-[0.98] disabled:text-[#898170]",
-    ghost: "text-[#25272d] hover:bg-[#eef3fd] hover:text-[#25272d] active:scale-[0.98] disabled:text-[#898170]",
+    primary: "bg-[#25272d] text-white shadow-xs hover:bg-[#191b1f] active:scale-[0.98] disabled:bg-[#ded8cd] disabled:text-[#6b6455] disabled:opacity-60 disabled:shadow-none focus-visible:outline-[#92a9e1]",
+    secondary: "border border-[#d6ccbf] bg-white text-[#25272d] shadow-2xs hover:border-[#92a9e1] hover:bg-[#faf7f2] active:scale-[0.98] disabled:text-[#6b6455]",
+    danger: "border border-rose-300 bg-white text-rose-800 shadow-2xs hover:bg-rose-50 hover:border-rose-400 active:scale-[0.98] disabled:text-[#6b6455]",
+    ghost: "text-[#25272d] hover:bg-[#eef3fd] hover:text-[#25272d] active:scale-[0.98] disabled:text-[#6b6455]",
   }[variant];
   return <button {...p} className={`inline-flex items-center justify-center gap-1.5 rounded-xl px-3.5 py-1.5 text-sm font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#92a9e1] disabled:cursor-not-allowed ${v} ${className}`} />;
 }

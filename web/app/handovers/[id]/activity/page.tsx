@@ -147,7 +147,7 @@ export default function ActivityPage({ params }: { params: Promise<{ id: string 
             <label className="flex items-center gap-1 text-slate-600">From <input type="date" className={sel} value={from} onChange={(e) => setFrom(e.target.value)} /></label>
             <label className="flex items-center gap-1 text-slate-600">To <input type="date" className={sel} value={to} onChange={(e) => setTo(e.target.value)} /></label>
             {(action || actor || cat || from || to) && <button className="text-indigo-700 underline" onClick={() => { setAction(""); setActor(""); setCat(""); setFrom(""); setTo(""); }}>Clear</button>}
-            <span className="ml-auto text-slate-500">{shown.length} of {rows.length} entries</span>
+            <span className="ml-auto text-slate-600">{shown.length} of {rows.length} entries</span>
           </div>
           <ol className="divide-y divide-slate-200 rounded-lg border border-slate-200 bg-white" aria-label="Activity log">
             {shown.map((r, i) => {
@@ -155,15 +155,15 @@ export default function ActivityPage({ params }: { params: Promise<{ id: string 
               const claim = r.claim_id ? claims.find((c) => c.id === r.claim_id) : null;
               return (
                 <li key={`${r.at}-${i}`} className="grid gap-1 p-3 text-sm sm:grid-cols-[11rem_1fr]">
-                  <div className="text-xs text-slate-500">
+                  <div className="text-xs text-slate-600">
                     <time dateTime={r.at}>{fmtDateTime(r.at)}</time>
                     <div className="font-semibold capitalize text-slate-800">{r.actor}</div>
                   </div>
                   <div>
                     <span className={`mr-2 inline-flex rounded-full border px-2 py-0.5 text-xs font-semibold ${GROUP_CLS[m.group]}`}>{m.label}</span>
                     <span className="text-slate-900">{r.summary}</span>
-                    {claim && <div className="mt-0.5 text-xs text-slate-500">Claim: “{claim.statement.slice(0, 110)}{claim.statement.length > 110 ? "…" : ""}”</div>}
-                    {r.claim_id && !claim && <div className="mt-0.5 text-xs text-slate-500">Claim id: {r.claim_id}</div>}
+                    {claim && <div className="mt-0.5 text-xs text-slate-600">Claim: “{claim.statement.slice(0, 110)}{claim.statement.length > 110 ? "…" : ""}”</div>}
+                    {r.claim_id && !claim && <div className="mt-0.5 text-xs text-slate-600">Claim id: {r.claim_id}</div>}
                   </div>
                 </li>
               );

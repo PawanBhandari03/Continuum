@@ -122,8 +122,8 @@ function ConflictCard({ cf, onChanged }: { cf: Conflict; onChanged: () => Promis
           {settled ? <CheckCircle2 size={13} aria-hidden /> : <AlertTriangle size={13} aria-hidden />} {RESULT[cf.resolution]}
         </span>
         <span title={KIND[cf.kind].help} className="rounded-full border border-slate-300 bg-slate-50 px-2 py-0.5 text-xs font-medium text-slate-800">{KIND[cf.kind].label}</span>
-        {cf.entity_key && <span className="text-xs text-slate-500">Topic: <b className="capitalize">{cf.entity_key}</b></span>}
-        <span className="text-xs text-slate-500">Found by {cf.detected_by.includes("rules") ? "named-value rules (no AI)" : "the AI contradiction check"}</span>
+        {cf.entity_key && <span className="text-xs text-slate-600">Topic: <b className="capitalize">{cf.entity_key}</b></span>}
+        <span className="text-xs text-slate-600">Found by {cf.detected_by.includes("rules") ? "named-value rules (no AI)" : "the AI contradiction check"}</span>
         {cf.severity === "blocking" && cf.resolution === "open" && <span className="ml-auto text-xs font-medium text-rose-800">Blocks publishing</span>}
       </div>
       <h2 className="mt-2 font-semibold text-slate-900">{cf.summary}</h2>
@@ -153,7 +153,7 @@ function ConflictCard({ cf, onChanged }: { cf: Conflict; onChanged: () => Promis
               <div className="mb-2 flex flex-wrap items-center gap-2 text-xs">
                 <span className="rounded bg-slate-800 px-1.5 py-0.5 font-bold text-white">Side {String.fromCharCode(65 + i)}</span>
                 <StateBadge state={s.claim.state} />
-                {i === newest && sides.length > 1 && <span className="text-slate-500">newest</span>}
+                {i === newest && sides.length > 1 && <span className="text-slate-600">newest</span>}
                 {kept && <span className="font-semibold text-emerald-800">Kept</span>}
                 {lost && <span className="font-semibold text-slate-600">Not kept</span>}
               </div>
@@ -204,7 +204,7 @@ function ConflictCard({ cf, onChanged }: { cf: Conflict; onChanged: () => Promis
               </label>
             ))}
           </div>
-          <p className="mt-1 text-xs text-slate-500">Or choose “Keep side …” above. Nothing is pre-selected.</p>
+          <p className="mt-1 text-xs text-slate-600">Or choose “Keep side …” above. Nothing is pre-selected.</p>
           {action === "both_true" && (
             <label className="mt-3 block text-sm">How both are true
               <input className="mt-1 w-full rounded-md border border-slate-300 p-2 text-sm" value={scope} onChange={(e) => setScope(e.target.value)} placeholder="e.g. Render hosts the API; Vercel hosts the web app." />
@@ -240,9 +240,9 @@ function ConflictCard({ cf, onChanged }: { cf: Conflict; onChanged: () => Promis
       </div>
       {showHist && (
         <ol className="mt-2 space-y-1.5 border-l-2 border-slate-200 pl-3 text-sm" aria-label="Decision history">
-          {!hist && <li className="text-slate-500">Loading…</li>}
+          {!hist && <li className="text-slate-600">Loading…</li>}
           {hist?.map((h, i) => (
-            <li key={i}><span className="text-xs text-slate-500">{fmtDateTime(h.at)} · {h.actor}</span><br /><b>{EVENT[h.action]}</b>{h.note ? ` — “${h.note}”` : ""}</li>
+            <li key={i}><span className="text-xs text-slate-600">{fmtDateTime(h.at)} · {h.actor}</span><br /><b>{EVENT[h.action]}</b>{h.note ? ` — “${h.note}”` : ""}</li>
           ))}
         </ol>
       )}

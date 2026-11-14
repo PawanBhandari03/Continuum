@@ -113,14 +113,14 @@ export default function InterviewPage({ params }: { params: Promise<{ id: string
           <div className="space-y-4">
             {gaps.map((g, i) => (
               <Card key={g.id}>
-                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Question {i + 1} of {total}</p>
+                <p className="text-xs font-semibold uppercase tracking-wide text-slate-600">Question {i + 1} of {total}</p>
                 <h2 className="mt-1 font-semibold">{g.question}</h2>
                 <div className="mt-3 grid gap-3 text-sm md:grid-cols-2">
                   <div className="rounded-md bg-slate-50 p-3">
                     <div className="mb-1 text-xs font-semibold text-slate-600">What we found</div>
                     <ul className="space-y-1.5">
                       {(g.evidence ?? []).map((e) => <li key={e.id}><span className="font-medium">{e.source_name ?? "Source"}</span> · <i>{e.author}</i>, {fmtDate(e.ts)}: “{e.text}”</li>)}
-                      {!(g.evidence ?? []).length && <li className="text-slate-500">No source mentions it at all.</li>}
+                      {!(g.evidence ?? []).length && <li className="text-slate-600">No source mentions it at all.</li>}
                     </ul>
                   </div>
                   <div className="rounded-md bg-slate-50 p-3">
@@ -179,7 +179,7 @@ function AnswerBox({ value, onChange, onSave, onSkip }: { value: string; onChang
         <Button variant="primary" disabled={!value.trim()} onClick={onSave}>Save answer</Button>
         {onSkip && <Button onClick={onSkip}><SkipForward size={14} aria-hidden /> Skip</Button>}
       </div>
-      <p className="mt-2 text-xs text-slate-500">Do not paste passwords or keys (they are refused). Say who holds them instead.</p>
+      <p className="mt-2 text-xs text-slate-600">Do not paste passwords or keys (they are refused). Say who holds them instead.</p>
     </div>
   );
 }

@@ -90,7 +90,7 @@ export function TourProvider({ children }: { children: ReactNode }) {
         <aside role="region" aria-label="Guided tour" className="fixed inset-x-2 bottom-2 z-40 rounded-2xl border border-[#e5dfd6] bg-[#faf7f2] p-5 shadow-2xl sm:inset-x-auto sm:right-4 sm:bottom-4 sm:w-96">
           <div className="flex items-start justify-between gap-2">
             <p className="text-xs font-semibold uppercase tracking-wide text-[#575245]" aria-live="polite">Guided tour · Step {step + 1} of {STEPS.length}</p>
-            <button onClick={close} aria-label="Close the guided tour" className="-mr-1 -mt-1 rounded p-1 text-[#898170] hover:bg-[#ede9e2]"><X size={16} /></button>
+            <button onClick={close} aria-label="Close the guided tour" className="-mr-1 -mt-1 rounded p-1 text-[#6b6455] hover:bg-[#ede9e2]"><X size={16} /></button>
           </div>
           <h2 ref={headingRef} tabIndex={-1} className="mt-1 text-base font-bold text-[#25272d]">{cur.title}</h2>
           <p className="mt-1 text-sm text-[#575245]">{cur.body}</p>

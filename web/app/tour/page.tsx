@@ -68,7 +68,7 @@ export default function TourPage() {
 
   const pct = Math.round((done.length / JUDGE_STEPS.length) * 100);
   return (
-    <div className="mx-auto max-w-3xl space-y-6">
+    <div className="mx-auto max-w-3xl space-y-6 overflow-x-hidden">
       <div className="rounded-2xl border border-[#e5dfd6] bg-white p-6 shadow-2xs">
         <div className="inline-flex items-center gap-1.5 rounded-full border border-[#b8c8ee] bg-[#eef3fd] px-3.5 py-1 text-xs font-semibold text-[#2b3e70] shadow-2xs mb-3">
           <Sparkles size={13} className="text-[#506cb8]" /> Hackathon Evaluation Walkthrough
@@ -95,17 +95,17 @@ export default function TourPage() {
           const seen = done.includes(i);
           const imp = IMPROVEMENT[i];
           return (
-            <li key={i} className={`rounded-2xl border bg-white p-5 shadow-2xs transition-all hover:shadow-sm ${seen ? "border-[#b8c8ee] ring-1 ring-[#92a9e1]/40" : "border-[#e5dfd6] hover:border-[#b8c8ee]"}`}>
+            <li key={i} className={`min-w-0 rounded-2xl border bg-white p-4 sm:p-5 shadow-2xs transition-all hover:shadow-sm ${seen ? "border-[#b8c8ee] ring-1 ring-[#92a9e1]/40" : "border-[#e5dfd6] hover:border-[#b8c8ee]"}`}>
               <div className="flex items-start gap-3.5">
                 <span className={`mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-sm font-bold shadow-2xs ${seen ? "bg-[#eef3fd] text-[#2b3e70] border border-[#b8c8ee]" : "bg-[#faf7f2] text-[#25272d] border border-[#e5dfd6]"}`} aria-hidden>
                   {seen ? <CheckCircle2 size={18} className="text-[#506cb8]" /> : i + 1}
                 </span>
                 <div className="min-w-0 flex-1">
-                  <div className="flex flex-wrap items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2 break-words">
                     <h2 className="text-base font-bold text-[#25272d]"><span className="sr-only">Step {i + 1}: </span>{s.title}</h2>
                     {s.go && <span className="rounded-full border border-[#b8c8ee] bg-[#eef3fd] px-2.5 py-0.5 text-xs font-semibold text-[#2b3e70]">as {ROLE_META[s.go.role].short}</span>}
                     {imp && <span className="rounded-full border border-[#e5dfd6] bg-[#faf7f2] px-2.5 py-0.5 text-xs font-semibold text-[#575245]">{imp}</span>}
-                    <span className="inline-flex items-center gap-1 text-xs text-[#898170]"><Clock size={12} aria-hidden /> about 1 min</span>
+                    <span className="inline-flex items-center gap-1 text-xs text-[#6b6455]"><Clock size={12} aria-hidden /> about 1 min</span>
                   </div>
                   <p className="mt-1.5 text-sm leading-relaxed text-[#575245]">{s.body}</p>
                   {s.go && READ_FOR[s.go.path] && <p className="mt-2 rounded-md bg-[#faf7f2] border border-[#e5dfd6] p-2 text-xs text-[#575245]"><b>What to do:</b> {READ_FOR[s.go.path]}</p>}
