@@ -64,7 +64,7 @@ try {
   const body = (await page.locator("main").innerText()).toLowerCase();
   check("privacy page shows India detectors, no raw values", /aadhaar/.test(body) && /pan number/.test(body) && /upi id/.test(body) && !/abcpe1234f|okaxis|9999 0000 1231/.test(body));
   await shot("privacy");
-  const card = page.locator("section").filter({ hasText: "Judgement about a person" }).first();
+  const card = page.getByText("Judgement about a person", { exact: true }).first().locator("xpath=ancestor::section[1]");
   await card.getByLabel("Reason").fill("Personal remark about a teammate; lead only.");
   await card.getByRole("button", { name: /Make this passage lead-only/ }).click();
   await page.getByText(/Nothing waiting for a decision|Waiting for your decision/).first().waitFor({ timeout: T });

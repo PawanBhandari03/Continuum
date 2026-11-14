@@ -258,6 +258,7 @@ def test_privacy_queue_lists_detectors_without_raw_values_and_escalation_hides_c
     _privacy_seed(s, sid)
     q = c.get(f"/handovers/{sid}/redactions", headers=L).json()
     names = {i["detector"]: i for i in q["items"]}
+    assert names["pan"]["decision"] == "keep_masked" and names["people_sensitive"]["decision"] == "pending"
     assert {"upi_id", "pan", "people_sensitive"} <= set(names)
     assert "ABCPE1234F" not in str(q) and "okaxis" not in str(q)        # raw values never sent
     assert c.get(f"/handovers/{sid}/redactions", headers=C).status_code == 403

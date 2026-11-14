@@ -61,7 +61,7 @@ export function ExportButtons({ hid, version }: { hid: string; version?: number 
   }, [printModel]);
 
   return (
-    <div className="no-print flex flex-col items-end gap-1">
+    <div className="no-print flex flex-col items-start gap-1">
       <div className="flex flex-wrap gap-2">
         <Button onClick={exportMd} disabled={busy !== null}><Download size={14} aria-hidden /> {busy === "md" ? "Preparing…" : "Export as Markdown"}</Button>
         <Button onClick={printIt} disabled={busy !== null}><Printer size={14} aria-hidden /> {busy === "print" ? "Preparing…" : "Print / Save as PDF"}</Button>

@@ -99,7 +99,7 @@ export default function LedgerPage({ params }: { params: Promise<{ id: string }>
       <PageTitle
         title="Claim ledger"
         sub="Every statement below is a claim with an evidence state and clickable sources. Nothing reaches the successor until you approve it and publish."
-        right={<div className="flex flex-col items-end gap-2"><Button onClick={() => setShowVersions(true)}><History size={14} aria-hidden /> Versions (published v{h?.version ?? "…"})</Button>{claims && claims.length > 0 && <ExportButtons hid={id} />}</div>}
+        right={<div className="flex flex-wrap items-start gap-2"><Button onClick={() => setShowVersions(true)}><History size={14} aria-hidden /> Versions (published v{h?.version ?? "…"})</Button>{claims && claims.length > 0 && <ExportButtons hid={id} />}</div>}
       />
       {loadErr && <div className="mb-3"><LoadError message={loadErr} onRetry={load} /></div>}
       {!claims && !loadErr && <SkeletonList rows={4} label="Loading claims" />}

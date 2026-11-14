@@ -1667,6 +1667,7 @@ DETECTOR_NAMES = {"api_key": "API key", "jwt": "Login token (JWT)", "private_key
                   "url_token": "Token inside a link", "password_assignment": "Password or secret",
                   "env_line": "Environment secret", "upi_id": "UPI ID", "email": "Email address",
                   "pan": "PAN number", "aadhaar": "Aadhaar number", "ifsc": "Bank IFSC code", "phone": "Phone number",
+                  "pii": "Personal data", "secret": "Secret",
                   "people_sensitive": "Judgement about a person", "manual": "Masked by a reviewer", "": "Masked"}
 
 
@@ -1685,13 +1686,17 @@ def build_privacy_queue(hid: str) -> int:
     rows = []
     for u in db().sel("evidence_units", {"handover_id": hid}):
         reds = [Redaction(**x) for x in (u.get("redactions") or [])]
+        if any(not r.detector for r in reds):  # stored before detectors were named: name them from a fresh scan
+            named = {(x.start, x.end): x.detector for x in scan(u["text"])}
+            reds = [r.model_copy(update={"detector": named.get((r.start, r.end), r.detector)}) for r in reds]
         for r in reds:
             rid = f"rr_{u['id']}_{r.start}"
             if rid not in have:
+                # Masking is already applied: the reviewer may revisit it, but nothing waits on them.
                 rows.append({"id": rid, "handover_id": hid, "evidence_id": u["id"], "start_pos": r.start,
                              "end_pos": r.end, "detector": r.detector or r.kind, "kind": r.kind,
                              "preview": _preview(u["text"], r.start, r.end, reds),
-                             "decision": "keep_masked" if r.kind == "secret" else "pending"})
+                             "decision": "keep_masked", "decided_by": "Automatic (masked on ingest)"})
         if u["label"] != "lead_only":
             for s, e in people_sensitive(u["text"]):
                 rid = f"rr_{u['id']}_p{s}"

@@ -117,6 +117,7 @@ function ItemCard({ item: i, onChanged }: { item: PrivacyItem; onChanged: () => 
   const pending = i.decision === "pending";
   const needReason = reason.trim().length < 5;
   return (
+    <div data-privacy-kind={i.kind} data-privacy-detector={i.detector}>
     <Card className={pending ? "border-amber-300" : ""}>
       <div className="flex flex-wrap items-center gap-2 text-xs">
         <span className={`rounded-full border px-2 py-0.5 font-semibold ${i.kind === "secret" ? "border-rose-300 bg-rose-50 text-rose-900" : i.kind === "suggestion" ? "border-amber-300 bg-amber-50 text-amber-900" : "border-slate-300 bg-slate-50 text-slate-800"}`}>{i.detector_name}</span>
@@ -140,5 +141,6 @@ function ItemCard({ item: i, onChanged }: { item: PrivacyItem; onChanged: () => 
         </div>
       )}
     </Card>
+    </div>
   );
 }
