@@ -87,34 +87,34 @@ export function TourProvider({ children }: { children: ReactNode }) {
     <TourCtx.Provider value={{ open }}>
       {children}
       {visible && (
-        <aside role="region" aria-label="Guided tour" className="fixed inset-x-2 bottom-2 z-40 rounded-2xl border border-[#e5dfd6] bg-[#faf7f2] p-5 shadow-2xl sm:inset-x-auto sm:right-4 sm:bottom-4 sm:w-96">
+        <aside role="region" aria-label="Guided tour" className="fixed inset-x-2 bottom-2 z-40 rounded-2xl border border-[#dce3f1] bg-[#f6f8fd] p-5 shadow-2xl sm:inset-x-auto sm:right-4 sm:bottom-4 sm:w-96">
           <div className="flex items-start justify-between gap-2">
-            <p className="text-xs font-semibold uppercase tracking-wide text-[#575245]" aria-live="polite">Guided tour · Step {step + 1} of {STEPS.length}</p>
-            <button onClick={close} aria-label="Close the guided tour" className="-mr-1 -mt-1 rounded p-1 text-[#6b6455] hover:bg-[#ede9e2]"><X size={16} /></button>
+            <p className="text-xs font-semibold uppercase tracking-wide text-[#455272]" aria-live="polite">Guided tour · Step {step + 1} of {STEPS.length}</p>
+            <button onClick={close} aria-label="Close the guided tour" className="-mr-1 -mt-1 rounded p-1 text-[#55627f] hover:bg-[#e5eaf6]"><X size={16} /></button>
           </div>
-          <h2 ref={headingRef} tabIndex={-1} className="mt-1 text-base font-bold text-[#25272d]">{cur.title}</h2>
-          <p className="mt-1 text-sm text-[#575245]">{cur.body}</p>
+          <h2 ref={headingRef} tabIndex={-1} className="mt-1 text-base font-bold text-[#0f1b3a]">{cur.title}</h2>
+          <p className="mt-1 text-sm text-[#455272]">{cur.body}</p>
           {cur.go && (
             <button
-              className="mt-3 inline-flex w-full items-center justify-center gap-1.5 rounded-xl bg-[#25272d] px-3.5 py-2 text-sm font-semibold text-white shadow-xs transition hover:bg-[#191b1f] active:scale-95"
+              className="mt-3 inline-flex w-full items-center justify-center gap-1.5 rounded-xl bg-[#0f1b3a] px-3.5 py-2 text-sm font-semibold text-white shadow-xs transition hover:bg-[#0a1330] active:scale-95"
               onClick={async () => {
                 setRole(cur.go!.role);
                 const hid = await ensureDemo();
                 router.push(`/handovers/${hid}/${cur.go!.path}`);
               }}
             >
-              <span>{cur.go.label}</span> <ArrowRight size={14} className="text-[#92a9e1]" aria-hidden />
+              <span>{cur.go.label}</span> <ArrowRight size={14} className="text-[#7b9bf0]" aria-hidden />
             </button>
           )}
           <div className="mt-3 flex items-center justify-between">
-            <button className="inline-flex items-center gap-1 rounded px-2 py-1 text-sm text-[#575245] hover:bg-[#ede9e2] disabled:opacity-40" disabled={step === 0} onClick={() => goStep(step - 1)}><ArrowLeft size={14} aria-hidden /> Back</button>
+            <button className="inline-flex items-center gap-1 rounded px-2 py-1 text-sm text-[#455272] hover:bg-[#e5eaf6] disabled:opacity-40" disabled={step === 0} onClick={() => goStep(step - 1)}><ArrowLeft size={14} aria-hidden /> Back</button>
             <ol className="flex items-center gap-1.5" aria-hidden>
-              {STEPS.map((_, i) => <li key={i} className={`h-1.5 transition-all ${i === step ? "w-4 rounded-full bg-[#92a9e1]" : "w-1.5 rounded-full bg-[#ded8cd]"}`} />)}
+              {STEPS.map((_, i) => <li key={i} className={`h-1.5 transition-all ${i === step ? "w-4 rounded-full bg-[#7b9bf0]" : "w-1.5 rounded-full bg-[#d2dbee]"}`} />)}
             </ol>
             {last ? (
-              <button className="rounded px-2.5 py-1 text-sm font-semibold text-[#25272d] hover:bg-[#ede9e2]" onClick={() => { goStep(0); close(); }}>Finish</button>
+              <button className="rounded px-2.5 py-1 text-sm font-semibold text-[#0f1b3a] hover:bg-[#e5eaf6]" onClick={() => { goStep(0); close(); }}>Finish</button>
             ) : (
-              <button className="inline-flex items-center gap-1 rounded px-2.5 py-1 text-sm font-semibold text-[#25272d] hover:bg-[#ede9e2]" onClick={() => goStep(step + 1)}>Next <ArrowRight size={14} aria-hidden /></button>
+              <button className="inline-flex items-center gap-1 rounded px-2.5 py-1 text-sm font-semibold text-[#0f1b3a] hover:bg-[#e5eaf6]" onClick={() => goStep(step + 1)}>Next <ArrowRight size={14} aria-hidden /></button>
             )}
           </div>
         </aside>

@@ -82,10 +82,10 @@ export function SourceChips({ claim }: { claim: Claim }) {
           <button
             key={c.evidence_id + i}
             onClick={() => open(claim, c.evidence_id)}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-[#e5dfd6] bg-[#faf7f2] px-2.5 py-1 text-xs font-medium text-[#25272d] shadow-2xs transition hover:border-[#92a9e1] hover:bg-[#eef3fd] hover:text-[#1c2a4d] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#92a9e1] active:scale-95"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-[#dce3f1] bg-[#f6f8fd] px-2.5 py-1 text-xs font-medium text-[#0f1b3a] shadow-2xs transition hover:border-[#7b9bf0] hover:bg-[#e9efff] hover:text-[#14235e] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#7b9bf0] active:scale-95"
             title="Open the original source text"
           >
-            <Icon size={12} className="text-[#575245]" aria-hidden />
+            <Icon size={12} className="text-[#455272]" aria-hidden />
             {d ? chipLabel(d.unit) : `Source ${i + 1}`}
             {c.support === "partial" && <span className="text-amber-700 font-bold" title="Partial support">~</span>}
           </button>

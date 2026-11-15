@@ -69,23 +69,23 @@ export default function TourPage() {
   const pct = Math.round((done.length / JUDGE_STEPS.length) * 100);
   return (
     <div className="mx-auto max-w-3xl space-y-6 overflow-x-hidden">
-      <div className="rounded-2xl border border-[#e5dfd6] bg-white p-6 shadow-2xs">
-        <div className="inline-flex items-center gap-1.5 rounded-full border border-[#b8c8ee] bg-[#eef3fd] px-3.5 py-1 text-xs font-semibold text-[#2b3e70] shadow-2xs mb-3">
-          <Sparkles size={13} className="text-[#506cb8]" /> Hackathon Evaluation Walkthrough
+      <div className="rounded-2xl border border-[#dce3f1] bg-white p-6 shadow-2xs">
+        <div className="inline-flex items-center gap-1.5 rounded-full border border-[#b7c7f5] bg-[#e9efff] px-3.5 py-1 text-xs font-semibold text-[#1d3a9e] shadow-2xs mb-3">
+          <Sparkles size={13} className="text-[#2d54d6]" /> Hackathon Evaluation Walkthrough
         </div>
-        <h1 className="text-3xl font-bold tracking-tight text-[#25272d] sm:text-4xl">Judge&apos;s Tour</h1>
-        <p className="mt-2 text-sm leading-relaxed text-[#575245]">
+        <h1 className="text-3xl font-bold tracking-tight text-[#0f1b3a] sm:text-4xl">Judge&apos;s Tour</h1>
+        <p className="mt-2 text-sm leading-relaxed text-[#455272]">
           The whole product in about {JUDGE_STEPS.length} minutes, with no sign-in and no typing beyond two short notes. Every button below switches to the right role and opens the right screen of <b>your own copy</b> of the CampusKart demo, so nothing you do affects anyone else.
         </p>
       </div>
 
-      <div className="rounded-2xl border border-[#e5dfd6] bg-white p-4 shadow-2xs" aria-live="polite">
+      <div className="rounded-2xl border border-[#dce3f1] bg-white p-4 shadow-2xs" aria-live="polite">
         <div className="flex items-center justify-between text-sm">
-          <span className="font-semibold text-[#25272d]">{done.length} of {JUDGE_STEPS.length} steps visited</span>
-          <span className="font-bold text-[#506cb8]">{pct}% Completed</span>
+          <span className="font-semibold text-[#0f1b3a]">{done.length} of {JUDGE_STEPS.length} steps visited</span>
+          <span className="font-bold text-[#2d54d6]">{pct}% Completed</span>
         </div>
-        <div className="mt-2.5 h-2.5 overflow-hidden rounded-full bg-[#f4efea] border border-[#e5dfd6]" role="progressbar" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100} aria-label="Tour progress">
-          <div className="h-full bg-[#92a9e1] transition-all duration-500 rounded-full" style={{ width: `${pct}%` }} />
+        <div className="mt-2.5 h-2.5 overflow-hidden rounded-full bg-[#f3f6fc] border border-[#dce3f1]" role="progressbar" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100} aria-label="Tour progress">
+          <div className="h-full bg-[#7b9bf0] transition-all duration-500 rounded-full" style={{ width: `${pct}%` }} />
         </div>
       </div>
       {err && <p role="alert" className="rounded-xl border border-rose-300 bg-rose-50 p-3 text-sm text-rose-900 shadow-2xs">{err}</p>}
@@ -95,39 +95,39 @@ export default function TourPage() {
           const seen = done.includes(i);
           const imp = IMPROVEMENT[i];
           return (
-            <li key={i} className={`min-w-0 rounded-2xl border bg-white p-4 sm:p-5 shadow-2xs transition-all hover:shadow-sm ${seen ? "border-[#b8c8ee] ring-1 ring-[#92a9e1]/40" : "border-[#e5dfd6] hover:border-[#b8c8ee]"}`}>
+            <li key={i} className={`min-w-0 rounded-2xl border bg-white p-4 sm:p-5 shadow-2xs transition-all hover:shadow-sm ${seen ? "border-[#b7c7f5] ring-1 ring-[#7b9bf0]/40" : "border-[#dce3f1] hover:border-[#b7c7f5]"}`}>
               <div className="flex items-start gap-3.5">
-                <span className={`mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-sm font-bold shadow-2xs ${seen ? "bg-[#eef3fd] text-[#2b3e70] border border-[#b8c8ee]" : "bg-[#faf7f2] text-[#25272d] border border-[#e5dfd6]"}`} aria-hidden>
-                  {seen ? <CheckCircle2 size={18} className="text-[#506cb8]" /> : i + 1}
+                <span className={`mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-sm font-bold shadow-2xs ${seen ? "bg-[#e9efff] text-[#1d3a9e] border border-[#b7c7f5]" : "bg-[#f6f8fd] text-[#0f1b3a] border border-[#dce3f1]"}`} aria-hidden>
+                  {seen ? <CheckCircle2 size={18} className="text-[#2d54d6]" /> : i + 1}
                 </span>
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2 break-words">
-                    <h2 className="text-base font-bold text-[#25272d]"><span className="sr-only">Step {i + 1}: </span>{s.title}</h2>
-                    {s.go && <span className="rounded-full border border-[#b8c8ee] bg-[#eef3fd] px-2.5 py-0.5 text-xs font-semibold text-[#2b3e70]">as {ROLE_META[s.go.role].short}</span>}
-                    {imp && <span className="rounded-full border border-[#e5dfd6] bg-[#faf7f2] px-2.5 py-0.5 text-xs font-semibold text-[#575245]">{imp}</span>}
-                    <span className="inline-flex items-center gap-1 text-xs text-[#6b6455]"><Clock size={12} aria-hidden /> about 1 min</span>
+                    <h2 className="text-base font-bold text-[#0f1b3a]"><span className="sr-only">Step {i + 1}: </span>{s.title}</h2>
+                    {s.go && <span className="rounded-full border border-[#b7c7f5] bg-[#e9efff] px-2.5 py-0.5 text-xs font-semibold text-[#1d3a9e]">as {ROLE_META[s.go.role].short}</span>}
+                    {imp && <span className="rounded-full border border-[#dce3f1] bg-[#f6f8fd] px-2.5 py-0.5 text-xs font-semibold text-[#455272]">{imp}</span>}
+                    <span className="inline-flex items-center gap-1 text-xs text-[#55627f]"><Clock size={12} aria-hidden /> about 1 min</span>
                   </div>
-                  <p className="mt-1.5 text-sm leading-relaxed text-[#575245]">{s.body}</p>
-                  {s.go && READ_FOR[s.go.path] && <p className="mt-2 rounded-md bg-[#faf7f2] border border-[#e5dfd6] p-2 text-xs text-[#575245]"><b>What to do:</b> {READ_FOR[s.go.path]}</p>}
+                  <p className="mt-1.5 text-sm leading-relaxed text-[#455272]">{s.body}</p>
+                  {s.go && READ_FOR[s.go.path] && <p className="mt-2 rounded-md bg-[#f6f8fd] border border-[#dce3f1] p-2 text-xs text-[#455272]"><b>What to do:</b> {READ_FOR[s.go.path]}</p>}
                   {s.go && (
-                    <button onClick={() => go(i)} disabled={busy !== null} aria-busy={busy === i} className="mt-3.5 inline-flex items-center gap-1.5 rounded-xl bg-[#25272d] px-4 py-2 text-sm font-semibold text-white shadow-2xs transition hover:bg-[#191b1f] active:scale-95 disabled:cursor-wait disabled:opacity-70">
-                      {busy === i ? <><Loader2 size={15} className="animate-spin" aria-hidden /> Preparing your copy…</> : <>{s.go.label} <ArrowRight size={15} className="text-[#92a9e1]" aria-hidden /></>}
+                    <button onClick={() => go(i)} disabled={busy !== null} aria-busy={busy === i} className="mt-3.5 inline-flex items-center gap-1.5 rounded-xl bg-[#0f1b3a] px-4 py-2 text-sm font-semibold text-white shadow-2xs transition hover:bg-[#0a1330] active:scale-95 disabled:cursor-wait disabled:opacity-70">
+                      {busy === i ? <><Loader2 size={15} className="animate-spin" aria-hidden /> Preparing your copy…</> : <>{s.go.label} <ArrowRight size={15} className="text-[#7b9bf0]" aria-hidden /></>}
                     </button>
                   )}
                 </div>
-                {!seen && <Circle className="mt-1 hidden text-[#d6ccbf] sm:block" size={18} aria-hidden />}
+                {!seen && <Circle className="mt-1 hidden text-[#c8d2e8] sm:block" size={18} aria-hidden />}
               </div>
             </li>
           );
         })}
       </ol>
 
-      <section className="rounded-2xl border border-[#e5dfd6] bg-white p-5 shadow-2xs" aria-labelledby="where">
-        <h2 id="where" className="text-base font-bold text-[#25272d]">Where each Round 3 improvement lives</h2>
-        <ul className="mt-3 space-y-2 text-sm text-[#575245]">
-          <li className="flex items-start gap-2"><span className="font-bold text-[#25272d] shrink-0">1 · Conflicts across sources:</span> <span>Step 2 (side by side, a reason for every decision, a history, a reopen).</span></li>
-          <li className="flex items-start gap-2"><span className="font-bold text-[#25272d] shrink-0">2 · Acknowledgement loop and version diff:</span> <span>Steps 4 to 6 (a flag becomes a question, the leaver answers, v2 shows what changed).</span></li>
-          <li className="flex items-start gap-2"><span className="font-bold text-[#25272d] shrink-0">3 · Sensitive data:</span> <span>Step 3 (masked items and the review queue), step 7 (tamper-evident log), and the Guest view from the home page.</span></li>
+      <section className="rounded-2xl border border-[#dce3f1] bg-white p-5 shadow-2xs" aria-labelledby="where">
+        <h2 id="where" className="text-base font-bold text-[#0f1b3a]">Where each Round 3 improvement lives</h2>
+        <ul className="mt-3 space-y-2 text-sm text-[#455272]">
+          <li className="flex items-start gap-2"><span className="font-bold text-[#0f1b3a] shrink-0">1 · Conflicts across sources:</span> <span>Step 2 (side by side, a reason for every decision, a history, a reopen).</span></li>
+          <li className="flex items-start gap-2"><span className="font-bold text-[#0f1b3a] shrink-0">2 · Acknowledgement loop and version diff:</span> <span>Steps 4 to 6 (a flag becomes a question, the leaver answers, v2 shows what changed).</span></li>
+          <li className="flex items-start gap-2"><span className="font-bold text-[#0f1b3a] shrink-0">3 · Sensitive data:</span> <span>Step 3 (masked items and the review queue), step 7 (tamper-evident log), and the Guest view from the home page.</span></li>
         </ul>
         <p className="mt-4 border-t border-zinc-100 pt-3 text-sm"><Link href="/" className="font-semibold text-zinc-900 hover:underline">Back to the home page</Link>. Press Help (top right) any time for the same steps as a small pop-up.</p>
       </section>

@@ -141,7 +141,7 @@ export default function ActivityPage({ params }: { params: Promise<{ id: string 
             </select>
             <span role="group" aria-label="Category" className="flex gap-1">
               {CATS.map((c) => (
-                <button key={c.key} aria-pressed={cat === c.key} onClick={() => setCat(cat === c.key ? "" : c.key)} className={`rounded-full border px-3 py-1 text-xs font-semibold ${cat === c.key ? "border-[#25272d] bg-[#25272d] text-white" : "border-slate-300 bg-white text-slate-800 hover:bg-slate-50"}`}>{c.label}</button>
+                <button key={c.key} aria-pressed={cat === c.key} onClick={() => setCat(cat === c.key ? "" : c.key)} className={`rounded-full border px-3 py-1 text-xs font-semibold ${cat === c.key ? "border-[#0f1b3a] bg-[#0f1b3a] text-white" : "border-slate-300 bg-white text-slate-800 hover:bg-slate-50"}`}>{c.label}</button>
               ))}
             </span>
             <label className="flex items-center gap-1 text-slate-600">From <input type="date" className={sel} value={from} onChange={(e) => setFrom(e.target.value)} /></label>

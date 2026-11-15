@@ -83,8 +83,7 @@ test("judge journey, one demo copy, every role", async ({ page }) => {
   await expect(page.getByRole("link", { name: /CSV/ })).toBeVisible();
 
   // guest
-  await page.getByRole("button", { name: "Switch role" }).click();
-  await page.getByRole("button", { name: /enter as Guest/i }).click();
+  await asRole(page, "Guest");
   await page.waitForURL(/\/start/, { timeout: T });
   await expect(page.getByText(/hidden by your access level/)).toBeVisible({ timeout: T });
 });

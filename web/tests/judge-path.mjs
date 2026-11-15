@@ -24,10 +24,11 @@ const T = 90000;
 const hidOf = () => page.url().match(/handovers\/([^/]+)/)?.[1];
 
 async function asRole(label) {
-  // switch role from the header and come back to the same copy
+  // switch role from the account menu in the top bar and come back to the same copy
   const hid = hidOf();
-  await page.getByRole("button", { name: "Switch role" }).click();
-  await page.getByRole("button", { name: new RegExp(`Enter as ${label}`) }).click();
+  await page.getByRole("button", { name: /Role and account menu/ }).click();
+  const names = { Reviewer: /^Reviewer/, Successor: /^Successor/, Leaver: /^Leaver/, Guest: /^Guest/ };
+  await page.getByRole("menuitemradio", { name: names[label] }).click();
   await page.waitForURL(new RegExp(`/handovers/${hid}/`), { timeout: T });
 }
 
@@ -136,9 +137,7 @@ try {
   await shot("audit");
 
   // 8. guest
-  await page.getByRole("button", { name: "Switch role" }).click();
-  await page.getByRole("button", { name: /enter as Guest/i }).click();
-  await page.waitForURL(/\/start/, { timeout: T });
+  await asRole("Guest");
   await page.getByText(/hidden by your access level/).waitFor({ timeout: T });
   check("guest sees public view with hidden count", true);
   await shot("guest");

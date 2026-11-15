@@ -28,11 +28,11 @@ export function AttentionTiles({ hid }: { hid: string }) {
   return (
     <section aria-label="What needs you now" className="mb-6">
       <div className="mb-2.5 flex flex-wrap items-baseline justify-between gap-2">
-        <h2 className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#25272d]">
+        <h2 className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#0f1b3a]">
           <UserAvatar name={userName} role={role} size={20} />
           <span>What needs {userName} now</span>
         </h2>
-        <p className="text-xs font-medium text-[#575245]">{open === 0 ? "Everything is up to date." : INTRO[role]}</p>
+        <p className="text-xs font-medium text-[#455272]">{open === 0 ? "Everything is up to date." : INTRO[role]}</p>
       </div>
       <ul className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-6">
         {items.map((i) => {
@@ -41,13 +41,13 @@ export function AttentionTiles({ hid }: { hid: string }) {
             <li key={i.key}>
               <Link
                 href={`/handovers/${hid}/${i.tab}`}
-                className={`group flex h-full min-h-[90px] flex-col justify-between rounded-xl border p-3.5 transition-all hover:-translate-y-0.5 hover:shadow-md active:translate-y-0 ${todo ? "border-[#b8c8ee] bg-[#eef3fd] shadow-xs hover:border-[#92a9e1]" : "border-[#e5dfd6] bg-white text-[#6b6455] hover:border-[#d6ccbf]"}`}
+                className={`group flex h-full min-h-[90px] flex-col justify-between rounded-xl border p-3.5 transition-all hover:-translate-y-0.5 hover:shadow-md active:translate-y-0 ${todo ? "border-[#b7c7f5] bg-[#e9efff] shadow-xs hover:border-[#7b9bf0]" : "border-[#dce3f1] bg-white text-[#55627f] hover:border-[#c8d2e8]"}`}
               >
                 <span className="flex items-center justify-between">
-                  <span className={`text-2xl font-extrabold tracking-tight ${todo ? "text-[#25272d]" : "text-[#c0b8a9]"}`}>{i.count}</span>
-                  {todo ? <ArrowRight size={15} className="text-[#2b3e70] transition group-hover:translate-x-1" aria-hidden /> : <CheckCircle2 size={16} className="text-emerald-600" aria-hidden />}
+                  <span className={`text-2xl font-extrabold tracking-tight ${todo ? "text-[#0f1b3a]" : "text-[#a8b4d0]"}`}>{i.count}</span>
+                  {todo ? <ArrowRight size={15} className="text-[#1d3a9e] transition group-hover:translate-x-1" aria-hidden /> : <CheckCircle2 size={16} className="text-emerald-600" aria-hidden />}
                 </span>
-                <span className={`mt-2 text-xs leading-snug ${todo ? "font-semibold text-[#25272d]" : "text-[#575245]"}`}>{i.label}{!todo && <span className="sr-only"> (nothing to do)</span>}</span>
+                <span className={`mt-2 text-xs leading-snug ${todo ? "font-semibold text-[#0f1b3a]" : "text-[#455272]"}`}>{i.label}{!todo && <span className="sr-only"> (nothing to do)</span>}</span>
               </Link>
             </li>
           );

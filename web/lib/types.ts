@@ -157,6 +157,8 @@ export interface Handover {
   revision?: number;
   leaver_available?: boolean;
   is_demo?: boolean;
+  /** project name, e.g. "CampusKart" */
+  title?: string | null;
 }
 
 export type AckStatus = "none" | "acknowledged" | "unclear";

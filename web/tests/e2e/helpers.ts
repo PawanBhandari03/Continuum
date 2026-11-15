@@ -13,11 +13,10 @@ export async function enter(page: Page, role: RoleLabel = "Reviewer"): Promise<s
   return page.url().match(/handovers\/([^/]+)/)![1];
 }
 
-/** Switch role from the header and stay on the same demo copy. */
+/** Switch role from the account menu in the top bar and stay on the same demo copy. */
 export async function asRole(page: Page, role: RoleLabel | "Guest") {
   const hid = page.url().match(/handovers\/([^/]+)/)![1];
-  await page.getByRole("button", { name: "Switch role" }).click();
-  const name = role === "Guest" ? /enter as Guest/i : new RegExp(`Enter as ${role}`);
-  await page.getByRole("button", { name }).click();
+  await page.getByRole("button", { name: /Role and account menu/ }).click();
+  await page.getByRole("menuitemradio", { name: role === "Guest" ? /^Guest/ : new RegExp(`^(${role}|Successor \(Contributor\)|Reviewer \(Lead\))`) }).click();
   await page.waitForURL(new RegExp(`/handovers/${hid}/`), { timeout: T });
 }
