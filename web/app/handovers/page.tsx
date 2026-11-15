@@ -165,8 +165,8 @@ export default function ProjectsPage() {
                   </label>
                   <label className="block">Successor&apos;s role
                     <select className={input} value={form.successor_role} onChange={(e) => setForm({ ...form, successor_role: e.target.value as "contributor" | "lead" })}>
-                      <option value="contributor">Contributor (sees public + contributor sources)</option>
-                      <option value="lead">Lead (sees everything)</option>
+                      <option value="contributor">Contributor (not lead-only)</option>
+                      <option value="lead">Lead (sees all)</option>
                     </select>
                   </label>
                   <label className="block">Handover target date
