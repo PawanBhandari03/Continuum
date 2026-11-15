@@ -1012,11 +1012,13 @@ def create_sandbox(project: str = "campuskart"):
         pass  # cleanup is best effort
     hid = f"h_demo_{uuid.uuid4().hex[:8]}"
     p = P(hid)
-    db().ins("handovers", [{"id": hid, "leaver": tpl["leaver"], "successor": tpl["successor"],
-                            "successor_role": tpl["successor_role"], "target_date": tpl["target_date"],
-                            "template_id": tid, "status": "in_review", "version": 0, "revision": 1,
-                            "title": tpl.get("title") or ("CampusKart" if tid == TEMPLATE else None),
-                            "meta": tpl.get("meta") or (CAMPUSKART_META if tid == TEMPLATE else {})}])
+    row = {"id": hid, "leaver": tpl["leaver"], "successor": tpl["successor"], "successor_role": tpl["successor_role"],
+           "target_date": tpl["target_date"], "template_id": tid, "status": "in_review", "version": 0, "revision": 1}
+    try:  # title and team come from migration 0004; an older database simply goes without them
+        db().ins("handovers", [{**row, "title": tpl.get("title") or ("CampusKart" if tid == TEMPLATE else None),
+                                "meta": tpl.get("meta") or (CAMPUSKART_META if tid == TEMPLATE else {})}])
+    except Exception:
+        db().ins("handovers", [row])
     srcs = [s for s in db().sel("sources", {"handover_id": tid}) if s["type"] != "exit_qa"]
     db().ins("sources", [{**s, "id": p + s["id"], "handover_id": hid} for s in srcs])
     keep = {s["id"] for s in srcs}
