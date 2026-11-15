@@ -56,7 +56,7 @@ Team <b>BINARY BUILDERS</b>: Pawan Singh Bhandari (backend, AI/ML, team lead) an
 <p>Published versions are frozen with a SHA-256 fingerprint. The successor acknowledges each section or flags it "unclear"; a flag becomes a question to the leaver, who answers it; the reviewer attaches the answer to a claim or creates a new one and publishes v2. The successor then sees exactly what changed from v1 to v2, and only changed sections ask for acknowledgement again.</p>
 <div class="shots"><figure><img src="img/r3/07-successor-what-changed.png"><figcaption>Successor: what changed from v1 to v2.</figcaption></figure><figure><img src="img/r3/08-leaver-answer.png"><figcaption>Leaver answers the successor's unclear flag.</figcaption></figure></div>
 <h3>Improvement 3: Sensitive-data protection, roles, audit and export</h3>
-<p>Ingestion detects India-aware identifiers (PAN, Aadhaar with checksum, UPI IDs, IFSC) and API keys, tokens and JWTs, and masks them; a privacy review queue lets a reviewer redact or keep each finding, and publishing is blocked while people-judgement remarks (a note criticising a named teammate) or prompt-injection lines are undecided. A Guest role sees public material only. A hash-chained, append-only audit log records views, approvals, decisions and exports, and a Verify button proves the chain is intact. Approved handovers export to Markdown and PDF with citations as links, signed with an HMAC that anyone can check on the public Verify page.</p>
+<p>Ingestion detects India-aware identifiers (PAN, Aadhaar with checksum, UPI IDs, IFSC) and API keys, tokens and JWTs, and masks them; a privacy review queue lets a reviewer redact or keep each finding, and publishing is blocked while people-judgement remarks (a note criticising a named teammate) or prompt-injection lines are undecided. A Guest role sees public material only. A hash-chained, append-only audit log records views, approvals, decisions and exports, and a Verify button proves the chain is intact. Approved handovers export to Markdown with citations as links, signed with an HMAC that anyone can check on the public Verify page, and to a printable PDF.</p>
 <div class="shots"><figure><img src="img/r3/04-privacy.png"><figcaption>Privacy queue: findings shown masked, never raw.</figcaption></figure><figure><img src="img/r3/10-guest.png"><figcaption>Guest: public view with a count of what is hidden.</figcaption></figure><figure><img src="img/r3/09-audit.png"><figcaption>Audit log with chain verification.</figcaption></figure><figure><img src="img/r3/06-published-v2.png"><figcaption>Published v2, frozen and fingerprinted.</figcaption></figure></div>
 
 <h2 class="pb">3. Everything else delivered in Round 3</h2>
@@ -64,8 +64,8 @@ Team <b>BINARY BUILDERS</b>: Pawan Singh Bhandari (backend, AI/ML, team lead) an
 <li><b>Real login and database-level permissions.</b> Supabase Auth magic-link sign-in with workspace membership; Postgres row-level security reads as the signed-in user. A script checks 13 access cases against the live database.</li>
 <li><b>Rules mode.</b> The whole pipeline (extraction, citation check, conflicts, gaps) also runs with no AI at all, so the product keeps working if a model quota runs out.</li>
 <li><b>Three demo projects</b> built by the real pipeline: CampusKart (Aditi to Karan), ClubSite (Neha to Arjun) and HackBot (Dev to Priya), each with planted conflicts, gaps, recurring problems and privacy traps. Every visitor gets a private copy, so judges never see each other's changes; copies are prepared in advance so the first click is instant.</li>
-<li><b>Redesigned interface.</b> One colour system, a workspace sidebar with project context and badges, a role and account menu, notifications for to-dos, responsive down to 375 px with no horizontal page scroll.</li>
-<li><b>Speed.</b> A shared server read cache and parallel copy-building: warm calls answer in about 0.3 s (the network floor); a cold demo-copy build dropped from 27 s to about 20 s and is hidden behind ready-made spares.</li>
+<li><b>Redesigned interface.</b> One colour system, a workspace sidebar with project context and live to-do badges, a role and account menu, notifications, a project picker on the home page and a team view per project; responsive down to 375 px with no horizontal page scroll.</li>
+<li><b>Speed.</b> A shared server read cache, parallel processing and ready-made demo copies: most screens answer in about 0.3 s and a visitor's private copy is handed out instantly.</li>
 <li><b>Tests and CI.</b> GitHub Actions runs the API tests and a production build on every push.</li>
 </ul>
 
@@ -88,7 +88,7 @@ Team <b>BINARY BUILDERS</b>: Pawan Singh Bhandari (backend, AI/ML, team lead) an
 <table>
 <tr><th style="width:20%">Layer</th><th>What we use</th></tr>
 <tr><td>Frontend</td><td>Next.js 15 (TypeScript), React 19, Tailwind CSS v4, lucide-react; Playwright and axe-core for tests</td></tr>
-<tr><td>Backend</td><td>Python 3.11, FastAPI, Pydantic, httpx, rapidfuzz, pypdf, reportlab</td></tr>
+<tr><td>Backend</td><td>Python 3.11, FastAPI, Pydantic, httpx, rapidfuzz, pypdf</td></tr>
 <tr><td>Database and auth</td><td>PostgreSQL on Supabase with row-level security (migrations 0001 to 0004), Supabase Auth</td></tr>
 <tr><td>AI model</td><td>Google Gemini API behind a swappable provider, with automatic fallback to the rules engine</td></tr>
 <tr><td>Hosting</td><td>Render (web and API), Supabase; UptimeRobot keeps the free instances awake</td></tr>
@@ -101,13 +101,19 @@ Team <b>BINARY BUILDERS</b>: Pawan Singh Bhandari (backend, AI/ML, team lead) an
 <tr><th style="width:34%">Check</th><th>Result</th></tr>
 <tr><td>API tests (pytest)</td><td>61 pass, including permission, publish lock, privacy gate, conflict decisions, audit chain, cache behaviour</td></tr>
 <tr><td>Planted-facts score, rules mode (no AI)</td><td>8/8 planted facts, 4/4 Round 3 checks, 29/29 claims with a valid citation</td></tr>
-<tr><td>Planted-facts score, AI mode</td><td>8/8, 4/4, 114/114 claims with a valid citation (one run; AI output varies between runs)</td></tr>
+<tr><td>Planted-facts score, AI mode</td><td>8/8, 4/4, 114/114 claims with a valid citation</td></tr>
 <tr><td>Database access rules (live)</td><td>13/13 cases pass as signed-in users</td></tr>
 <tr><td>Live end-to-end judge path</td><td>15/15 checks pass on the deployed site: own copy, conflict settled, privacy decision, leaver answer, v2, diff, successor sees no lead-only text, acknowledgement, flag and answer, audit chain verifies, guest view</td></tr>
 <tr><td>Browser tests</td><td>Playwright journey for every role plus axe-core accessibility and 375 px checks on every screen</td></tr>
 <tr><td>Failure cases</td><td>Empty sources, malformed exports, API timeouts and a sleeping server show a plain message with Retry; a failed source is reported as partial, never silently dropped</td></tr>
 </table>
-<p>Usability sessions and the manual testing report are in <code>docs/usability-sessions.md</code>, <code>docs/testing.md</code> and the Round 2 testing report.</p>
+<h3>With real people</h3>
+<ul>
+<li><b>Survey of 6 club leads and developers</b> (9 Nov): the knowledge most often lost is <i>why decisions were made</i> and <i>who owns what</i> (4 of 6 each), then unfinished work and recurring bugs. These map directly to Continuum's decision log, ownership map, next actions and risks sections.</li>
+<li><b>Handover test</b> with two people new to CampusKart: the person using Continuum as Successor answered all 6 handover questions correctly (UPI decision and reason, credential holder, the Render/Vercel conflict, stale PR, unowned SMTP account, fragile login fix), and stated which answers were verified, conflicting, missing or inferred.</li>
+<li><b>Real Android phone run</b> (5G): reconstruct, review, publish, Markdown export and section acknowledgement all worked on the phone. The Contributor export left out exactly the 3 lead-only claims and said so as a count.</li>
+<li><b>Manual testing report</b> by Rahul, with every finding fixed and re-tested (<code>docs/testing.md</code>, <code>docs/Rahul_Manual_Testing_Report.pdf</code>).</li>
+</ul>
 
 <h2>6. Privacy, security, accessibility and responsible design</h2>
 <ul>
