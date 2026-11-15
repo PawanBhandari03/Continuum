@@ -26,11 +26,11 @@ _SECTION = {"decision": "decision_log", "risk": "risks", "dependency": "dependen
 
 # Deterministic mapping of free-form model topics onto the handover's required slots.
 SLOT_KEYWORDS = {
-    "deploy": ["render", "vercel", "netlify", "heroku", "deploy", "hosting", "hosted", "production server"],
+    "deploy": ["render", "vercel", "netlify", "heroku", "railway", "fly.io", "aws", "gcp", "deploy", "hosting", "hosted", "production server"],
     "payments": ["payment", "upi", "gateway", "kyc", "razorpay", "paise", "refund", "cash on delivery", "cod "],
     "auth": ["login", "log in", "auth", "session", "refresh token", "password", "sign-in", "signin"],
     "email": ["smtp", "email", "e-mail", "verification mail"],
-    "storage": ["bucket", "image upload", "object storage", "s3", "storage", "uploaded image", "listing images"],
+    "storage": ["bucket", "image upload", "object storage", "s3", "storage", "uploaded image", "listing images", "cloudinary"],
     "database": ["postgres", "mysql", "mariadb", "mongodb", "sqlite", "firestore", "database"],
     "ci": ["github actions", "circleci", "jenkins", "gitlab ci", "travis", "ci pipeline", "continuous integration"],
 }
@@ -122,7 +122,7 @@ def assign_sections(claims: list[Claim]) -> None:
 def _is_document(eid: str, units: dict) -> bool:
     u = units.get(eid)
     loc = (u.locator if u else "") or ""
-    return "readme" in eid.lower() or loc.startswith("notes://") or loc.lower().endswith("readme.md")
+    return "readme" in eid.lower() or loc.startswith("notes://") or loc.lower().endswith(("readme.md", "/readme"))
 
 
 def _newest(c: Claim, units: dict) -> str:
@@ -185,12 +185,13 @@ def detect_conflicts(claims: list[Claim], provider: Provider, units: dict | None
         cid = f"cf_{len(conflicts) + 1}"
         docs = [c for c in sides if c.citations and all(_is_document(x.evidence_id, units) for x in c.citations)]
         acts = [c for c in sides if c not in docs]
-        stale = bool(docs and acts and max(_newest(c, units) for c in acts) > max(_newest(c, units) for c in docs))
+        # a document is stale when newer activity contradicts it (compare the OLDEST document with the newest activity)
+        stale = bool(docs and acts and max(_newest(c, units) for c in acts) > min(_newest(c, units) for c in docs))
         owners = {c.owner for c in sides if c.owner}
         kind = ("staleness" if stale else
                 "ownership" if all(c.type == "owner" for c in sides) and len(owners) > 1 else "value")
         if stale:
-            d = docs[0]
+            d = min(docs, key=lambda c: _newest(c, units))
             when = sorted({_newest(c, units)[:10] for c in acts})
             summary = (f'The documentation ({_newest(d, units)[:10] or "undated"}) says "{d.statement}", but newer '
                        f'activity ({", ".join(when)}) says "' + '" / "'.join(c.statement for c in acts) + '".')

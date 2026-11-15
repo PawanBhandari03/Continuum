@@ -1,0 +1,1583 @@
+{
+ "key": "hackbot",
+ "template_id": "h_3",
+ "handover": {
+  "leaver": "dev",
+  "successor": "priya",
+  "target_date": "2026-11-22",
+  "title": "HackBot",
+  "meta": {
+   "description": "Discord bot that announces hackathons, matches teammates and posts daily reminders for a club server.",
+   "team": [
+    {
+     "name": "Dev Patel",
+     "role": "Backend (leaving)"
+    },
+    {
+     "name": "Priya Sharma",
+     "role": "Successor"
+    },
+    {
+     "name": "Ishaan V.",
+     "role": "Developer"
+    },
+    {
+     "name": "Tanvi Nair",
+     "role": "Community"
+    },
+    {
+     "name": "Prof. Iyer",
+     "role": "Mentor"
+    }
+   ],
+   "stack": [
+    "Python",
+    "discord.py",
+    "Railway",
+    "Postgres",
+    "APScheduler"
+   ],
+   "repo": "binary-coders/hackbot"
+  }
+ },
+ "demo_task": [
+  "dependencies",
+  "Who owns the Discord application and the Railway project, and how do I take them over?",
+  "Dev owns both under his personal logins. He transfers the Discord application and the Railway project to the club account before 22 Nov; until then Priya has no access."
+ ],
+ "sources": [
+  {
+   "status_reason": null,
+   "unit_count": 18,
+   "id": "h_3__src_github",
+   "handover_id": "h_3",
+   "type": "github",
+   "name": "HackBot repo (README, commits, PRs, issues, TODOs)",
+   "status": "ok",
+   "default_label": "public"
+  },
+  {
+   "status_reason": null,
+   "unit_count": 25,
+   "id": "h_3__src_chat",
+   "handover_id": "h_3",
+   "type": "chat_export",
+   "name": "Team chat export (#general, #dev)",
+   "status": "ok",
+   "default_label": "contributor"
+  },
+  {
+   "status_reason": null,
+   "unit_count": 1,
+   "id": "h_3__src_note_architecture.md",
+   "handover_id": "h_3",
+   "type": "notes",
+   "name": "Notes: architecture.md",
+   "status": "ok",
+   "default_label": "contributor"
+  },
+  {
+   "status_reason": null,
+   "unit_count": 1,
+   "id": "h_3__src_note_handover-planning-2026-10-28.md",
+   "handover_id": "h_3",
+   "type": "notes",
+   "name": "Notes: handover-planning-2026-10-28.md",
+   "status": "ok",
+   "default_label": "contributor"
+  },
+  {
+   "status_reason": null,
+   "unit_count": 1,
+   "id": "h_3__src_note_sponsor-notes.md",
+   "handover_id": "h_3",
+   "type": "notes",
+   "name": "Notes: sponsor-notes.md",
+   "status": "ok",
+   "default_label": "contributor"
+  },
+  {
+   "status_reason": null,
+   "unit_count": 1,
+   "id": "h_3__src_note_mentor-notes.md",
+   "handover_id": "h_3",
+   "type": "notes",
+   "name": "Notes: mentor-notes.md — lead only",
+   "status": "ok",
+   "default_label": "lead_only"
+  }
+ ],
+ "units": [
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_3__ev_github_001",
+   "handover_id": "h_3",
+   "source_id": "h_3__src_github",
+   "author": "Dev Patel",
+   "ts": "2026-08-06T10:30:00+00:00",
+   "text": "README.md:\n# HackBot\n\nA Discord bot that announces hackathons, matches teammates and posts daily reminders for the club server.\n\n## Deployment\n\nThe bot is hosted on Heroku. Pushes to `main` redeploy automatically.\n\n## Data\n\nThe bot keeps its data in a local SQLite file.\n\n## Local setup\n\nCreate a Discord application, copy `.env.example` to `.env`, run `pip install -r requirements.txt` and `python bot.py`.",
+   "locator": "github://binary-coders/hackbot/blob/main/README.md",
+   "label": "public"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_3__ev_github_002",
+   "handover_id": "h_3",
+   "source_id": "h_3__src_github",
+   "author": "Dev Patel",
+   "ts": "2026-08-09T14:05:00+00:00",
+   "text": "Commit 11a22b3: Scaffold discord.py bot with ping and help commands",
+   "locator": "github://binary-coders/hackbot/commit/11a22b3",
+   "label": "public"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_3__ev_github_003",
+   "handover_id": "h_3",
+   "source_id": "h_3__src_github",
+   "author": "Ishaan V.",
+   "ts": "2026-08-16T14:05:00+00:00",
+   "text": "Commit 44c55d6: Add hackathon announcement command with embeds",
+   "locator": "github://binary-coders/hackbot/commit/44c55d6",
+   "label": "public"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_3__ev_github_004",
+   "handover_id": "h_3",
+   "source_id": "h_3__src_github",
+   "author": "Dev Patel",
+   "ts": "2026-08-23T14:05:00+00:00",
+   "text": "Commit 77e88f9: Add team matching command using skills in the member profile",
+   "locator": "github://binary-coders/hackbot/commit/77e88f9",
+   "label": "public"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_3__ev_github_005",
+   "handover_id": "h_3",
+   "source_id": "h_3__src_github",
+   "author": "Dev Patel",
+   "ts": "2026-09-01T16:20:00+00:00",
+   "text": "PR #23 (merged): Switch from prefix commands to slash commands\nWe moved to slash commands because Discord restricts the message content intent for bots in more than 100 servers.",
+   "locator": "github://binary-coders/hackbot/pull/23",
+   "label": "public"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_3__ev_github_006",
+   "handover_id": "h_3",
+   "source_id": "h_3__src_github",
+   "author": "Tanvi Nair",
+   "ts": "2026-09-08T14:05:00+00:00",
+   "text": "Commit 00a11b2: Add daily reminder task with APScheduler",
+   "locator": "github://binary-coders/hackbot/commit/00a11b2",
+   "label": "public"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_3__ev_github_007",
+   "handover_id": "h_3",
+   "source_id": "h_3__src_github",
+   "author": "Dev Patel",
+   "ts": "2026-09-22T16:20:00+00:00",
+   "text": "PR #27 (merged): Move from SQLite to Postgres\nWe moved the data to Postgres because the Railway disk is ephemeral and the SQLite file was wiped on every deploy.",
+   "locator": "github://binary-coders/hackbot/pull/27",
+   "label": "public"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_3__ev_github_008",
+   "handover_id": "h_3",
+   "source_id": "h_3__src_github",
+   "author": "Dev Patel",
+   "ts": "2026-09-24T14:05:00+00:00",
+   "text": "Commit 33c44d5: Migrate bot storage to the Postgres client",
+   "locator": "github://binary-coders/hackbot/commit/33c44d5",
+   "label": "public"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_3__ev_github_009",
+   "handover_id": "h_3",
+   "source_id": "h_3__src_github",
+   "author": "Dev Patel",
+   "ts": "2026-10-01T14:05:00+00:00",
+   "text": "Commit 66e77f8: chore: add railway.json and configure the Railway project for the bot",
+   "locator": "github://binary-coders/hackbot/commit/66e77f8",
+   "label": "public"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_3__ev_github_010",
+   "handover_id": "h_3",
+   "source_id": "h_3__src_github",
+   "author": "Dev Patel",
+   "ts": "2026-10-02T14:05:00+00:00",
+   "text": "Commit 99a00b1: Switch deploy from Heroku to Railway",
+   "locator": "github://binary-coders/hackbot/commit/99a00b1",
+   "label": "public"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_3__ev_github_011",
+   "handover_id": "h_3",
+   "source_id": "h_3__src_github",
+   "author": "Ishaan V.",
+   "ts": "2026-10-10T14:05:00+00:00",
+   "text": "Commit 22c33d4: Add retry with backoff for Discord rate limits",
+   "locator": "github://binary-coders/hackbot/commit/22c33d4",
+   "label": "public"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_3__ev_github_012",
+   "handover_id": "h_3",
+   "source_id": "h_3__src_github",
+   "author": "Dev Patel",
+   "ts": "2026-10-18T16:20:00+00:00",
+   "text": "PR #31 (merged): Temporary workaround for duplicate reminders\nTemporary fix: skip a reminder if the same one was sent within 5 minutes. Root cause is the scheduler restarting on deploy.",
+   "locator": "github://binary-coders/hackbot/pull/31",
+   "label": "public"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_3__ev_github_013",
+   "handover_id": "h_3",
+   "source_id": "h_3__src_github",
+   "author": "Dev Patel",
+   "ts": "2026-10-18T14:05:00+00:00",
+   "text": "Commit 55e66f7: hack: skip duplicate reminders sent within 5 minutes",
+   "locator": "github://binary-coders/hackbot/commit/55e66f7",
+   "label": "public"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_3__ev_github_014",
+   "handover_id": "h_3",
+   "source_id": "h_3__src_github",
+   "author": "repo",
+   "ts": "2026-10-18T10:30:00+00:00",
+   "text": "bot/scheduler.py line 41: # TODO: remove this hack once the scheduler job store is persistent",
+   "locator": "github://binary-coders/hackbot/blob/main/bot/scheduler.py#L41",
+   "label": "public"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_3__ev_github_015",
+   "handover_id": "h_3",
+   "source_id": "h_3__src_github",
+   "author": "Priya Sharma",
+   "ts": "2026-11-03T16:20:00+00:00",
+   "text": "PR #34 (open): Team matching v2: match by timezone and skills\nReview requested. Dev asked for changes on 4 Nov: add tests for the empty-profile case.",
+   "locator": "github://binary-coders/hackbot/pull/34",
+   "label": "public"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_3__ev_github_016",
+   "handover_id": "h_3",
+   "source_id": "h_3__src_github",
+   "author": "Tanvi Nair",
+   "ts": "2026-10-12T11:10:00+00:00",
+   "text": "Issue #29 (open): Bot hits Discord rate limits during big announcements\n429 errors when announcing to 30 channels at once.",
+   "locator": "github://binary-coders/hackbot/issues/29",
+   "label": "public"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_3__ev_github_017",
+   "handover_id": "h_3",
+   "source_id": "h_3__src_github",
+   "author": "Priya Sharma",
+   "ts": "2026-10-27T11:10:00+00:00",
+   "text": "Issue #32 (open): Add a /help command listing all slash commands",
+   "locator": "github://binary-coders/hackbot/issues/32",
+   "label": "public"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_3__ev_github_018",
+   "handover_id": "h_3",
+   "source_id": "h_3__src_github",
+   "author": "Priya Sharma",
+   "ts": "2026-11-01T11:10:00+00:00",
+   "text": "Issue #33 (open): Update README: hosting and database sections are out of date",
+   "locator": "github://binary-coders/hackbot/issues/33",
+   "label": "public"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_3__ev_chat_019",
+   "handover_id": "h_3",
+   "source_id": "h_3__src_chat",
+   "author": "Dev Patel",
+   "ts": "2026-08-06T18:00:00+00:00",
+   "text": "HackBot repo is up. Anyone who wants to help, grab an issue.",
+   "locator": "slack://general/2026-08-06#1800",
+   "label": "contributor"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_3__ev_chat_020",
+   "handover_id": "h_3",
+   "source_id": "h_3__src_chat",
+   "author": "Dev Patel",
+   "ts": "2026-08-09T10:15:00+00:00",
+   "text": "We decided to write the bot in Python with discord.py. Final.",
+   "locator": "slack://dev/2026-08-09#1015",
+   "label": "contributor"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_3__ev_chat_021",
+   "handover_id": "h_3",
+   "source_id": "h_3__src_chat",
+   "author": "Ishaan V.",
+   "ts": "2026-08-16T20:40:00+00:00",
+   "text": "Announcement command works. Embeds look good on mobile too.",
+   "locator": "slack://dev/2026-08-16#2040",
+   "label": "contributor"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_3__ev_chat_022",
+   "handover_id": "h_3",
+   "source_id": "h_3__src_chat",
+   "author": "Dev Patel",
+   "ts": "2026-08-30T11:55:00+00:00",
+   "text": "The Discord bot token and application access are only with me, Dev, because it is registered under my personal account.",
+   "locator": "slack://dev/2026-08-30#1155",
+   "label": "contributor"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_3__ev_chat_023",
+   "handover_id": "h_3",
+   "source_id": "h_3__src_chat",
+   "author": "Dev Patel",
+   "ts": "2026-09-01T14:20:00+00:00",
+   "text": "Slash commands are merged. We decided to drop prefix commands completely. Final.",
+   "locator": "slack://dev/2026-09-01#1420",
+   "label": "contributor"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_3__ev_chat_024",
+   "handover_id": "h_3",
+   "source_id": "h_3__src_chat",
+   "author": "Tanvi Nair",
+   "ts": "2026-09-05T16:05:00+00:00",
+   "text": "Reminders fire twice sometimes after a deploy, anyone else seeing this?",
+   "locator": "slack://dev/2026-09-05#1605",
+   "label": "contributor"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_3__ev_chat_025",
+   "handover_id": "h_3",
+   "source_id": "h_3__src_chat",
+   "author": "Dev Patel",
+   "ts": "2026-09-22T12:10:00+00:00",
+   "text": "SQLite file got wiped on deploy again. We decided to move to Postgres on Railway. Final.",
+   "locator": "slack://dev/2026-09-22#1210",
+   "label": "contributor"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_3__ev_chat_026",
+   "handover_id": "h_3",
+   "source_id": "h_3__src_chat",
+   "author": "Dev Patel",
+   "ts": "2026-10-02T09:30:00+00:00",
+   "text": "Heroku free hours are gone. Bot runs on Railway from today, Heroku app can be deleted.",
+   "locator": "slack://dev/2026-10-02#0930",
+   "label": "contributor"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_3__ev_chat_027",
+   "handover_id": "h_3",
+   "source_id": "h_3__src_chat",
+   "author": "Ishaan V.",
+   "ts": "2026-10-03T10:05:00+00:00",
+   "text": "Railway pe deploy ho gaya, logs are clean.",
+   "locator": "slack://dev/2026-10-03#1005",
+   "label": "contributor"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_3__ev_chat_028",
+   "handover_id": "h_3",
+   "source_id": "h_3__src_chat",
+   "author": "Tanvi Nair",
+   "ts": "2026-10-09T17:45:00+00:00",
+   "text": "bot hits Discord rate limit again (429) during the Smart India hackathon announcement",
+   "locator": "slack://dev/2026-10-09#1745",
+   "label": "contributor"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_3__ev_chat_029",
+   "handover_id": "h_3",
+   "source_id": "h_3__src_chat",
+   "author": "Tanvi Nair",
+   "ts": "2026-10-16T19:20:00+00:00",
+   "text": "bot hits Discord rate limit again (429) while announcing to all channels",
+   "locator": "slack://dev/2026-10-16#1920",
+   "label": "contributor"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_3__ev_chat_030",
+   "handover_id": "h_3",
+   "source_id": "h_3__src_chat",
+   "author": "Ishaan V.",
+   "ts": "2026-10-24T13:10:00+00:00",
+   "text": "bot hits Discord rate limit again (429) even with the retry, third time",
+   "locator": "slack://dev/2026-10-24#1310",
+   "label": "contributor"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_3__ev_chat_031",
+   "handover_id": "h_3",
+   "source_id": "h_3__src_chat",
+   "author": "Dev Patel",
+   "ts": "2026-10-18T21:35:00+00:00",
+   "text": "Pushed a temporary workaround for duplicate reminders. Proper fix once the scheduler store is persistent.",
+   "locator": "slack://dev/2026-10-18#2135",
+   "label": "contributor"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_3__ev_chat_032",
+   "handover_id": "h_3",
+   "source_id": "h_3__src_chat",
+   "author": "Dev Patel",
+   "ts": "2026-10-19T08:50:00+00:00",
+   "text": "That hack will bite us when we add more scheduled jobs, left a TODO in scheduler.py.",
+   "locator": "slack://dev/2026-10-19#0850",
+   "label": "contributor"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_3__ev_chat_033",
+   "handover_id": "h_3",
+   "source_id": "h_3__src_chat",
+   "author": "Priya Sharma",
+   "ts": "2026-10-21T15:00:00+00:00",
+   "text": "Is there a plan to monitor uptime? The bot went offline for 3 hours last Sunday.",
+   "locator": "slack://dev/2026-10-21#1500",
+   "label": "contributor"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_3__ev_chat_034",
+   "handover_id": "h_3",
+   "source_id": "h_3__src_chat",
+   "author": "Dev Patel",
+   "ts": "2026-10-21T15:10:00+00:00",
+   "text": "We decided to keep payments out of the bot. Sponsor credits stay with the club treasurer.",
+   "locator": "slack://dev/2026-10-21#1510",
+   "label": "contributor"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_3__ev_chat_035",
+   "handover_id": "h_3",
+   "source_id": "h_3__src_chat",
+   "author": "Dev Patel",
+   "ts": "2026-10-21T15:12:00+00:00",
+   "text": "We decided the bot sends no email. Announcements are Discord only.",
+   "locator": "slack://dev/2026-10-21#1512",
+   "label": "contributor"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_3__ev_chat_036",
+   "handover_id": "h_3",
+   "source_id": "h_3__src_chat",
+   "author": "Dev Patel",
+   "ts": "2026-10-21T15:15:00+00:00",
+   "text": "We decided not to store files in the bot. Attachments stay on Discord only, no storage needed.",
+   "locator": "slack://dev/2026-10-21#1515",
+   "label": "contributor"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_3__ev_chat_037",
+   "handover_id": "h_3",
+   "source_id": "h_3__src_chat",
+   "author": "Dev Patel",
+   "ts": "2026-10-28T12:00:00+00:00",
+   "text": "I am graduating soon so I am handing HackBot over to Priya.",
+   "locator": "slack://general/2026-10-28#1200",
+   "label": "contributor"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_3__ev_chat_038",
+   "handover_id": "h_3",
+   "source_id": "h_3__src_chat",
+   "author": "Priya Sharma",
+   "ts": "2026-10-28T12:05:00+00:00",
+   "text": "Happy to take it. Please list the accounts and tokens I will need.",
+   "locator": "slack://dev/2026-10-28#1205",
+   "label": "contributor"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_3__ev_chat_039",
+   "handover_id": "h_3",
+   "source_id": "h_3__src_chat",
+   "author": "Dev Patel",
+   "ts": "2026-10-29T18:30:00+00:00",
+   "text": "The Railway deploy token is stored in the shared Railway project settings, under my GitHub login.",
+   "locator": "slack://dev/2026-10-29#1830",
+   "label": "contributor"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_3__ev_chat_040",
+   "handover_id": "h_3",
+   "source_id": "h_3__src_chat",
+   "author": "Dev Patel",
+   "ts": "2026-11-02T11:00:00+00:00",
+   "text": "The uptime monitor API key is kept in the shared sheet, and nobody remembers creating that account.",
+   "locator": "slack://dev/2026-11-02#1100",
+   "label": "contributor"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_3__ev_chat_041",
+   "handover_id": "h_3",
+   "source_id": "h_3__src_chat",
+   "author": "Dev Patel",
+   "ts": "2026-10-21T15:20:00+00:00",
+   "text": "We decided the bot needs no user login; permissions come from Discord roles.",
+   "locator": "slack://dev/2026-10-21#1520",
+   "label": "contributor"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_3__ev_chat_042",
+   "handover_id": "h_3",
+   "source_id": "h_3__src_chat",
+   "author": "Dev Patel",
+   "ts": "2026-11-04T10:20:00+00:00",
+   "text": "Review of PR #34: please add tests for the empty-profile case.",
+   "locator": "slack://dev/2026-11-04#1020",
+   "label": "contributor"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_3__ev_chat_043",
+   "handover_id": "h_3",
+   "source_id": "h_3__src_chat",
+   "author": "Tanvi Nair",
+   "ts": "2026-11-06T16:40:00+00:00",
+   "text": "Hackathon reminder for Friday posted correctly.",
+   "locator": "slack://general/2026-11-06#1640",
+   "label": "contributor"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_3__ev_note_architecture.md_044",
+   "handover_id": "h_3",
+   "source_id": "h_3__src_note_architecture.md",
+   "author": "notes",
+   "ts": "2026-10-12T09:00:00+00:00",
+   "text": "# HackBot architecture (synthetic)\n\n- **Bot:** Python with discord.py, slash commands only.\n- **Hosting:** see the README for the hosting target.\n- **Data:** members, teams and reminders are stored in a Postgres database.\n- **Scheduler:** APScheduler runs the daily reminder job inside the bot process.",
+   "locator": "notes://architecture.md#p44",
+   "label": "contributor"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_3__ev_note_handover-planning-2026-10-28.md_045",
+   "handover_id": "h_3",
+   "source_id": "h_3__src_note_handover-planning-2026-10-28.md",
+   "author": "notes",
+   "ts": "2026-10-28T09:00:00+00:00",
+   "text": "# Handover planning, 28 Oct 2026 (synthetic)\n\nAttendees: Dev, Priya, Ishaan, Tanvi.\n\n- Team matching v2 (PR #34) needs another review pass.\n- Rate limits during big announcements are still not solved.\n- Action: Dev to move the Discord application to the club account before graduating.\n- Action: Priya to set up uptime monitoring under the club account.",
+   "locator": "notes://handover-planning-2026-10-28.md#p45",
+   "label": "contributor"
+  },
+  {
+   "redactions": [
+    {
+     "start": 60,
+     "end": 81,
+     "kind": "pii",
+     "detector": "email"
+    },
+    {
+     "start": 123,
+     "end": 133,
+     "kind": "pii",
+     "detector": "pan"
+    }
+   ],
+   "flags": [],
+   "id": "h_3__ev_note_sponsor-notes.md_046",
+   "handover_id": "h_3",
+   "source_id": "h_3__src_note_sponsor-notes.md",
+   "author": "Tanvi Nair",
+   "ts": "2026-10-30T09:00:00+00:00",
+   "text": "# Sponsor notes (synthetic)\n\nSponsor invoices are paid from sponsors@club.example; the treasurer's PAN for the invoices is BCDPE2345G.\n\nIshaan has been unreliable about answering sponsor emails this month, so Tanvi is covering them for now.",
+   "locator": "notes://sponsor-notes.md#p46",
+   "label": "contributor"
+  },
+  {
+   "redactions": [
+    {
+     "start": 155,
+     "end": 186,
+     "kind": "secret",
+     "detector": "api_key"
+    },
+    {
+     "start": 222,
+     "end": 237,
+     "kind": "pii",
+     "detector": "phone"
+    }
+   ],
+   "flags": [],
+   "id": "h_3__ev_note_mentor-notes.md_047",
+   "handover_id": "h_3",
+   "source_id": "h_3__src_note_mentor-notes.md",
+   "author": "Prof. Iyer",
+   "ts": "2026-11-03T09:00:00+00:00",
+   "text": "# Mentor notes, Prof. Iyer (LEAD ONLY, synthetic)\n\nCandid feedback for the lead only: Ishaan often misses deadlines and needs closer supervision.\nTest key sk_test_FAKE_77abcXYZ9876543210 is in the shared sheet. Call me on +91-00000-22222.\n\n(All values above are fake and must never appear in the successor view.)",
+   "locator": "notes://mentor-notes.md#p47",
+   "label": "lead_only"
+  }
+ ],
+ "claims": [
+  {
+   "method": "rules",
+   "id": "h_3__cl_1",
+   "handover_id": "h_3",
+   "type": "fact",
+   "statement": "The bot is hosted on Heroku.",
+   "state": "conflicting",
+   "confidence_reason": "Conflicts with another claim; not auto-resolved",
+   "workstream": "deploy",
+   "entity_key": "deploy",
+   "owner": null,
+   "label": "public",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "unresolved",
+   "date": "2026-08-06",
+   "citations": [
+    {
+     "evidence_id": "h_3__ev_github_001",
+     "quote": "The bot is hosted on Heroku.",
+     "support": "full"
+    }
+   ],
+   "conflict_id": "h_3__cf_1",
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null
+  },
+  {
+   "method": "rules",
+   "id": "h_3__cl_10",
+   "handover_id": "h_3",
+   "type": "risk",
+   "statement": "bot/scheduler.py line 41: # TODO: remove this hack once the scheduler job store is persistent",
+   "state": "verified",
+   "confidence_reason": "Rule match: the source states this word for word (no AI)",
+   "workstream": "general",
+   "entity_key": "general",
+   "owner": null,
+   "label": "public",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "risks",
+   "date": "2026-10-18",
+   "citations": [
+    {
+     "evidence_id": "h_3__ev_github_014",
+     "quote": "bot/scheduler.py line 41: # TODO: remove this hack once the scheduler job store is persistent",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null
+  },
+  {
+   "method": "rules",
+   "id": "h_3__cl_11",
+   "handover_id": "h_3",
+   "type": "next_action",
+   "statement": "PR #34 (open): Team matching v2: match by timezone and skills",
+   "state": "verified",
+   "confidence_reason": "Rule match: the source states this word for word (no AI)",
+   "workstream": "general",
+   "entity_key": "general",
+   "owner": null,
+   "label": "public",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "first_week",
+   "date": "2026-11-03",
+   "citations": [
+    {
+     "evidence_id": "h_3__ev_github_015",
+     "quote": "PR #34 (open): Team matching v2: match by timezone and skills",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null
+  },
+  {
+   "method": "rules",
+   "id": "h_3__cl_12",
+   "handover_id": "h_3",
+   "type": "next_action",
+   "statement": "Issue #29 (open): Bot hits Discord rate limits during big announcements",
+   "state": "verified",
+   "confidence_reason": "Rule match: the source states this word for word (no AI)",
+   "workstream": "general",
+   "entity_key": "general",
+   "owner": null,
+   "label": "public",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "first_week",
+   "date": "2026-10-12",
+   "citations": [
+    {
+     "evidence_id": "h_3__ev_github_016",
+     "quote": "Issue #29 (open): Bot hits Discord rate limits during big announcements",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null
+  },
+  {
+   "method": "rules",
+   "id": "h_3__cl_13",
+   "handover_id": "h_3",
+   "type": "next_action",
+   "statement": "Issue #32 (open): Add a /help command listing all slash commands",
+   "state": "verified",
+   "confidence_reason": "Rule match: the source states this word for word (no AI)",
+   "workstream": "general",
+   "entity_key": "general",
+   "owner": null,
+   "label": "public",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "first_week",
+   "date": "2026-10-27",
+   "citations": [
+    {
+     "evidence_id": "h_3__ev_github_017",
+     "quote": "Issue #32 (open): Add a /help command listing all slash commands",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null
+  },
+  {
+   "method": "rules",
+   "id": "h_3__cl_14",
+   "handover_id": "h_3",
+   "type": "next_action",
+   "statement": "Issue #33 (open): Update README: hosting and database sections are out of date",
+   "state": "verified",
+   "confidence_reason": "Rule match: the source states this word for word (no AI)",
+   "workstream": "deploy",
+   "entity_key": "deploy",
+   "owner": null,
+   "label": "public",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "first_week",
+   "date": "2026-11-01",
+   "citations": [
+    {
+     "evidence_id": "h_3__ev_github_018",
+     "quote": "Issue #33 (open): Update README: hosting and database sections are out of date",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null
+  },
+  {
+   "method": "rules",
+   "id": "h_3__cl_15",
+   "handover_id": "h_3",
+   "type": "decision",
+   "statement": "We decided to write the bot in Python with discord.py.",
+   "state": "verified",
+   "confidence_reason": "Rule match: the source states this word for word (no AI)",
+   "workstream": "general",
+   "entity_key": "general",
+   "owner": null,
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "decision_log",
+   "date": "2026-08-09",
+   "citations": [
+    {
+     "evidence_id": "h_3__ev_chat_020",
+     "quote": "We decided to write the bot in Python with discord.py.",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null
+  },
+  {
+   "method": "rules",
+   "id": "h_3__cl_16",
+   "handover_id": "h_3",
+   "type": "dependency",
+   "statement": "The Discord bot token and application access are only with me, Dev, because it is registered under my personal account.",
+   "state": "verified",
+   "confidence_reason": "Rule match: the source states this word for word (no AI)",
+   "workstream": "general",
+   "entity_key": "general",
+   "owner": "Dev Patel",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "dependencies",
+   "date": "2026-08-30",
+   "citations": [
+    {
+     "evidence_id": "h_3__ev_chat_022",
+     "quote": "The Discord bot token and application access are only with me, Dev, because it is registered under my personal account.",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null
+  },
+  {
+   "method": "rules",
+   "id": "h_3__cl_17",
+   "handover_id": "h_3",
+   "type": "decision",
+   "statement": "We decided to drop prefix commands completely.",
+   "state": "verified",
+   "confidence_reason": "Rule match: the source states this word for word (no AI)",
+   "workstream": "general",
+   "entity_key": "general",
+   "owner": null,
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "decision_log",
+   "date": "2026-09-01",
+   "citations": [
+    {
+     "evidence_id": "h_3__ev_chat_023",
+     "quote": "We decided to drop prefix commands completely.",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null
+  },
+  {
+   "method": "rules",
+   "id": "h_3__cl_18",
+   "handover_id": "h_3",
+   "type": "decision",
+   "statement": "We decided to move to Postgres on Railway.",
+   "state": "conflicting",
+   "confidence_reason": "Conflicts with another claim; not auto-resolved",
+   "workstream": "deploy",
+   "entity_key": "deploy",
+   "owner": null,
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "unresolved",
+   "date": "2026-09-22",
+   "citations": [
+    {
+     "evidence_id": "h_3__ev_chat_025",
+     "quote": "We decided to move to Postgres on Railway.",
+     "support": "full"
+    }
+   ],
+   "conflict_id": "h_3__cf_1",
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null
+  },
+  {
+   "method": "rules",
+   "id": "h_3__cl_19",
+   "handover_id": "h_3",
+   "type": "fact",
+   "statement": "Bot runs on Railway from today, Heroku app can be deleted.",
+   "state": "verified",
+   "confidence_reason": "Rule match: the source states this word for word (no AI)",
+   "workstream": "deploy",
+   "entity_key": "deploy",
+   "owner": null,
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "state",
+   "date": "2026-10-02",
+   "citations": [
+    {
+     "evidence_id": "h_3__ev_chat_026",
+     "quote": "Bot runs on Railway from today, Heroku app can be deleted.",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null
+  },
+  {
+   "method": "rules",
+   "id": "h_3__cl_2",
+   "handover_id": "h_3",
+   "type": "fact",
+   "statement": "The bot keeps its data in a local SQLite file.",
+   "state": "conflicting",
+   "confidence_reason": "Conflicts with another claim; not auto-resolved",
+   "workstream": "database",
+   "entity_key": "database",
+   "owner": null,
+   "label": "public",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "unresolved",
+   "date": "2026-08-06",
+   "citations": [
+    {
+     "evidence_id": "h_3__ev_github_001",
+     "quote": "The bot keeps its data in a local SQLite file.",
+     "support": "full"
+    }
+   ],
+   "conflict_id": "h_3__cf_2",
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null
+  },
+  {
+   "method": "rules",
+   "id": "h_3__cl_20",
+   "handover_id": "h_3",
+   "type": "risk",
+   "statement": "Pushed a temporary workaround for duplicate reminders.",
+   "state": "verified",
+   "confidence_reason": "Rule match: the source states this word for word (no AI)",
+   "workstream": "general",
+   "entity_key": "general",
+   "owner": null,
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "risks",
+   "date": "2026-10-18",
+   "citations": [
+    {
+     "evidence_id": "h_3__ev_chat_031",
+     "quote": "Pushed a temporary workaround for duplicate reminders.",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null
+  },
+  {
+   "method": "rules",
+   "id": "h_3__cl_21",
+   "handover_id": "h_3",
+   "type": "risk",
+   "statement": "That hack will bite us when we add more scheduled jobs, left a TODO in scheduler.py.",
+   "state": "verified",
+   "confidence_reason": "Rule match: the source states this word for word (no AI)",
+   "workstream": "general",
+   "entity_key": "general",
+   "owner": null,
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "risks",
+   "date": "2026-10-19",
+   "citations": [
+    {
+     "evidence_id": "h_3__ev_chat_032",
+     "quote": "That hack will bite us when we add more scheduled jobs, left a TODO in scheduler.py.",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null
+  },
+  {
+   "method": "rules",
+   "id": "h_3__cl_22",
+   "handover_id": "h_3",
+   "type": "decision",
+   "statement": "We decided to keep payments out of the bot.",
+   "state": "verified",
+   "confidence_reason": "Rule match: the source states this word for word (no AI)",
+   "workstream": "payments",
+   "entity_key": "payments",
+   "owner": null,
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "project",
+   "date": "2026-10-21",
+   "citations": [
+    {
+     "evidence_id": "h_3__ev_chat_034",
+     "quote": "We decided to keep payments out of the bot.",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null
+  },
+  {
+   "method": "rules",
+   "id": "h_3__cl_23",
+   "handover_id": "h_3",
+   "type": "decision",
+   "statement": "We decided the bot sends no email.",
+   "state": "verified",
+   "confidence_reason": "Rule match: the source states this word for word (no AI)",
+   "workstream": "email",
+   "entity_key": "email",
+   "owner": null,
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "project",
+   "date": "2026-10-21",
+   "citations": [
+    {
+     "evidence_id": "h_3__ev_chat_035",
+     "quote": "We decided the bot sends no email.",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null
+  },
+  {
+   "method": "rules",
+   "id": "h_3__cl_24",
+   "handover_id": "h_3",
+   "type": "decision",
+   "statement": "We decided not to store files in the bot.",
+   "state": "verified",
+   "confidence_reason": "Rule match: the source states this word for word (no AI)",
+   "workstream": "general",
+   "entity_key": "general",
+   "owner": null,
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "decision_log",
+   "date": "2026-10-21",
+   "citations": [
+    {
+     "evidence_id": "h_3__ev_chat_036",
+     "quote": "We decided not to store files in the bot.",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null
+  },
+  {
+   "method": "rules",
+   "id": "h_3__cl_25",
+   "handover_id": "h_3",
+   "type": "dependency",
+   "statement": "The Railway deploy token is stored in the shared Railway project settings, under my GitHub login.",
+   "state": "verified",
+   "confidence_reason": "Rule match: the source states this word for word (no AI)",
+   "workstream": "deploy",
+   "entity_key": "deploy",
+   "owner": null,
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "dependencies",
+   "date": "2026-10-29",
+   "citations": [
+    {
+     "evidence_id": "h_3__ev_chat_039",
+     "quote": "The Railway deploy token is stored in the shared Railway project settings, under my GitHub login.",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null
+  },
+  {
+   "method": "rules",
+   "id": "h_3__cl_26",
+   "handover_id": "h_3",
+   "type": "dependency",
+   "statement": "The uptime monitor API key is kept in the shared sheet, and nobody remembers creating that account.",
+   "state": "verified",
+   "confidence_reason": "Rule match: the source states this word for word (no AI)",
+   "workstream": "general",
+   "entity_key": "general",
+   "owner": null,
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "dependencies",
+   "date": "2026-11-02",
+   "citations": [
+    {
+     "evidence_id": "h_3__ev_chat_040",
+     "quote": "The uptime monitor API key is kept in the shared sheet, and nobody remembers creating that account.",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null
+  },
+  {
+   "method": "rules",
+   "id": "h_3__cl_27",
+   "handover_id": "h_3",
+   "type": "decision",
+   "statement": "We decided the bot needs no user login; permissions come from Discord roles.",
+   "state": "verified",
+   "confidence_reason": "Rule match: the source states this word for word (no AI)",
+   "workstream": "auth",
+   "entity_key": "auth",
+   "owner": null,
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "project",
+   "date": "2026-10-21",
+   "citations": [
+    {
+     "evidence_id": "h_3__ev_chat_041",
+     "quote": "We decided the bot needs no user login; permissions come from Discord roles.",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null
+  },
+  {
+   "method": "rules",
+   "id": "h_3__cl_28",
+   "handover_id": "h_3",
+   "type": "fact",
+   "statement": "- **Data:** members, teams and reminders are stored in a Postgres database.",
+   "state": "conflicting",
+   "confidence_reason": "Conflicts with another claim; not auto-resolved",
+   "workstream": "database",
+   "entity_key": "database",
+   "owner": null,
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "unresolved",
+   "date": "2026-10-12",
+   "citations": [
+    {
+     "evidence_id": "h_3__ev_note_architecture.md_044",
+     "quote": "- **Data:** members, teams and reminders are stored in a Postgres database.",
+     "support": "full"
+    }
+   ],
+   "conflict_id": "h_3__cf_2",
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null
+  },
+  {
+   "method": "rules",
+   "id": "h_3__cl_3",
+   "handover_id": "h_3",
+   "type": "decision",
+   "statement": "PR #23 (merged): Switch from prefix commands to slash commands",
+   "state": "verified",
+   "confidence_reason": "Rule match: the source states this word for word (no AI)",
+   "workstream": "general",
+   "entity_key": "general",
+   "owner": null,
+   "label": "public",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "decision_log",
+   "date": "2026-09-01",
+   "citations": [
+    {
+     "evidence_id": "h_3__ev_github_005",
+     "quote": "PR #23 (merged): Switch from prefix commands to slash commands",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null
+  },
+  {
+   "method": "rules",
+   "id": "h_3__cl_4",
+   "handover_id": "h_3",
+   "type": "decision",
+   "statement": "PR #27 (merged): Move from SQLite to Postgres",
+   "state": "verified",
+   "confidence_reason": "Rule match: the source states this word for word (no AI)",
+   "workstream": "database",
+   "entity_key": "database",
+   "owner": null,
+   "label": "public",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "decision_log",
+   "date": "2026-09-22",
+   "citations": [
+    {
+     "evidence_id": "h_3__ev_github_007",
+     "quote": "PR #27 (merged): Move from SQLite to Postgres",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null
+  },
+  {
+   "method": "rules",
+   "id": "h_3__cl_5",
+   "handover_id": "h_3",
+   "type": "fact",
+   "statement": "Commit 33c44d5: Migrate bot storage to the Postgres client",
+   "state": "verified",
+   "confidence_reason": "Rule match: the source states this word for word (no AI)",
+   "workstream": "storage",
+   "entity_key": "storage",
+   "owner": null,
+   "label": "public",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "project",
+   "date": "2026-09-24",
+   "citations": [
+    {
+     "evidence_id": "h_3__ev_github_008",
+     "quote": "Commit 33c44d5: Migrate bot storage to the Postgres client",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null
+  },
+  {
+   "method": "rules",
+   "id": "h_3__cl_6",
+   "handover_id": "h_3",
+   "type": "fact",
+   "statement": "Commit 66e77f8: chore: add railway.json and configure the Railway project for the bot",
+   "state": "conflicting",
+   "confidence_reason": "Conflicts with another claim; not auto-resolved",
+   "workstream": "deploy",
+   "entity_key": "deploy",
+   "owner": null,
+   "label": "public",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "unresolved",
+   "date": "2026-10-01",
+   "citations": [
+    {
+     "evidence_id": "h_3__ev_github_009",
+     "quote": "Commit 66e77f8: chore: add railway.json and configure the Railway project for the bot",
+     "support": "full"
+    }
+   ],
+   "conflict_id": "h_3__cf_1",
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null
+  },
+  {
+   "method": "rules",
+   "id": "h_3__cl_7",
+   "handover_id": "h_3",
+   "type": "fact",
+   "statement": "Commit 99a00b1: Switch deploy from Heroku to Railway",
+   "state": "verified",
+   "confidence_reason": "Rule match: the source states this word for word (no AI)",
+   "workstream": "deploy",
+   "entity_key": "deploy",
+   "owner": null,
+   "label": "public",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "state",
+   "date": "2026-10-02",
+   "citations": [
+    {
+     "evidence_id": "h_3__ev_github_010",
+     "quote": "Commit 99a00b1: Switch deploy from Heroku to Railway",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null
+  },
+  {
+   "method": "rules",
+   "id": "h_3__cl_8",
+   "handover_id": "h_3",
+   "type": "risk",
+   "statement": "PR #31 (merged): Temporary workaround for duplicate reminders",
+   "state": "verified",
+   "confidence_reason": "Rule match: the source states this word for word (no AI)",
+   "workstream": "general",
+   "entity_key": "general",
+   "owner": null,
+   "label": "public",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "risks",
+   "date": "2026-10-18",
+   "citations": [
+    {
+     "evidence_id": "h_3__ev_github_012",
+     "quote": "PR #31 (merged): Temporary workaround for duplicate reminders",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null
+  },
+  {
+   "method": "rules",
+   "id": "h_3__cl_9",
+   "handover_id": "h_3",
+   "type": "risk",
+   "statement": "Commit 55e66f7: hack: skip duplicate reminders sent within 5 minutes",
+   "state": "verified",
+   "confidence_reason": "Rule match: the source states this word for word (no AI)",
+   "workstream": "general",
+   "entity_key": "general",
+   "owner": null,
+   "label": "public",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "risks",
+   "date": "2026-10-18",
+   "citations": [
+    {
+     "evidence_id": "h_3__ev_github_013",
+     "quote": "Commit 55e66f7: hack: skip duplicate reminders sent within 5 minutes",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null
+  },
+  {
+   "method": "rules",
+   "id": "h_3__cl_L1",
+   "handover_id": "h_3",
+   "type": "dependency",
+   "statement": "Test key [REDACTED SECRET] is in the shared sheet.",
+   "state": "verified",
+   "confidence_reason": "Rule match: the source states this word for word (no AI)",
+   "workstream": "general",
+   "entity_key": "general",
+   "owner": null,
+   "label": "lead_only",
+   "review_status": "pending",
+   "sensitive": true,
+   "section": "project",
+   "date": "2026-11-03",
+   "citations": [
+    {
+     "evidence_id": "h_3__ev_note_mentor-notes.md_047",
+     "quote": "Test key [REDACTED SECRET] is in the shared sheet.",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null
+  }
+ ],
+ "conflicts": [
+  {
+   "resolution": "open",
+   "resolved_by": null,
+   "note": null,
+   "entity_key": "deploy",
+   "kind": "staleness",
+   "severity": "blocking",
+   "detected_by": "rules",
+   "resolution_claim_id": null,
+   "decided_at": null,
+   "label": "contributor",
+   "id": "h_3__cf_1",
+   "claim_ids": [
+    "h_3__cl_1",
+    "h_3__cl_6",
+    "h_3__cl_18"
+   ],
+   "summary": "The documentation (2026-08-06) says \"The bot is hosted on Heroku.\", but newer activity (2026-09-22, 2026-10-01) says \"Commit 66e77f8: chore: add railway.json and configure the Railway project for the bot\" / \"We decided to move to Postgres on Railway.\".",
+   "handover_id": "h_3"
+  },
+  {
+   "resolution": "open",
+   "resolved_by": null,
+   "note": null,
+   "entity_key": "database",
+   "kind": "value",
+   "severity": "warning",
+   "detected_by": "rules",
+   "resolution_claim_id": null,
+   "decided_at": null,
+   "label": "contributor",
+   "id": "h_3__cf_2",
+   "claim_ids": [
+    "h_3__cl_2",
+    "h_3__cl_28"
+   ],
+   "summary": "Sources disagree about database: \"The bot keeps its data in a local SQLite file.\" vs \"- **Data:** members, teams and reminders are stored in a Postgres database.\"",
+   "handover_id": "h_3"
+  }
+ ],
+ "gaps": [
+  {
+   "status": "open",
+   "answer": null,
+   "answer_evidence_id": null,
+   "evidence_found": [
+    "h_3__ev_chat_039"
+   ],
+   "id": "h_3__gp_owner_cl_25",
+   "claim_id": "h_3__cl_25",
+   "question": "Who owns this: The Railway deploy token is stored in the shared Railway project settings, under my GitHub login?",
+   "handover_id": "h_3"
+  },
+  {
+   "status": "open",
+   "answer": null,
+   "answer_evidence_id": null,
+   "evidence_found": [
+    "h_3__ev_chat_040"
+   ],
+   "id": "h_3__gp_owner_cl_26",
+   "claim_id": "h_3__cl_26",
+   "question": "Who owns this: The uptime monitor API key is kept in the shared sheet, and nobody remembers creating that account?",
+   "handover_id": "h_3"
+  }
+ ]
+}

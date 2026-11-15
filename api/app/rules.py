@@ -11,7 +11,7 @@ from .models import Claim, EvidenceUnit, RawCitation, RawClaim
 from .llm import safe_text
 
 DECISION = re.compile(
-    r"\b(we decided|decided to|decision:|we('ll| will) go with|going with|final(ised|ized)?\b|agreed (to|on)|"
+    r"\b(we decided|decided to|decision:|decided:|we('ll| will) go with|going with|final(ised|ized)?\b|agreed (to|on)|"
     r"switch(ed|ing)? (to|from)|mov(e|ed|ing) (payments |it )?(to|from)|replac(e|ed|ing)|migrat(e|ed|ing) to|"
     r"we chose|chose to|final hai|final kar|decide kiya|tay hua)", re.I)
 RISK = re.compile(r"\b(temporary|temp fix|hack|workaround|quick fix|fragile|flaky|keeps? (breaking|failing)|"
@@ -21,6 +21,8 @@ OPEN_Q = re.compile(r"(no decision yet|still undecided|not decided|\btbd\b|shoul
 OWNER = re.compile(r"\b(?:only )?([A-Z][a-z]{2,})\b (?:owns|has the (?:credentials|keys|password|access|login)|"
                    r"holds the|is the only one|maintains|handles)\b")
 ASK = re.compile(r"\bask ([A-Z][a-z]{2,})\b")
+DBFACT = re.compile(r"\b(stored in|stores? (?:its |their )?data in|keeps? (?:its |their )?data in|lives? in|uses?)\b[^.]{0,40}\b"
+                    r"(postgres(?:ql)?|mysql|mariadb|mongodb|sqlite|firestore)\b", re.I)
 DEPLOY = re.compile(r"\b(deployed (on|to)|hosted on|runs on|deploy(s|ed|ing)? (the \w+ )?(app )?(to|on))\b", re.I)
 CONFIG = re.compile(r"\b(vercel\.json|render\.yaml|netlify\.toml|procfile|fly\.toml)\b", re.I)
 MARKER = re.compile(r"^\s*(DECISION|RISK|OWNER|TODO|NEXT|BLOCKER|QUESTION|DEPENDENCY)\s*:\s*(.{8,})$", re.I | re.M)
@@ -129,7 +131,7 @@ class RuleProvider:
                     out.append(_claim("open_question", s, u))
                 elif DECISION.search(s):
                     out.append(_claim("decision", s, u))
-                elif DEPLOY.search(s) or CONFIG.search(s):
+                elif DEPLOY.search(s) or CONFIG.search(s) or DBFACT.search(s):
                     out.append(_claim("fact", s, u))
                 elif SELF_OWNER.search(s) and NEGATION.search(s):
                     out.append(_claim("open_question", s, u))  # "I do not have the password": nobody owns it
@@ -210,6 +212,8 @@ def rule_contradicts(a: Claim, b: Claim) -> bool | None:
     slot = a.entity_key if a.entity_key == b.entity_key else None
     if not slot or slot not in VALUES:
         return None
+    if a.type in ("dependency", "owner") or b.type in ("dependency", "owner"):
+        return None  # who holds a credential is not a competing value for the topic
     ta = a.statement + " " + " ".join(c.quote for c in a.citations)
     tb = b.statement + " " + " ".join(c.quote for c in b.citations)
     va, vb = values_in(ta, slot), values_in(tb, slot)

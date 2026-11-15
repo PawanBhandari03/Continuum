@@ -46,6 +46,17 @@ ACTORS = {"lead": "Reviewer (lead)", "contributor": "Karan (successor)", "leaver
           "guest": "Guest viewer"}
 SECTIONS = snapshots.SECTIONS
 TEMPLATE = "h_1"
+# Demo projects a visitor can open (each gets its own private copy per visitor). h_1 is the original CampusKart demo.
+PROJECT_KEYS = {"campuskart": "h_1", "clubsite": "h_2", "hackbot": "h_3"}
+TEMPLATE_IDS = tuple(PROJECT_KEYS.values())
+CAMPUSKART_META = {
+    "description": "Campus marketplace app where students buy and sell second-hand items (payments, listings, sign-in).",
+    "team": [{"name": "Aditi Rao", "role": "Backend lead (leaving)"}, {"name": "Karan Verma", "role": "Successor"},
+             {"name": "Meera Das", "role": "Storage and uploads"}, {"name": "Dev Patel", "role": "Frontend"},
+             {"name": "Rohan K.", "role": "Payments"}, {"name": "Prof. Iyer", "role": "Mentor"}],
+    "stack": ["React", "Vercel", "UPI deep links", "Object storage", "College SMTP"],
+    "repo": "PawanBhandari03/campuskart",
+}
 SANDBOX_TTL_HOURS = 24
 
 
@@ -303,7 +314,9 @@ def get_handover_row(hid: str) -> dict:
 def handover_out(h: dict) -> dict:
     out = {k: h.get(k) for k in ("id", "leaver", "successor", "successor_role", "target_date", "status",
                                  "version", "approved_by", "published_at", "revision", "leaver_available")}
-    out["is_demo"] = h["id"] == TEMPLATE or h.get("template_id") == TEMPLATE
+    out["is_demo"] = h["id"] in TEMPLATE_IDS or h.get("template_id") in TEMPLATE_IDS
+    out["title"] = h.get("title") or ("CampusKart" if out["is_demo"] and (h.get("template_id") or h["id"]) == TEMPLATE else None)
+    out["meta"] = h.get("meta") or {}
     return out
 
 
@@ -735,6 +748,11 @@ def _reconstruct(hid: str, job_id: str) -> None:
 SEED_PREFIX = "seed__"
 
 
+def seed_prefix(tpl: str) -> str:
+    """Prefix of stored-run ids for a template (kept globally unique across templates)."""
+    return SEED_PREFIX if tpl == TEMPLATE else f"seed_{tpl}__"
+
+
 def seed_id(hid: str) -> str:
     return f"{hid}_seed"
 
@@ -785,7 +803,7 @@ def snapshot_seed(hid: str = TEMPLATE, x_demo_role: Optional[str] = Header(None)
 
 def _restore(hid: str) -> tuple[int, int, int]:
     tpl = template_of(hid)
-    n = _copy_claimset(seed_id(tpl), hid, strip=SEED_PREFIX, add=P(hid), ev_add="" if hid == tpl else P(hid))
+    n = _copy_claimset(seed_id(tpl), hid, strip=seed_prefix(tpl), add=P(hid), ev_add="" if hid == tpl else P(hid))
     db().upd("handovers", {"id": hid}, {"status": "in_review", "approved_by": None, "published_at": None})
     fix_readme_date(hid)
     k = redetect_conflicts(hid)
@@ -892,14 +910,34 @@ def recompute_labels(hid: str) -> int:
 def demo_labels(hid: str) -> None:
     """The CampusKart repo is public on GitHub, so its evidence is labelled public (what a Guest may read);
     chat stays contributor and the mentor notes stay lead-only."""
-    gh = f"{P(hid)}src_github"
-    db().upd("sources", {"id": gh}, {"default_label": "public"})
-    db().upd("evidence_units", {"source_id": gh}, {"label": "public"})
+    for src in db().sel("sources", {"handover_id": hid, "type": "github"}, select="id"):
+        db().upd("sources", {"id": src["id"]}, {"default_label": "public"})
+        db().upd("evidence_units", {"source_id": src["id"]}, {"label": "public"})
     recompute_labels(hid)
 
 
 DEMO_TASK = ("dependencies", "Who do I ask for the image bucket credentials before I change anything?",
              "Meera holds the bucket credentials. Ask her on #dev before changing upload settings.")
+
+
+_fixtures: dict = {}
+
+
+def fixture(key: str) -> dict | None:
+    if key not in _fixtures:
+        f = config.DEMO_DIR / "projects" / f"{key}.json"
+        _fixtures[key] = json.loads(f.read_text(encoding="utf-8")) if f.exists() else None
+    return _fixtures[key]
+
+
+def demo_task_for(hid: str) -> tuple:
+    tpl = template_of(hid)
+    for key, tid in PROJECT_KEYS.items():
+        if tid == tpl and tpl != TEMPLATE:
+            fx = fixture(key)
+            if fx:
+                return tuple(fx["demo_task"])
+    return DEMO_TASK
 
 
 def seed_published(hid: str) -> None:
@@ -919,7 +957,7 @@ def seed_published(hid: str) -> None:
     log(hid, "system", "reset", "Demo prepared: stored reconstruction loaded.", role="system",
         target_type="handover", target_id=hid)
     _publish(hid, lead, "lead", note="v1 (demo starting point)")
-    section, question, answer = DEMO_TASK
+    section, question, answer = demo_task_for(hid)
     tid = f"{P(hid)}task_1"
     db().ins("tasks", [{"id": tid, "handover_id": hid, "kind": "unclear_flag", "section": section, "text": question,
                         "raised_by": ACTORS["contributor"], "raised_role": "contributor", "assigned_to": "both",
@@ -940,7 +978,7 @@ def reset_demo(hid: str, x_demo_role: Optional[str] = Header(None)):
     """Reset a demo handover (the template or a visitor's copy) to the judge-safe starting state."""
     need(role_of(x_demo_role), "lead")
     h = get_handover_row(hid)
-    if hid != TEMPLATE and h.get("template_id") != TEMPLATE:
+    if hid not in TEMPLATE_IDS and h.get("template_id") not in TEMPLATE_IDS:
         raise HTTPException(400, "Only demo handovers can be reset.")
     if not has_snapshot(hid):
         raise HTTPException(400, "No stored snapshot for this handover.")
@@ -954,15 +992,19 @@ def reset_demo(hid: str, x_demo_role: Optional[str] = Header(None)):
 
 def _cleanup_sandboxes() -> None:
     cutoff = (datetime.now(timezone.utc) - timedelta(hours=SANDBOX_TTL_HOURS)).isoformat()
-    for h in db().sel("handovers", {"template_id": TEMPLATE, "created_at": f"lt.{cutoff}"}, select="id"):
-        db().delete("handovers", {"id": h["id"]})  # cascades to its sources, evidence, claims, versions…
+    for tid in TEMPLATE_IDS:
+        for h in db().sel("handovers", {"template_id": tid, "created_at": f"lt.{cutoff}"}, select="id"):
+            db().delete("handovers", {"id": h["id"]})  # cascades to its sources, evidence, claims, versions…
 
 
 @app.post("/demo/sandbox")
-def create_sandbox():
-    """Give this visitor their own copy of the CampusKart demo, so judges never see each other's changes."""
-    tpl = get_handover_row(TEMPLATE)
-    if not has_snapshot(TEMPLATE):
+def create_sandbox(project: str = "campuskart"):
+    """Give this visitor their own copy of a demo project, so judges never see each other's changes."""
+    tid = PROJECT_KEYS.get(project)
+    if not tid:
+        raise not_found("Unknown demo project")
+    tpl = get_handover_row(tid)
+    if not has_snapshot(tid):
         raise HTTPException(503, "Demo template is not ready.")
     try:
         _cleanup_sandboxes()
@@ -972,18 +1014,77 @@ def create_sandbox():
     p = P(hid)
     db().ins("handovers", [{"id": hid, "leaver": tpl["leaver"], "successor": tpl["successor"],
                             "successor_role": tpl["successor_role"], "target_date": tpl["target_date"],
-                            "template_id": TEMPLATE, "status": "in_review", "version": 0, "revision": 1}])
-    srcs = [s for s in db().sel("sources", {"handover_id": TEMPLATE}) if s["type"] != "exit_qa"]
+                            "template_id": tid, "status": "in_review", "version": 0, "revision": 1,
+                            "title": tpl.get("title") or ("CampusKart" if tid == TEMPLATE else None),
+                            "meta": tpl.get("meta") or (CAMPUSKART_META if tid == TEMPLATE else {})}])
+    srcs = [s for s in db().sel("sources", {"handover_id": tid}) if s["type"] != "exit_qa"]
     db().ins("sources", [{**s, "id": p + s["id"], "handover_id": hid} for s in srcs])
     keep = {s["id"] for s in srcs}
-    units = [u for u in db().sel("evidence_units", {"handover_id": TEMPLATE}) if u["source_id"] in keep]
+    units = [u for u in db().sel("evidence_units", {"handover_id": tid}) if u["source_id"] in keep]
     db().ins("evidence_units", [{**u, "id": p + u["id"], "source_id": p + u["source_id"], "handover_id": hid}
                                 for u in units])
     _restore(hid)
     demo_labels(hid)
     build_privacy_queue(hid)
     seed_published(hid)
-    return {"handover_id": hid}
+    return {"handover_id": hid, "project": project}
+
+
+_catalog_cache: dict = {}
+
+
+@app.get("/demo/projects")
+def demo_projects():
+    """The demo projects a visitor can open: who is leaving, the team, the stack and what the stored run contains."""
+    hit = _catalog_cache.get("v")
+    if hit and hit[0] > time.monotonic():
+        return hit[1]
+    out = []
+    for key, tid in PROJECT_KEYS.items():
+        h = db().one("handovers", {"id": tid})
+        if not h:
+            continue
+        sid = seed_id(tid)
+        claims = db().sel("claims", {"handover_id": sid}, select="state,type")
+        out.append({"key": key, "template_id": tid, "title": h.get("title") or "CampusKart", "leaver": h["leaver"],
+                    "successor": h["successor"], "target_date": h["target_date"],
+                    "meta": h.get("meta") or (CAMPUSKART_META if tid == TEMPLATE else {}),
+                    "claims": len([c for c in claims if c["type"] != "gap"]),
+                    "conflicts": len(db().sel("conflicts", {"handover_id": sid}, select="id")),
+                    "gaps": len(db().sel("gaps", {"handover_id": sid}, select="id"))})
+    _catalog_cache["v"] = (time.monotonic() + 120, out)
+    return out
+
+
+def install_project(key: str) -> bool:
+    """Install an extra demo project (template + stored run) from demo-data/projects/<key>.json. Idempotent."""
+    fx = fixture(key)
+    tpl = PROJECT_KEYS[key]
+    if not fx or db().one("handovers", {"id": tpl}):
+        return False
+    h = fx["handover"]
+    db().ins("handovers", [{"id": tpl, "leaver": h["leaver"], "successor": h["successor"], "successor_role": "contributor",
+                            "target_date": h["target_date"], "version": 0, "status": "in_review", "title": h["title"],
+                            "meta": h["meta"]}])
+    db().ins("sources", [{**x, "handover_id": tpl} for x in fx["sources"]])
+    db().ins("evidence_units", [{**u, "handover_id": tpl} for u in fx["units"]])
+    sid, sp = seed_id(tpl), seed_prefix(tpl)
+    rn = lambda x: (sp + x[len(tpl) + 2:]) if x and x.startswith(tpl + "__") else x  # noqa: E731
+    db().ins("handovers", [{"id": sid, "leaver": h["leaver"], "successor": h["successor"], "successor_role": "contributor",
+                            "target_date": h["target_date"]}])
+    db().ins("claims", [{**c, "id": rn(c["id"]), "handover_id": sid, "conflict_id": rn(c.get("conflict_id"))}
+                        for c in fx["claims"]])
+    if fx["conflicts"]:
+        db().ins("conflicts", [{**c, "id": rn(c["id"]), "handover_id": sid, "claim_ids": [rn(x) for x in c["claim_ids"]]}
+                               for c in fx["conflicts"]])
+    if fx["gaps"]:
+        db().ins("gaps", [{**g, "id": rn(g["id"]), "handover_id": sid, "claim_id": rn(g["claim_id"])} for g in fx["gaps"]])
+    cache_clear()
+    _restore(tpl)
+    demo_labels(tpl)
+    build_privacy_queue(tpl)
+    seed_published(tpl)
+    return True
 
 
 def _replay(hid: str, job_id: str) -> None:
@@ -2057,7 +2158,7 @@ def manual_redact(eid: str, body: ManualMask, x_demo_role: Optional[str] = Heade
 # ---------------- demo seeding ----------------
 @app.post("/demo/seed")
 def seed_demo():
-    """Create the CampusKart demo template (h_1) with sample sources. Idempotent."""
+    """Create the demo templates: CampusKart (h_1) with sample sources, plus the extra projects. Idempotent."""
     if not db().one("handovers", {"id": TEMPLATE}):
         db().ins("handovers", [{"id": TEMPLATE, "leaver": "aditi", "successor": "karan",
                                 "successor_role": "contributor", "target_date": "2026-11-30", "version": 0}])
@@ -2065,4 +2166,9 @@ def seed_demo():
             target_id=TEMPLATE)
     ingest_sample(TEMPLATE)
     build_privacy_queue(TEMPLATE)
-    return {"ok": True, "handover_id": TEMPLATE}
+    try:  # title and team for the catalog (columns added by migration 0004)
+        db().upd("handovers", {"id": TEMPLATE}, {"title": "CampusKart", "meta": CAMPUSKART_META})
+    except Exception:
+        pass
+    installed = [k for k in PROJECT_KEYS if k != "campuskart" and install_project(k)]
+    return {"ok": True, "handover_id": TEMPLATE, "installed": installed}

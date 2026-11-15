@@ -1,0 +1,1741 @@
+{
+ "key": "clubsite",
+ "template_id": "h_2",
+ "handover": {
+  "leaver": "neha",
+  "successor": "arjun",
+  "target_date": "2026-11-20",
+  "title": "ClubSite",
+  "meta": {
+   "description": "Website of a college coding club: events calendar, member directory, membership payments.",
+   "team": [
+    {
+     "name": "Neha Rao",
+     "role": "Web lead (leaving)"
+    },
+    {
+     "name": "Arjun Mehta",
+     "role": "Successor"
+    },
+    {
+     "name": "Sana Iyer",
+     "role": "Design"
+    },
+    {
+     "name": "Vikram S.",
+     "role": "Treasurer"
+    },
+    {
+     "name": "Prof. Rao",
+     "role": "Mentor"
+    }
+   ],
+   "stack": [
+    "Next.js",
+    "Vercel",
+    "Supabase Postgres",
+    "Cloudinary",
+    "SendGrid",
+    "Razorpay"
+   ],
+   "repo": "binary-coders/clubsite"
+  }
+ },
+ "demo_task": [
+  "dependencies",
+  "Who can give me the SendGrid login and access to the Vercel project?",
+  "Vikram set SendGrid up and lost the laptop, so create a new API key in the club SendGrid account (treasurer has it). Neha moves the Vercel project to the club account before 20 Nov."
+ ],
+ "sources": [
+  {
+   "status_reason": null,
+   "unit_count": 19,
+   "id": "h_2__src_github",
+   "handover_id": "h_2",
+   "type": "github",
+   "name": "ClubSite repo (README, commits, PRs, issues, TODOs)",
+   "status": "ok",
+   "default_label": "public"
+  },
+  {
+   "status_reason": null,
+   "unit_count": 27,
+   "id": "h_2__src_chat",
+   "handover_id": "h_2",
+   "type": "chat_export",
+   "name": "Team chat export (#general, #dev)",
+   "status": "ok",
+   "default_label": "contributor"
+  },
+  {
+   "status_reason": null,
+   "unit_count": 1,
+   "id": "h_2__src_note_architecture.md",
+   "handover_id": "h_2",
+   "type": "notes",
+   "name": "Notes: architecture.md",
+   "status": "ok",
+   "default_label": "contributor"
+  },
+  {
+   "status_reason": null,
+   "unit_count": 1,
+   "id": "h_2__src_note_meeting-2026-10-30.md",
+   "handover_id": "h_2",
+   "type": "notes",
+   "name": "Notes: meeting-2026-10-30.md",
+   "status": "ok",
+   "default_label": "contributor"
+  },
+  {
+   "status_reason": null,
+   "unit_count": 1,
+   "id": "h_2__src_note_treasurer-notes.md",
+   "handover_id": "h_2",
+   "type": "notes",
+   "name": "Notes: treasurer-notes.md",
+   "status": "ok",
+   "default_label": "contributor"
+  },
+  {
+   "status_reason": null,
+   "unit_count": 1,
+   "id": "h_2__src_note_mentor-notes.md",
+   "handover_id": "h_2",
+   "type": "notes",
+   "name": "Notes: mentor-notes.md — lead only",
+   "status": "ok",
+   "default_label": "lead_only"
+  }
+ ],
+ "units": [
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_2__ev_github_001",
+   "handover_id": "h_2",
+   "source_id": "h_2__src_github",
+   "author": "Neha Rao",
+   "ts": "2026-07-28T10:30:00+00:00",
+   "text": "README.md:\n# ClubSite\n\nWebsite of the Binary Coders Club: events, member directory and the club blog.\n\n## Deployment\n\nThe site is deployed on Netlify. Pushes to `main` redeploy automatically.\n\n## Data\n\nEvents and members are stored in Firestore.\n\n## Local setup\n\nCopy `.env.example` to `.env.local`, run `npm install` and `npm run dev`.",
+   "locator": "github://binary-coders/clubsite/blob/main/README.md",
+   "label": "public"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_2__ev_github_002",
+   "handover_id": "h_2",
+   "source_id": "h_2__src_github",
+   "author": "Neha Rao",
+   "ts": "2026-08-04T14:05:00+00:00",
+   "text": "Commit 3fa91c2: Scaffold Next.js app with events list and member directory",
+   "locator": "github://binary-coders/clubsite/commit/3fa91c2",
+   "label": "public"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_2__ev_github_003",
+   "handover_id": "h_2",
+   "source_id": "h_2__src_github",
+   "author": "Sana Iyer",
+   "ts": "2026-08-11T14:05:00+00:00",
+   "text": "Commit 9b7e1d4: Add club logo, colour tokens and responsive navbar",
+   "locator": "github://binary-coders/clubsite/commit/9b7e1d4",
+   "label": "public"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_2__ev_github_004",
+   "handover_id": "h_2",
+   "source_id": "h_2__src_github",
+   "author": "Vikram S.",
+   "ts": "2026-08-18T16:20:00+00:00",
+   "text": "PR #38 (merged): Add membership fee page with a Razorpay payment link\nMembers pay the yearly fee of Rs 200 through a Razorpay payment link. Vikram owns the Razorpay dashboard.",
+   "locator": "github://binary-coders/clubsite/pull/38",
+   "label": "public"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_2__ev_github_005",
+   "handover_id": "h_2",
+   "source_id": "h_2__src_github",
+   "author": "Neha Rao",
+   "ts": "2026-08-25T14:05:00+00:00",
+   "text": "Commit c41d0aa: Add Google sign-in with NextAuth",
+   "locator": "github://binary-coders/clubsite/commit/c41d0aa",
+   "label": "public"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_2__ev_github_006",
+   "handover_id": "h_2",
+   "source_id": "h_2__src_github",
+   "author": "Arjun Mehta",
+   "ts": "2026-09-02T14:05:00+00:00",
+   "text": "Commit e18ab55: Add events calendar component (read only)",
+   "locator": "github://binary-coders/clubsite/commit/e18ab55",
+   "label": "public"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_2__ev_github_007",
+   "handover_id": "h_2",
+   "source_id": "h_2__src_github",
+   "author": "Sana Iyer",
+   "ts": "2026-09-09T14:05:00+00:00",
+   "text": "Commit 71d2f30: Upload event photos to Cloudinary instead of the repo",
+   "locator": "github://binary-coders/clubsite/commit/71d2f30",
+   "label": "public"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_2__ev_github_008",
+   "handover_id": "h_2",
+   "source_id": "h_2__src_github",
+   "author": "Neha Rao",
+   "ts": "2026-09-15T16:20:00+00:00",
+   "text": "PR #41 (merged): Migrate events data from Firestore to Postgres on Supabase\nWe moved the events data to Postgres on Supabase because Firestore costs were unpredictable and calendar reads were slow.",
+   "locator": "github://binary-coders/clubsite/pull/41",
+   "label": "public"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_2__ev_github_009",
+   "handover_id": "h_2",
+   "source_id": "h_2__src_github",
+   "author": "Neha Rao",
+   "ts": "2026-09-20T14:05:00+00:00",
+   "text": "Commit 5d3c9b8: Migrate events reads to the Postgres client",
+   "locator": "github://binary-coders/clubsite/commit/5d3c9b8",
+   "label": "public"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_2__ev_github_010",
+   "handover_id": "h_2",
+   "source_id": "h_2__src_github",
+   "author": "Neha Rao",
+   "ts": "2026-10-05T14:05:00+00:00",
+   "text": "Commit a1b2c3d: chore: add vercel.json and configure the Vercel project for the web app",
+   "locator": "github://binary-coders/clubsite/commit/a1b2c3d",
+   "label": "public"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_2__ev_github_011",
+   "handover_id": "h_2",
+   "source_id": "h_2__src_github",
+   "author": "Neha Rao",
+   "ts": "2026-10-06T14:05:00+00:00",
+   "text": "Commit b7c8d9e: Switch deploy script from Netlify to Vercel",
+   "locator": "github://binary-coders/clubsite/commit/b7c8d9e",
+   "label": "public"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_2__ev_github_012",
+   "handover_id": "h_2",
+   "source_id": "h_2__src_github",
+   "author": "Vikram S.",
+   "ts": "2026-10-12T14:05:00+00:00",
+   "text": "Commit f0e1d2c: Send event reminder emails through SendGrid",
+   "locator": "github://binary-coders/clubsite/commit/f0e1d2c",
+   "label": "public"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_2__ev_github_013",
+   "handover_id": "h_2",
+   "source_id": "h_2__src_github",
+   "author": "Neha Rao",
+   "ts": "2026-10-20T16:20:00+00:00",
+   "text": "PR #44 (merged): Fix login loop with a temporary cookie workaround\nTemporary fix: clear the stale session cookie on redirect. Proper fix needs NextAuth session refresh changes.",
+   "locator": "github://binary-coders/clubsite/pull/44",
+   "label": "public"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_2__ev_github_014",
+   "handover_id": "h_2",
+   "source_id": "h_2__src_github",
+   "author": "Neha Rao",
+   "ts": "2026-10-21T14:05:00+00:00",
+   "text": "Commit 9a8b7c6: temporary fix for login loop in auth session handling",
+   "locator": "github://binary-coders/clubsite/commit/9a8b7c6",
+   "label": "public"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_2__ev_github_015",
+   "handover_id": "h_2",
+   "source_id": "h_2__src_github",
+   "author": "repo",
+   "ts": "2026-10-21T10:30:00+00:00",
+   "text": "src/lib/auth.ts line 22: // TODO: remove this hack once NextAuth session refresh is fixed",
+   "locator": "github://binary-coders/clubsite/blob/main/src/lib/auth.ts#L22",
+   "label": "public"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_2__ev_github_016",
+   "handover_id": "h_2",
+   "source_id": "h_2__src_github",
+   "author": "Arjun Mehta",
+   "ts": "2026-11-04T16:20:00+00:00",
+   "text": "PR #52 (open): Events calendar view with month and list modes\nReview requested. Neha asked for changes on 5 Nov: keyboard navigation and empty states.",
+   "locator": "github://binary-coders/clubsite/pull/52",
+   "label": "public"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_2__ev_github_017",
+   "handover_id": "h_2",
+   "source_id": "h_2__src_github",
+   "author": "Sana Iyer",
+   "ts": "2026-10-14T11:10:00+00:00",
+   "text": "Issue #47 (open): Image optimisation fails during the build\nBuild fails on image optimisation (sharp) for large event photos. Works locally.",
+   "locator": "github://binary-coders/clubsite/issues/47",
+   "label": "public"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_2__ev_github_018",
+   "handover_id": "h_2",
+   "source_id": "h_2__src_github",
+   "author": "Arjun Mehta",
+   "ts": "2026-10-25T11:10:00+00:00",
+   "text": "Issue #49 (open): Dark mode\nNobody has decided whether dark mode is in scope for this term.",
+   "locator": "github://binary-coders/clubsite/issues/49",
+   "label": "public"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_2__ev_github_019",
+   "handover_id": "h_2",
+   "source_id": "h_2__src_github",
+   "author": "Arjun Mehta",
+   "ts": "2026-11-02T11:10:00+00:00",
+   "text": "Issue #50 (open): Update README: deployment and database sections are out of date",
+   "locator": "github://binary-coders/clubsite/issues/50",
+   "label": "public"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_2__ev_chat_020",
+   "handover_id": "h_2",
+   "source_id": "h_2__src_chat",
+   "author": "Neha Rao",
+   "ts": "2026-08-03T17:20:00+00:00",
+   "text": "Welcome to the ClubSite channel! Repo is in the club GitHub org, ping me for access.",
+   "locator": "slack://general/2026-08-03#1720",
+   "label": "contributor"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_2__ev_chat_021",
+   "handover_id": "h_2",
+   "source_id": "h_2__src_chat",
+   "author": "Neha Rao",
+   "ts": "2026-08-05T11:02:00+00:00",
+   "text": "We decided to use Next.js with Tailwind for the club website. Final.",
+   "locator": "slack://dev/2026-08-05#1102",
+   "label": "contributor"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_2__ev_chat_022",
+   "handover_id": "h_2",
+   "source_id": "h_2__src_chat",
+   "author": "Vikram S.",
+   "ts": "2026-08-18T15:40:00+00:00",
+   "text": "We decided membership fee payments go through a Razorpay payment link. Final.",
+   "locator": "slack://dev/2026-08-18#1540",
+   "label": "contributor"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_2__ev_chat_023",
+   "handover_id": "h_2",
+   "source_id": "h_2__src_chat",
+   "author": "Vikram S.",
+   "ts": "2026-08-18T15:45:00+00:00",
+   "text": "Vikram owns the Razorpay dashboard, ask him for payout reports.",
+   "locator": "slack://dev/2026-08-18#1545",
+   "label": "contributor"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_2__ev_chat_024",
+   "handover_id": "h_2",
+   "source_id": "h_2__src_chat",
+   "author": "Neha Rao",
+   "ts": "2026-08-26T12:15:00+00:00",
+   "text": "Google sign-in is working in production. Users must use their college Google account.",
+   "locator": "slack://dev/2026-08-26#1215",
+   "label": "contributor"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_2__ev_chat_025",
+   "handover_id": "h_2",
+   "source_id": "h_2__src_chat",
+   "author": "Sana Iyer",
+   "ts": "2026-09-09T19:05:00+00:00",
+   "text": "We decided event photos go to Cloudinary storage instead of the repo. Final.",
+   "locator": "slack://dev/2026-09-09#1905",
+   "label": "contributor"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_2__ev_chat_026",
+   "handover_id": "h_2",
+   "source_id": "h_2__src_chat",
+   "author": "Sana Iyer",
+   "ts": "2026-09-09T19:10:00+00:00",
+   "text": "The Cloudinary credentials are only with Sana, ask Sana before changing upload settings.",
+   "locator": "slack://dev/2026-09-09#1910",
+   "label": "contributor"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_2__ev_chat_027",
+   "handover_id": "h_2",
+   "source_id": "h_2__src_chat",
+   "author": "Arjun Mehta",
+   "ts": "2026-09-12T10:11:00+00:00",
+   "text": "Can someone share the design file for the events page?",
+   "locator": "slack://general/2026-09-12#1011",
+   "label": "contributor"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_2__ev_chat_028",
+   "handover_id": "h_2",
+   "source_id": "h_2__src_chat",
+   "author": "Neha Rao",
+   "ts": "2026-09-14T21:30:00+00:00",
+   "text": "Firestore bill is surprising again. We decided to move events to Supabase Postgres. Final.",
+   "locator": "slack://dev/2026-09-14#2130",
+   "label": "contributor"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_2__ev_chat_029",
+   "handover_id": "h_2",
+   "source_id": "h_2__src_chat",
+   "author": "Arjun Mehta",
+   "ts": "2026-09-16T13:45:00+00:00",
+   "text": "Neha ne kaha tha migration PR #41 merge ho gaya? Staging pe events dikh rahe hain.",
+   "locator": "slack://dev/2026-09-16#1345",
+   "label": "contributor"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_2__ev_chat_030",
+   "handover_id": "h_2",
+   "source_id": "h_2__src_chat",
+   "author": "Sana Iyer",
+   "ts": "2026-09-18T09:55:00+00:00",
+   "text": "build fails again on image optimisation (sharp) for the big hackathon photos",
+   "locator": "slack://dev/2026-09-18#0955",
+   "label": "contributor"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_2__ev_chat_031",
+   "handover_id": "h_2",
+   "source_id": "h_2__src_chat",
+   "author": "Sana Iyer",
+   "ts": "2026-09-30T18:20:00+00:00",
+   "text": "build fails again on image optimisation (sharp), resized photos by hand for now",
+   "locator": "slack://dev/2026-09-30#1820",
+   "label": "contributor"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_2__ev_chat_032",
+   "handover_id": "h_2",
+   "source_id": "h_2__src_chat",
+   "author": "Neha Rao",
+   "ts": "2026-10-05T16:10:00+00:00",
+   "text": "Netlify build minutes are over. I am moving the web app to Vercel and will delete the netlify config next week.",
+   "locator": "slack://dev/2026-10-05#1610",
+   "label": "contributor"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_2__ev_chat_033",
+   "handover_id": "h_2",
+   "source_id": "h_2__src_chat",
+   "author": "Neha Rao",
+   "ts": "2026-10-06T12:00:00+00:00",
+   "text": "Vercel pe deploy ho gaya, production is live on Vercel now.",
+   "locator": "slack://dev/2026-10-06#1200",
+   "label": "contributor"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_2__ev_chat_034",
+   "handover_id": "h_2",
+   "source_id": "h_2__src_chat",
+   "author": "Vikram S.",
+   "ts": "2026-10-08T14:30:00+00:00",
+   "text": "We decided reminder emails go through SendGrid. Final.",
+   "locator": "slack://general/2026-10-08#1430",
+   "label": "contributor"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_2__ev_chat_035",
+   "handover_id": "h_2",
+   "source_id": "h_2__src_chat",
+   "author": "Vikram S.",
+   "ts": "2026-10-08T14:35:00+00:00",
+   "text": "The SendGrid API key is kept in the shared sheet, but I set the account up on a laptop I no longer have.",
+   "locator": "slack://general/2026-10-08#1435",
+   "label": "contributor"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_2__ev_chat_036",
+   "handover_id": "h_2",
+   "source_id": "h_2__src_chat",
+   "author": "Sana Iyer",
+   "ts": "2026-10-14T20:05:00+00:00",
+   "text": "build fails again on image optimisation (sharp), third time this month",
+   "locator": "slack://dev/2026-10-14#2005",
+   "label": "contributor"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_2__ev_chat_037",
+   "handover_id": "h_2",
+   "source_id": "h_2__src_chat",
+   "author": "Arjun Mehta",
+   "ts": "2026-10-19T11:25:00+00:00",
+   "text": "Login loop is back for some students after Google sign-in. Is anyone looking at it?",
+   "locator": "slack://dev/2026-10-19#1125",
+   "label": "contributor"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_2__ev_chat_038",
+   "handover_id": "h_2",
+   "source_id": "h_2__src_chat",
+   "author": "Neha Rao",
+   "ts": "2026-10-20T22:10:00+00:00",
+   "text": "Pushed a temporary fix for the login loop (clearing the stale cookie). Proper fix after the exams.",
+   "locator": "slack://dev/2026-10-20#2210",
+   "label": "contributor"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_2__ev_chat_039",
+   "handover_id": "h_2",
+   "source_id": "h_2__src_chat",
+   "author": "Neha Rao",
+   "ts": "2026-10-22T10:40:00+00:00",
+   "text": "That hack will bite us when NextAuth v5 lands, leaving a TODO in auth.ts.",
+   "locator": "slack://dev/2026-10-22#1040",
+   "label": "contributor"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_2__ev_chat_040",
+   "handover_id": "h_2",
+   "source_id": "h_2__src_chat",
+   "author": "Arjun Mehta",
+   "ts": "2026-10-25T15:15:00+00:00",
+   "text": "Dark mode: should we add it this term? Still undecided.",
+   "locator": "slack://general/2026-10-25#1515",
+   "label": "contributor"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_2__ev_chat_041",
+   "handover_id": "h_2",
+   "source_id": "h_2__src_chat",
+   "author": "Sana Iyer",
+   "ts": "2026-10-26T15:20:00+00:00",
+   "text": "Dark mode is nice to have but not decided.",
+   "locator": "slack://general/2026-10-26#1520",
+   "label": "contributor"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_2__ev_chat_042",
+   "handover_id": "h_2",
+   "source_id": "h_2__src_chat",
+   "author": "Neha Rao",
+   "ts": "2026-10-30T17:00:00+00:00",
+   "text": "I am leaving the club web team after this sprint. Arjun takes over ClubSite.",
+   "locator": "slack://dev/2026-10-30#1700",
+   "label": "contributor"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_2__ev_chat_043",
+   "handover_id": "h_2",
+   "source_id": "h_2__src_chat",
+   "author": "Arjun Mehta",
+   "ts": "2026-10-30T17:05:00+00:00",
+   "text": "Got it. Please write down the deploy steps and who owns what before you go.",
+   "locator": "slack://dev/2026-10-30#1705",
+   "label": "contributor"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_2__ev_chat_044",
+   "handover_id": "h_2",
+   "source_id": "h_2__src_chat",
+   "author": "Neha Rao",
+   "ts": "2026-11-02T12:30:00+00:00",
+   "text": "Vercel access is only with me, Neha, because the project sits under my personal account.",
+   "locator": "slack://dev/2026-11-02#1230",
+   "label": "contributor"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_2__ev_chat_045",
+   "handover_id": "h_2",
+   "source_id": "h_2__src_chat",
+   "author": "Neha Rao",
+   "ts": "2026-11-05T10:10:00+00:00",
+   "text": "Review of PR #52: please add keyboard navigation and empty states.",
+   "locator": "slack://dev/2026-11-05#1010",
+   "label": "contributor"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_2__ev_chat_046",
+   "handover_id": "h_2",
+   "source_id": "h_2__src_chat",
+   "author": "Vikram S.",
+   "ts": "2026-11-07T09:45:00+00:00",
+   "text": "Event reminder for the Rust workshop went out fine today.",
+   "locator": "slack://general/2026-11-07#0945",
+   "label": "contributor"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_2__ev_note_architecture.md_047",
+   "handover_id": "h_2",
+   "source_id": "h_2__src_note_architecture.md",
+   "author": "notes",
+   "ts": "2026-10-15T09:00:00+00:00",
+   "text": "# Architecture notes (synthetic)\n\n- **Web:** Next.js app, see the README for the deployment target.\n- **Data:** events and members live in a Postgres database.\n- **Images:** event photos go to a third-party image service.\n- **Email:** reminder emails are sent through SendGrid.",
+   "locator": "notes://architecture.md#p47",
+   "label": "contributor"
+  },
+  {
+   "redactions": [],
+   "flags": [],
+   "id": "h_2__ev_note_meeting-2026-10-30.md_048",
+   "handover_id": "h_2",
+   "source_id": "h_2__src_note_meeting-2026-10-30.md",
+   "author": "notes",
+   "ts": "2026-10-30T09:00:00+00:00",
+   "text": "# Web team meeting, 30 Oct 2026 (synthetic)\n\nAttendees: Neha, Arjun, Sana, Vikram.\n\n- Events calendar PR #52 needs another review pass.\n- Dark mode: discussed briefly, not decided. Parked for next term.\n- Action: Neha to document the deploy steps before leaving.\n- Treasurer Vikram receives the Razorpay payouts in the club bank account.",
+   "locator": "notes://meeting-2026-10-30.md#p48",
+   "label": "contributor"
+  },
+  {
+   "redactions": [
+    {
+     "start": 64,
+     "end": 85,
+     "kind": "pii",
+     "detector": "upi_id"
+    },
+    {
+     "start": 116,
+     "end": 126,
+     "kind": "pii",
+     "detector": "pan"
+    }
+   ],
+   "flags": [],
+   "id": "h_2__ev_note_treasurer-notes.md_049",
+   "handover_id": "h_2",
+   "source_id": "h_2__src_note_treasurer-notes.md",
+   "author": "Vikram S.",
+   "ts": "2026-10-28T09:00:00+00:00",
+   "text": "# Treasurer notes (synthetic)\n\nFee refunds are paid by UPI from treasurer.club@okaxis. The club PAN for receipts is ABCPE1234F.\n\nSana has been unreliable about answering design requests this month, so Neha is covering the events page for now.",
+   "locator": "notes://treasurer-notes.md#p49",
+   "label": "contributor"
+  },
+  {
+   "redactions": [
+    {
+     "start": 152,
+     "end": 183,
+     "kind": "secret",
+     "detector": "api_key"
+    },
+    {
+     "start": 219,
+     "end": 234,
+     "kind": "pii",
+     "detector": "phone"
+    }
+   ],
+   "flags": [],
+   "id": "h_2__ev_note_mentor-notes.md_050",
+   "handover_id": "h_2",
+   "source_id": "h_2__src_note_mentor-notes.md",
+   "author": "Prof. Rao",
+   "ts": "2026-11-03T09:00:00+00:00",
+   "text": "# Mentor notes, Prof. Rao (LEAD ONLY, synthetic)\n\nCandid feedback for the lead only: Sana often misses deadlines and needs closer supervision.\nTest key sk_test_FAKE_88xyzABC0123456789 is in the shared sheet. Call me on +91-00000-11111.\n\n(All values above are fake and must never appear in the successor view.)",
+   "locator": "notes://mentor-notes.md#p50",
+   "label": "lead_only"
+  }
+ ],
+ "claims": [
+  {
+   "method": "rules",
+   "id": "h_2__cl_1",
+   "handover_id": "h_2",
+   "type": "fact",
+   "statement": "The site is deployed on Netlify.",
+   "state": "conflicting",
+   "confidence_reason": "Conflicts with another claim; not auto-resolved",
+   "workstream": "deploy",
+   "entity_key": "deploy",
+   "owner": null,
+   "label": "public",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "unresolved",
+   "date": "2026-07-28",
+   "citations": [
+    {
+     "evidence_id": "h_2__ev_github_001",
+     "quote": "The site is deployed on Netlify.",
+     "support": "full"
+    }
+   ],
+   "conflict_id": "h_2__cf_1",
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null
+  },
+  {
+   "method": "rules",
+   "id": "h_2__cl_10",
+   "handover_id": "h_2",
+   "type": "next_action",
+   "statement": "Issue #47 (open): Image optimisation fails during the build",
+   "state": "verified",
+   "confidence_reason": "Rule match: the source states this word for word (no AI)",
+   "workstream": "general",
+   "entity_key": "general",
+   "owner": null,
+   "label": "public",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "first_week",
+   "date": "2026-10-14",
+   "citations": [
+    {
+     "evidence_id": "h_2__ev_github_017",
+     "quote": "Issue #47 (open): Image optimisation fails during the build",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null
+  },
+  {
+   "method": "rules",
+   "id": "h_2__cl_11",
+   "handover_id": "h_2",
+   "type": "next_action",
+   "statement": "Issue #49 (open): Dark mode",
+   "state": "verified",
+   "confidence_reason": "Rule match: the source states this word for word (no AI)",
+   "workstream": "general",
+   "entity_key": "general",
+   "owner": null,
+   "label": "public",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "first_week",
+   "date": "2026-10-25",
+   "citations": [
+    {
+     "evidence_id": "h_2__ev_github_018",
+     "quote": "Issue #49 (open): Dark mode",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null
+  },
+  {
+   "method": "rules",
+   "id": "h_2__cl_12",
+   "handover_id": "h_2",
+   "type": "next_action",
+   "statement": "Issue #50 (open): Update README: deployment and database sections are out of date",
+   "state": "verified",
+   "confidence_reason": "Rule match: the source states this word for word (no AI)",
+   "workstream": "deploy",
+   "entity_key": "deploy",
+   "owner": null,
+   "label": "public",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "first_week",
+   "date": "2026-11-02",
+   "citations": [
+    {
+     "evidence_id": "h_2__ev_github_019",
+     "quote": "Issue #50 (open): Update README: deployment and database sections are out of date",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null
+  },
+  {
+   "method": "rules",
+   "id": "h_2__cl_13",
+   "handover_id": "h_2",
+   "type": "decision",
+   "statement": "We decided to use Next.js with Tailwind for the club website.",
+   "state": "verified",
+   "confidence_reason": "Rule match: the source states this word for word (no AI)",
+   "workstream": "general",
+   "entity_key": "general",
+   "owner": null,
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "decision_log",
+   "date": "2026-08-05",
+   "citations": [
+    {
+     "evidence_id": "h_2__ev_chat_021",
+     "quote": "We decided to use Next.js with Tailwind for the club website.",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null
+  },
+  {
+   "method": "rules",
+   "id": "h_2__cl_14",
+   "handover_id": "h_2",
+   "type": "decision",
+   "statement": "We decided membership fee payments go through a Razorpay payment link.",
+   "state": "verified",
+   "confidence_reason": "Rule match: the source states this word for word (no AI)",
+   "workstream": "payments",
+   "entity_key": "payments",
+   "owner": null,
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "project",
+   "date": "2026-08-18",
+   "citations": [
+    {
+     "evidence_id": "h_2__ev_chat_022",
+     "quote": "We decided membership fee payments go through a Razorpay payment link.",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null
+  },
+  {
+   "method": "rules",
+   "id": "h_2__cl_15",
+   "handover_id": "h_2",
+   "type": "owner",
+   "statement": "Vikram owns the Razorpay dashboard, ask him for payout reports.",
+   "state": "verified",
+   "confidence_reason": "Rule match: the source states this word for word (no AI)",
+   "workstream": "payments",
+   "entity_key": "payments",
+   "owner": "Vikram",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "dependencies",
+   "date": "2026-08-18",
+   "citations": [
+    {
+     "evidence_id": "h_2__ev_chat_023",
+     "quote": "Vikram owns the Razorpay dashboard, ask him for payout reports.",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null
+  },
+  {
+   "method": "rules",
+   "id": "h_2__cl_16",
+   "handover_id": "h_2",
+   "type": "decision",
+   "statement": "We decided event photos go to Cloudinary storage instead of the repo.",
+   "state": "verified",
+   "confidence_reason": "Rule match: the source states this word for word (no AI)",
+   "workstream": "storage",
+   "entity_key": "storage",
+   "owner": null,
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "project",
+   "date": "2026-09-09",
+   "citations": [
+    {
+     "evidence_id": "h_2__ev_chat_025",
+     "quote": "We decided event photos go to Cloudinary storage instead of the repo.",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null
+  },
+  {
+   "method": "rules",
+   "id": "h_2__cl_17",
+   "handover_id": "h_2",
+   "type": "dependency",
+   "statement": "The Cloudinary credentials are only with Sana, ask Sana before changing upload settings.",
+   "state": "verified",
+   "confidence_reason": "Rule match: the source states this word for word (no AI)",
+   "workstream": "storage",
+   "entity_key": "storage",
+   "owner": "Sana",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "dependencies",
+   "date": "2026-09-09",
+   "citations": [
+    {
+     "evidence_id": "h_2__ev_chat_026",
+     "quote": "The Cloudinary credentials are only with Sana, ask Sana before changing upload settings.",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null
+  },
+  {
+   "method": "rules",
+   "id": "h_2__cl_18",
+   "handover_id": "h_2",
+   "type": "decision",
+   "statement": "We decided to move events to Supabase Postgres.",
+   "state": "conflicting",
+   "confidence_reason": "Conflicts with another claim; not auto-resolved",
+   "workstream": "database",
+   "entity_key": "database",
+   "owner": null,
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "unresolved",
+   "date": "2026-09-14",
+   "citations": [
+    {
+     "evidence_id": "h_2__ev_chat_028",
+     "quote": "We decided to move events to Supabase Postgres.",
+     "support": "full"
+    }
+   ],
+   "conflict_id": "h_2__cf_2",
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null
+  },
+  {
+   "method": "rules",
+   "id": "h_2__cl_19",
+   "handover_id": "h_2",
+   "type": "risk",
+   "statement": "build fails again on image optimisation (sharp) for the big hackathon photos",
+   "state": "verified",
+   "confidence_reason": "Rule match: the source states this word for word (no AI)",
+   "workstream": "general",
+   "entity_key": "general",
+   "owner": null,
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "risks",
+   "date": "2026-09-18",
+   "citations": [
+    {
+     "evidence_id": "h_2__ev_chat_030",
+     "quote": "build fails again on image optimisation (sharp) for the big hackathon photos",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null
+  },
+  {
+   "method": "rules",
+   "id": "h_2__cl_2",
+   "handover_id": "h_2",
+   "type": "fact",
+   "statement": "Events and members are stored in Firestore.",
+   "state": "conflicting",
+   "confidence_reason": "Conflicts with another claim; not auto-resolved",
+   "workstream": "database",
+   "entity_key": "database",
+   "owner": null,
+   "label": "public",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "unresolved",
+   "date": "2026-07-28",
+   "citations": [
+    {
+     "evidence_id": "h_2__ev_github_001",
+     "quote": "Events and members are stored in Firestore.",
+     "support": "full"
+    }
+   ],
+   "conflict_id": "h_2__cf_2",
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null
+  },
+  {
+   "method": "rules",
+   "id": "h_2__cl_20",
+   "handover_id": "h_2",
+   "type": "risk",
+   "statement": "build fails again on image optimisation (sharp), resized photos by hand for now",
+   "state": "verified",
+   "confidence_reason": "Rule match: the source states this word for word (no AI)",
+   "workstream": "general",
+   "entity_key": "general",
+   "owner": null,
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "risks",
+   "date": "2026-09-30",
+   "citations": [
+    {
+     "evidence_id": "h_2__ev_chat_031",
+     "quote": "build fails again on image optimisation (sharp), resized photos by hand for now",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null
+  },
+  {
+   "method": "rules",
+   "id": "h_2__cl_21",
+   "handover_id": "h_2",
+   "type": "decision",
+   "statement": "We decided reminder emails go through SendGrid.",
+   "state": "verified",
+   "confidence_reason": "Rule match: the source states this word for word (no AI)",
+   "workstream": "email",
+   "entity_key": "email",
+   "owner": null,
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "project",
+   "date": "2026-10-08",
+   "citations": [
+    {
+     "evidence_id": "h_2__ev_chat_034",
+     "quote": "We decided reminder emails go through SendGrid.",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null
+  },
+  {
+   "method": "rules",
+   "id": "h_2__cl_22",
+   "handover_id": "h_2",
+   "type": "dependency",
+   "statement": "The SendGrid API key is kept in the shared sheet, but I set the account up on a laptop I no longer have.",
+   "state": "verified",
+   "confidence_reason": "Rule match: the source states this word for word (no AI)",
+   "workstream": "general",
+   "entity_key": "general",
+   "owner": null,
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "dependencies",
+   "date": "2026-10-08",
+   "citations": [
+    {
+     "evidence_id": "h_2__ev_chat_035",
+     "quote": "The SendGrid API key is kept in the shared sheet, but I set the account up on a laptop I no longer have.",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null
+  },
+  {
+   "method": "rules",
+   "id": "h_2__cl_23",
+   "handover_id": "h_2",
+   "type": "risk",
+   "statement": "build fails again on image optimisation (sharp), third time this month",
+   "state": "verified",
+   "confidence_reason": "Rule match: the source states this word for word (no AI)",
+   "workstream": "general",
+   "entity_key": "general",
+   "owner": null,
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "risks",
+   "date": "2026-10-14",
+   "citations": [
+    {
+     "evidence_id": "h_2__ev_chat_036",
+     "quote": "build fails again on image optimisation (sharp), third time this month",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null
+  },
+  {
+   "method": "rules",
+   "id": "h_2__cl_24",
+   "handover_id": "h_2",
+   "type": "risk",
+   "statement": "Pushed a temporary fix for the login loop (clearing the stale cookie).",
+   "state": "verified",
+   "confidence_reason": "Rule match: the source states this word for word (no AI)",
+   "workstream": "auth",
+   "entity_key": "auth",
+   "owner": null,
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "risks",
+   "date": "2026-10-20",
+   "citations": [
+    {
+     "evidence_id": "h_2__ev_chat_038",
+     "quote": "Pushed a temporary fix for the login loop (clearing the stale cookie).",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null
+  },
+  {
+   "method": "rules",
+   "id": "h_2__cl_25",
+   "handover_id": "h_2",
+   "type": "risk",
+   "statement": "That hack will bite us when NextAuth v5 lands, leaving a TODO in auth.ts.",
+   "state": "verified",
+   "confidence_reason": "Rule match: the source states this word for word (no AI)",
+   "workstream": "auth",
+   "entity_key": "auth",
+   "owner": null,
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "risks",
+   "date": "2026-10-22",
+   "citations": [
+    {
+     "evidence_id": "h_2__ev_chat_039",
+     "quote": "That hack will bite us when NextAuth v5 lands, leaving a TODO in auth.ts.",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null
+  },
+  {
+   "method": "rules",
+   "id": "h_2__cl_26",
+   "handover_id": "h_2",
+   "type": "open_question",
+   "statement": "Dark mode: should we add it this term?",
+   "state": "verified",
+   "confidence_reason": "Rule match: the source states this word for word (no AI)",
+   "workstream": "general",
+   "entity_key": "general",
+   "owner": null,
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "unresolved",
+   "date": "2026-10-25",
+   "citations": [
+    {
+     "evidence_id": "h_2__ev_chat_040",
+     "quote": "Dark mode: should we add it this term?",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null
+  },
+  {
+   "method": "rules",
+   "id": "h_2__cl_27",
+   "handover_id": "h_2",
+   "type": "open_question",
+   "statement": "Dark mode is nice to have but not decided.",
+   "state": "verified",
+   "confidence_reason": "Rule match: the source states this word for word (no AI)",
+   "workstream": "general",
+   "entity_key": "general",
+   "owner": null,
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "unresolved",
+   "date": "2026-10-26",
+   "citations": [
+    {
+     "evidence_id": "h_2__ev_chat_041",
+     "quote": "Dark mode is nice to have but not decided.",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null
+  },
+  {
+   "method": "rules",
+   "id": "h_2__cl_28",
+   "handover_id": "h_2",
+   "type": "dependency",
+   "statement": "Vercel access is only with me, Neha, because the project sits under my personal account.",
+   "state": "verified",
+   "confidence_reason": "Rule match: the source states this word for word (no AI)",
+   "workstream": "deploy",
+   "entity_key": "deploy",
+   "owner": "Neha Rao",
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "dependencies",
+   "date": "2026-11-02",
+   "citations": [
+    {
+     "evidence_id": "h_2__ev_chat_044",
+     "quote": "Vercel access is only with me, Neha, because the project sits under my personal account.",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null
+  },
+  {
+   "method": "rules",
+   "id": "h_2__cl_29",
+   "handover_id": "h_2",
+   "type": "fact",
+   "statement": "- **Data:** events and members live in a Postgres database.",
+   "state": "conflicting",
+   "confidence_reason": "Conflicts with another claim; not auto-resolved",
+   "workstream": "database",
+   "entity_key": "database",
+   "owner": null,
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "unresolved",
+   "date": "2026-10-15",
+   "citations": [
+    {
+     "evidence_id": "h_2__ev_note_architecture.md_047",
+     "quote": "- **Data:** events and members live in a Postgres database.",
+     "support": "full"
+    }
+   ],
+   "conflict_id": "h_2__cf_2",
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null
+  },
+  {
+   "method": "rules",
+   "id": "h_2__cl_3",
+   "handover_id": "h_2",
+   "type": "fact",
+   "statement": "Commit 5d3c9b8: Migrate events reads to the Postgres client",
+   "state": "conflicting",
+   "confidence_reason": "Conflicts with another claim; not auto-resolved",
+   "workstream": "database",
+   "entity_key": "database",
+   "owner": null,
+   "label": "public",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "unresolved",
+   "date": "2026-09-20",
+   "citations": [
+    {
+     "evidence_id": "h_2__ev_github_009",
+     "quote": "Commit 5d3c9b8: Migrate events reads to the Postgres client",
+     "support": "full"
+    }
+   ],
+   "conflict_id": "h_2__cf_2",
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null
+  },
+  {
+   "method": "rules",
+   "id": "h_2__cl_30",
+   "handover_id": "h_2",
+   "type": "open_question",
+   "statement": "- Dark mode: discussed briefly, not decided.",
+   "state": "verified",
+   "confidence_reason": "Rule match: the source states this word for word (no AI)",
+   "workstream": "general",
+   "entity_key": "general",
+   "owner": null,
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "unresolved",
+   "date": "2026-10-30",
+   "citations": [
+    {
+     "evidence_id": "h_2__ev_note_meeting-2026-10-30.md_048",
+     "quote": "- Dark mode: discussed briefly, not decided.",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null
+  },
+  {
+   "method": "rules",
+   "id": "h_2__cl_31",
+   "handover_id": "h_2",
+   "type": "risk",
+   "statement": "Recurring problem (3 times since 2026-09-18): build fails again on image optimisation (sharp) for the big hackathon photos",
+   "state": "verified",
+   "confidence_reason": "Rule match: the source states this word for word (no AI)",
+   "workstream": "general",
+   "entity_key": "general",
+   "owner": null,
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "risks",
+   "date": "2026-09-18",
+   "citations": [
+    {
+     "evidence_id": "h_2__ev_chat_030",
+     "quote": "build fails again on image optimisation (sharp) for the big hackathon photos",
+     "support": "full"
+    },
+    {
+     "evidence_id": "h_2__ev_chat_031",
+     "quote": "build fails again on image optimisation (sharp), resized photos by hand for now",
+     "support": "full"
+    },
+    {
+     "evidence_id": "h_2__ev_chat_036",
+     "quote": "build fails again on image optimisation (sharp), third time this month",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null
+  },
+  {
+   "method": "rules",
+   "id": "h_2__cl_4",
+   "handover_id": "h_2",
+   "type": "fact",
+   "statement": "Commit a1b2c3d: chore: add vercel.json and configure the Vercel project for the web app",
+   "state": "conflicting",
+   "confidence_reason": "Conflicts with another claim; not auto-resolved",
+   "workstream": "deploy",
+   "entity_key": "deploy",
+   "owner": null,
+   "label": "public",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "unresolved",
+   "date": "2026-10-05",
+   "citations": [
+    {
+     "evidence_id": "h_2__ev_github_010",
+     "quote": "Commit a1b2c3d: chore: add vercel.json and configure the Vercel project for the web app",
+     "support": "full"
+    }
+   ],
+   "conflict_id": "h_2__cf_1",
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null
+  },
+  {
+   "method": "rules",
+   "id": "h_2__cl_5",
+   "handover_id": "h_2",
+   "type": "fact",
+   "statement": "Commit b7c8d9e: Switch deploy script from Netlify to Vercel",
+   "state": "verified",
+   "confidence_reason": "Rule match: the source states this word for word (no AI)",
+   "workstream": "deploy",
+   "entity_key": "deploy",
+   "owner": null,
+   "label": "public",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "state",
+   "date": "2026-10-06",
+   "citations": [
+    {
+     "evidence_id": "h_2__ev_github_011",
+     "quote": "Commit b7c8d9e: Switch deploy script from Netlify to Vercel",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null
+  },
+  {
+   "method": "rules",
+   "id": "h_2__cl_6",
+   "handover_id": "h_2",
+   "type": "risk",
+   "statement": "PR #44 (merged): Fix login loop with a temporary cookie workaround",
+   "state": "verified",
+   "confidence_reason": "Rule match: the source states this word for word (no AI)",
+   "workstream": "auth",
+   "entity_key": "auth",
+   "owner": null,
+   "label": "public",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "risks",
+   "date": "2026-10-20",
+   "citations": [
+    {
+     "evidence_id": "h_2__ev_github_013",
+     "quote": "PR #44 (merged): Fix login loop with a temporary cookie workaround",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null
+  },
+  {
+   "method": "rules",
+   "id": "h_2__cl_7",
+   "handover_id": "h_2",
+   "type": "risk",
+   "statement": "Commit 9a8b7c6: temporary fix for login loop in auth session handling",
+   "state": "verified",
+   "confidence_reason": "Rule match: the source states this word for word (no AI)",
+   "workstream": "auth",
+   "entity_key": "auth",
+   "owner": null,
+   "label": "public",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "risks",
+   "date": "2026-10-21",
+   "citations": [
+    {
+     "evidence_id": "h_2__ev_github_014",
+     "quote": "Commit 9a8b7c6: temporary fix for login loop in auth session handling",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null
+  },
+  {
+   "method": "rules",
+   "id": "h_2__cl_8",
+   "handover_id": "h_2",
+   "type": "risk",
+   "statement": "src/lib/auth.ts line 22: // TODO: remove this hack once NextAuth session refresh is fixed",
+   "state": "verified",
+   "confidence_reason": "Rule match: the source states this word for word (no AI)",
+   "workstream": "auth",
+   "entity_key": "auth",
+   "owner": null,
+   "label": "public",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "risks",
+   "date": "2026-10-21",
+   "citations": [
+    {
+     "evidence_id": "h_2__ev_github_015",
+     "quote": "src/lib/auth.ts line 22: // TODO: remove this hack once NextAuth session refresh is fixed",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null
+  },
+  {
+   "method": "rules",
+   "id": "h_2__cl_9",
+   "handover_id": "h_2",
+   "type": "next_action",
+   "statement": "PR #52 (open): Events calendar view with month and list modes",
+   "state": "verified",
+   "confidence_reason": "Rule match: the source states this word for word (no AI)",
+   "workstream": "general",
+   "entity_key": "general",
+   "owner": null,
+   "label": "public",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "first_week",
+   "date": "2026-11-04",
+   "citations": [
+    {
+     "evidence_id": "h_2__ev_github_016",
+     "quote": "PR #52 (open): Events calendar view with month and list modes",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null
+  },
+  {
+   "method": "rules",
+   "id": "h_2__cl_L1",
+   "handover_id": "h_2",
+   "type": "dependency",
+   "statement": "Test key [REDACTED SECRET] is in the shared sheet.",
+   "state": "verified",
+   "confidence_reason": "Rule match: the source states this word for word (no AI)",
+   "workstream": "general",
+   "entity_key": "general",
+   "owner": null,
+   "label": "lead_only",
+   "review_status": "pending",
+   "sensitive": true,
+   "section": "project",
+   "date": "2026-11-03",
+   "citations": [
+    {
+     "evidence_id": "h_2__ev_note_mentor-notes.md_050",
+     "quote": "Test key [REDACTED SECRET] is in the shared sheet.",
+     "support": "full"
+    }
+   ],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null
+  },
+  {
+   "method": "model",
+   "id": "h_2__cl_gap_auth",
+   "handover_id": "h_2",
+   "type": "gap",
+   "statement": "No verified information about: auth.",
+   "state": "missing",
+   "confidence_reason": "Required for a handover; no supporting evidence found",
+   "workstream": "auth",
+   "entity_key": "auth",
+   "owner": null,
+   "label": "contributor",
+   "review_status": "pending",
+   "sensitive": false,
+   "section": "unresolved",
+   "date": null,
+   "citations": [],
+   "conflict_id": null,
+   "version": 1,
+   "confirmed_by": null,
+   "confirmed_at": null
+  }
+ ],
+ "conflicts": [
+  {
+   "resolution": "open",
+   "resolved_by": null,
+   "note": null,
+   "entity_key": "deploy",
+   "kind": "staleness",
+   "severity": "blocking",
+   "detected_by": "rules",
+   "resolution_claim_id": null,
+   "decided_at": null,
+   "label": "public",
+   "id": "h_2__cf_1",
+   "claim_ids": [
+    "h_2__cl_1",
+    "h_2__cl_4"
+   ],
+   "summary": "The documentation (2026-07-28) says \"The site is deployed on Netlify.\", but newer activity (2026-10-05) says \"Commit a1b2c3d: chore: add vercel.json and configure the Vercel project for the web app\".",
+   "handover_id": "h_2"
+  },
+  {
+   "resolution": "open",
+   "resolved_by": null,
+   "note": null,
+   "entity_key": "database",
+   "kind": "staleness",
+   "severity": "warning",
+   "detected_by": "rules",
+   "resolution_claim_id": null,
+   "decided_at": null,
+   "label": "contributor",
+   "id": "h_2__cf_2",
+   "claim_ids": [
+    "h_2__cl_2",
+    "h_2__cl_3",
+    "h_2__cl_18",
+    "h_2__cl_29"
+   ],
+   "summary": "The documentation (2026-07-28) says \"Events and members are stored in Firestore.\", but newer activity (2026-09-14, 2026-09-20) says \"Commit 5d3c9b8: Migrate events reads to the Postgres client\" / \"We decided to move events to Supabase Postgres.\".",
+   "handover_id": "h_2"
+  }
+ ],
+ "gaps": [
+  {
+   "status": "open",
+   "answer": null,
+   "answer_evidence_id": null,
+   "evidence_found": [
+    "h_2__ev_github_005",
+    "h_2__ev_github_013",
+    "h_2__ev_github_014",
+    "h_2__ev_github_015",
+    "h_2__ev_chat_039"
+   ],
+   "id": "h_2__gp_auth",
+   "claim_id": "h_2__cl_gap_auth",
+   "question": "How does login/auth work and what known fragile parts exist?",
+   "handover_id": "h_2"
+  },
+  {
+   "status": "open",
+   "answer": null,
+   "answer_evidence_id": null,
+   "evidence_found": [
+    "h_2__ev_chat_035"
+   ],
+   "id": "h_2__gp_owner_cl_22",
+   "claim_id": "h_2__cl_22",
+   "question": "Who owns this: The SendGrid API key is kept in the shared sheet, but I set the account up on a laptop I no longer have?",
+   "handover_id": "h_2"
+  }
+ ]
+}

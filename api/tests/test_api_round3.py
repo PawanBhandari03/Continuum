@@ -342,3 +342,36 @@ def test_actor_is_the_signed_in_email(api, monkeypatch):
     h = c.post("/handovers", headers={"Authorization": "Bearer t"}, json={"leaver": "a", "successor": "b", "target_date": "2026-12-01"}).json()["id"]
     rows = c.get(f"/handovers/{h}/audit", headers={"Authorization": "Bearer t"}).json()
     assert rows and rows[0]["actor"] == "pawan@example.com"
+
+
+# ---------- extra demo projects (ClubSite, HackBot) ----------
+def test_extra_projects_install_and_copy_cleanly():
+    from app.memstore import MemStore
+    main.use_store(MemStore())
+    main._readme_date["v"] = None
+    main._fixtures.clear()
+    s = main.db()
+    assert main.install_project("clubsite") and main.install_project("hackbot")
+    assert main.install_project("clubsite") is False  # idempotent
+    c = TestClient(main.app)
+    for project, tpl, lead_secret, fake in (("clubsite", "h_2", "misses deadlines", "sk_test_fake_88"),
+                                           ("hackbot", "h_3", "misses deadlines", "sk_test_fake_77")):
+        sid = c.post(f"/demo/sandbox?project={project}").json()["handover_id"]
+        h = c.get(f"/handovers/{sid}", headers=L).json()
+        assert h["is_demo"] and h["title"].lower().replace(" ", "") == project and h["meta"]["team"]
+        v = c.get(f"/handovers/{sid}/view", headers=C).json()
+        assert v["version"] == 1 and sum(len(x["claims"]) for x in v["sections"]) > 10
+        for who in (C, G, LV):
+            for path in ("view", "claims", "conflicts", "gaps", "tasks"):
+                body = c.get(f"/handovers/{sid}/{path}", headers=who).text.lower()
+                assert lead_secret not in body and fake not in body and "abcpe1234f" not in body, (project, path)
+        cf = c.get(f"/handovers/{sid}/conflicts", headers=L).json()
+        assert len(cf) == 2 and {x["entity_key"] for x in cf} == {"deploy", "database"}
+        assert c.get(f"/handovers/{sid}/tasks", headers=L).json()[0]["status"] == "answered"
+        assert c.get(f"/handovers/{sid}/audit/verify", headers=L).json()["ok"]
+    assert {p["key"] for p in c.get("/demo/projects").json()} == {"clubsite", "hackbot"}
+    # projects are isolated from each other
+    a = c.post("/demo/sandbox?project=clubsite").json()["handover_id"]
+    b = c.post("/demo/sandbox?project=hackbot").json()["handover_id"]
+    assert {x["id"] for x in s.sel("claims", {"handover_id": a})}.isdisjoint({x["id"] for x in s.sel("claims", {"handover_id": b})})
+    assert c.post("/demo/sandbox?project=nope").status_code == 404
