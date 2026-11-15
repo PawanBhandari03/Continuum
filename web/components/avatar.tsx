@@ -38,6 +38,7 @@ export function UserAvatar({ name, role, src, size = 36, className = "" }: Avata
           alt={name}
           width={size}
           height={size}
+          unoptimized
           className="h-full w-full object-cover"
           onError={() => setError(true)}
         />
