@@ -131,11 +131,11 @@ function ConflictCard({ cf, onChanged }: { cf: Conflict; onChanged: () => Promis
 
       {sides.length > 1 && Number.isFinite(min) && max > min && (
         <div className="mt-3" aria-label="When each side was written">
-          <div className="relative h-8 rounded bg-slate-100">
+          <div className="relative h-14 rounded bg-[#f5f8fe] ring-1 ring-line">
             {sides.map((s, i) => {
               const pos = dates[i] ? ((+new Date(dates[i]) - min) / (max - min)) * 100 : 0;
               return (
-                <span key={s.claim.id} className="absolute top-1 -translate-x-1/2 whitespace-nowrap rounded-full border border-slate-400 bg-white px-1.5 text-[11px] font-semibold text-slate-800" style={{ left: `${Math.min(92, Math.max(8, pos))}%` }}>
+                <span key={s.claim.id} className="absolute -translate-x-1/2 whitespace-nowrap rounded-full border border-[#c8d2e8] bg-white px-2 py-0.5 text-[11px] font-semibold text-ink shadow-2xs" style={{ left: `${Math.min(90, Math.max(10, pos))}%`, top: i % 2 ? 31 : 4 }}>
                   {String.fromCharCode(65 + i)} · {fmtDate(dates[i])}
                 </span>
               );

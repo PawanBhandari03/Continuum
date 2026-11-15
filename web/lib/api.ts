@@ -11,6 +11,7 @@ import type {
   Conflict,
   ConflictAction,
   ConflictEvent,
+  DemoProject,
   EvidenceDetail,
   EvidenceState,
   Gap,
@@ -75,7 +76,8 @@ export interface Api {
   listHandovers(include?: string | null): Promise<Handover[]>;
   getHandover(id: string): Promise<Handover>;
   createHandover(body: NewHandover): Promise<Handover>;
-  createSandbox(): Promise<{ handover_id: string }>;
+  createSandbox(project?: string): Promise<{ handover_id: string; project: string }>;
+  getDemoProjects(): Promise<DemoProject[]>;
   getSources(hid: string): Promise<Source[]>;
   addSource(hid: string, body: NewSource): Promise<Source[]>;
   /** Upload a Slack export (.zip) or notes (.md/.txt/.pdf). Bad files come back as a visible failed/partial source, not an exception. */
@@ -210,7 +212,8 @@ const realApi: Api = {
   listHandovers: (include) => http(`/handovers${include ? `?include=${encodeURIComponent(include)}` : ""}`),
   getHandover: (id) => http(`/handovers/${id}`),
   createHandover: (b) => http("/handovers", post(b)),
-  createSandbox: () => http("/demo/sandbox", { method: "POST", body: "{}" }, 120000),
+  createSandbox: (project = "campuskart") => http(`/demo/sandbox?project=${encodeURIComponent(project)}`, { method: "POST", body: "{}" }, 120000),
+  getDemoProjects: () => http("/demo/projects"),
   getSources: (h) => http(`/handovers/${h}/sources`),
   addSource: async (h, b) => {
     await http(`/handovers/${h}/sources`, post(b), 180000);

@@ -159,6 +159,7 @@ export interface Handover {
   is_demo?: boolean;
   /** project name, e.g. "CampusKart" */
   title?: string | null;
+  meta?: DemoProject["meta"];
 }
 
 export type AckStatus = "none" | "acknowledged" | "unclear";
@@ -329,4 +330,19 @@ export interface AiStatus {
   model_configured: boolean;
   calls: { model?: number; rules?: number };
   recent_errors: string[];
+}
+
+
+/** A demo project from GET /demo/projects (the catalog on the Projects page). */
+export interface DemoProject {
+  key: string;
+  template_id: string;
+  title: string;
+  leaver: string;
+  successor: string;
+  target_date: string;
+  claims: number;
+  conflicts: number;
+  gaps: number;
+  meta: { description?: string; team?: { name: string; role: string }[]; stack?: string[]; repo?: string };
 }

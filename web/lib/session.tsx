@@ -1,7 +1,7 @@
 "use client";
 // Demo session: one-click role entry, no sign-in (judges must be able to use the link unaided).
-// Each visitor gets their OWN copy of the CampusKart demo handover (POST /demo/sandbox), remembered in this
-// browser, so nobody sees anybody else's clicks.
+// Each visitor gets their OWN copy of each demo project (POST /demo/sandbox?project=...), remembered in this browser,
+// so nobody sees anybody else's clicks.
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
 import type { Role } from "./types";
 import { api, setApiRole } from "./api";
@@ -14,22 +14,27 @@ export const ROLE_META: Record<Role, { label: string; short: string; actor: stri
 };
 
 const ROLE_KEY = "continuum-role";
-const DEMO_KEY = "continuum-demo-hid";
+const DEMO_KEY = "continuum-demo-hid"; // the demo copy opened most recently
+const MAP_KEY = "continuum-demo-map"; // project key -> this browser's copy
+const PROJECT_KEY = "continuum-demo-project";
+export const DEFAULT_PROJECT = "campuskart";
 
 interface Ctx {
   role: Role | null;
   ready: boolean;
   actor: string;
   setRole: (r: Role | null) => void;
-  /** this browser's own demo handover id, if one was created */
+  /** the demo copy opened most recently in this browser */
   demoId: string | null;
-  /** returns this browser's demo handover id, creating a fresh copy when needed (about 5-20 s on free hosting) */
-  ensureDemo: () => Promise<string>;
-  /** forget the current copy and make a new one */
-  newDemo: () => Promise<string>;
+  /** this browser's copy per project (project key -> handover id) */
+  demoMap: Record<string, string>;
+  /** returns this browser's copy of a project, creating a fresh one when needed (about 5-20 s on free hosting) */
+  ensureDemo: (project?: string) => Promise<string>;
+  /** forget the copy of a project (default: the current one) and make a new one */
+  newDemo: (project?: string) => Promise<string>;
 }
 const SessionCtx = createContext<Ctx>({
-  role: null, ready: false, actor: "", setRole: () => {}, demoId: null,
+  role: null, ready: false, actor: "", setRole: () => {}, demoId: null, demoMap: {},
   ensureDemo: async () => "h_1", newDemo: async () => "h_1",
 });
 
@@ -46,12 +51,20 @@ const write = (k: string, v: string | null) => {
     else window.localStorage.removeItem(k);
   } catch {}
 };
+const readMap = (): Record<string, string> => {
+  try {
+    return JSON.parse(read(MAP_KEY) ?? "{}") as Record<string, string>;
+  } catch {
+    return {};
+  }
+};
 
-let pending: Promise<string> | null = null;
+const pending: Record<string, Promise<string>> = {};
 
 export function SessionProvider({ children }: { children: ReactNode }) {
   const [role, setRoleState] = useState<Role | null>(null);
   const [demoId, setDemoId] = useState<string | null>(null);
+  const [demoMap, setDemoMap] = useState<Record<string, string>>({});
   const [ready, setReady] = useState(false);
   useEffect(() => {
     const r = read(ROLE_KEY) as Role | null;
@@ -59,7 +72,11 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       setRoleState(r);
       setApiRole(r);
     }
-    setDemoId(read(DEMO_KEY));
+    const map = readMap();
+    const cur = read(DEMO_KEY);
+    if (cur && !Object.values(map).includes(cur)) map[read(PROJECT_KEY) ?? DEFAULT_PROJECT] = cur; // older single-copy sessions
+    setDemoMap(map);
+    setDemoId(cur);
     setReady(true);
   }, []);
   const setRole = (r: Role | null) => {
@@ -67,36 +84,48 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     setApiRole(r);
     write(ROLE_KEY, r);
   };
-  const create = useCallback(async () => {
-    const { handover_id } = await api.createSandbox();
-    write(DEMO_KEY, handover_id);
-    setDemoId(handover_id);
-    return handover_id;
+  const remember = useCallback((project: string, id: string) => {
+    const map = { ...readMap(), [project]: id };
+    write(MAP_KEY, JSON.stringify(map));
+    write(DEMO_KEY, id);
+    write(PROJECT_KEY, project);
+    setDemoMap(map);
+    setDemoId(id);
   }, []);
-  const ensureDemo = useCallback(async () => {
-    if (pending) return pending;
-    pending = (async () => {
-      const have = read(DEMO_KEY);
+  const create = useCallback(async (project: string) => {
+    const { handover_id } = await api.createSandbox(project);
+    remember(project, handover_id);
+    return handover_id;
+  }, [remember]);
+  const ensureDemo = useCallback(async (project: string = DEFAULT_PROJECT) => {
+    const inflight: Promise<string> | undefined = pending[project];
+    if (inflight) return inflight;
+    pending[project] = (async () => {
+      const have = readMap()[project] ?? (project === DEFAULT_PROJECT ? read(DEMO_KEY) : null);
       if (have) {
         try {
           await api.getHandover(have);
+          remember(project, have);
           return have;
         } catch {
           /* expired or removed: make a new copy */
         }
       }
-      return create();
+      return create(project);
     })().finally(() => {
-      pending = null;
+      delete pending[project];
     });
-    return pending;
-  }, [create]);
-  const newDemo = useCallback(async () => {
-    write(DEMO_KEY, null);
-    return create();
+    return pending[project];
+  }, [create, remember]);
+  const newDemo = useCallback(async (project?: string) => {
+    const p = project ?? read(PROJECT_KEY) ?? DEFAULT_PROJECT;
+    const map = readMap();
+    delete map[p];
+    write(MAP_KEY, JSON.stringify(map));
+    return create(p);
   }, [create]);
   return (
-    <SessionCtx.Provider value={{ role, ready, actor: role ? ROLE_META[role].actor : "", setRole, demoId, ensureDemo, newDemo }}>
+    <SessionCtx.Provider value={{ role, ready, actor: role ? ROLE_META[role].actor : "", setRole, demoId, demoMap, ensureDemo, newDemo }}>
       {children}
     </SessionCtx.Provider>
   );
