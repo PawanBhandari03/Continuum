@@ -762,24 +762,28 @@ def template_of(hid: str) -> str:
     return (h or {}).get("template_id") or hid
 
 
-def _copy_claimset(src_hid: str, dst_hid: str, strip: str = "", add: str = "", ev_add: str = "") -> tuple[int, int, int]:
+def _copy_claimset(src_hid: str, dst_hid: str, strip: str = "", add: str = "", ev_add: str = "",
+                   fresh: bool = False) -> tuple[int, int, int]:
     """Copy claims, conflicts and gaps between handovers, renaming ids (strip/add a prefix) and, for demo copies,
     the evidence ids they cite (ev_add)."""
     ren = lambda x: (add + (x[len(strip):] if strip and x.startswith(strip) else x)) if x else x  # noqa: E731
     ev = lambda x: ev_add + x if x else x  # noqa: E731
-    claims = db().sel("claims", {"handover_id": src_hid})
-    conflicts = db().sel("conflicts", {"handover_id": src_hid})
-    gaps = db().sel("gaps", {"handover_id": src_hid})
-    for t in ("claims", "conflicts", "gaps"):
-        db().delete(t, {"handover_id": dst_hid})
+    box: dict = {}
+    _par(lambda: box.__setitem__("c", db().sel("claims", {"handover_id": src_hid})),
+         lambda: box.__setitem__("f", db().sel("conflicts", {"handover_id": src_hid})),
+         lambda: box.__setitem__("g", db().sel("gaps", {"handover_id": src_hid})))
+    claims, conflicts, gaps = box["c"], box["f"], box["g"]
+    if not fresh:
+        for t in ("claims", "conflicts", "gaps"):
+            db().delete(t, {"handover_id": dst_hid})
     rows = [{**c, "id": ren(c["id"]), "handover_id": dst_hid, "conflict_id": ren(c.get("conflict_id")),
              "citations": [{**ci, "evidence_id": ev(ci["evidence_id"])} for ci in (c.get("citations") or [])]}
             for c in claims]
-    db().ins("claims", rows)
-    db().ins("conflicts", [{**c, "id": ren(c["id"]), "handover_id": dst_hid,
-                            "claim_ids": [ren(x) for x in c["claim_ids"]]} for c in conflicts])
-    db().ins("gaps", [{**g, "id": ren(g["id"]), "handover_id": dst_hid, "claim_id": ren(g["claim_id"]),
-                       "evidence_found": [ev(x) for x in (g.get("evidence_found") or [])]} for g in gaps])
+    cf_rows = [{**c, "id": ren(c["id"]), "handover_id": dst_hid, "claim_ids": [ren(x) for x in c["claim_ids"]]}
+               for c in conflicts]
+    gap_rows = [{**g, "id": ren(g["id"]), "handover_id": dst_hid, "claim_id": ren(g["claim_id"]),
+                 "evidence_found": [ev(x) for x in (g.get("evidence_found") or [])]} for g in gaps]
+    _par(lambda: db().ins("claims", rows), lambda: db().ins("conflicts", cf_rows), lambda: db().ins("gaps", gap_rows))
     return len(claims), len(conflicts), len(gaps)
 
 
@@ -801,13 +805,24 @@ def snapshot_seed(hid: str = TEMPLATE, x_demo_role: Optional[str] = Header(None)
     return {"ok": True, "claims": n[0], "conflicts": n[1], "gaps": n[2]}
 
 
-def _restore(hid: str) -> tuple[int, int, int]:
+def _restore(hid: str, fast: bool = False) -> tuple[int, int, int]:
+    """Load the stored run into a handover. `fast` (a brand-new demo copy): the stored run was already refreshed with
+    the current conflict rules when its template was last reset, so nothing needs recomputing."""
     tpl = template_of(hid)
-    n = _copy_claimset(seed_id(tpl), hid, strip=seed_prefix(tpl), add=P(hid), ev_add="" if hid == tpl else P(hid))
+    n = _copy_claimset(seed_id(tpl), hid, strip=seed_prefix(tpl), add=P(hid), ev_add="" if hid == tpl else P(hid),
+                       fresh=fast)
     db().upd("handovers", {"id": hid}, {"status": "in_review", "approved_by": None, "published_at": None})
+    if fast:
+        return n
     fix_readme_date(hid)
     k = redetect_conflicts(hid)
     return n[0], k, n[2]
+
+
+def refresh_seed(tpl: str) -> None:
+    """Template only: store its current claims, conflicts and gaps (after conflict detection and labelling) as the run
+    that every new demo copy starts from."""
+    _copy_claimset(tpl, seed_id(tpl), strip=f"{tpl}__" if tpl != TEMPLATE else "", add=seed_prefix(tpl))
 
 
 def redetect_conflicts(hid: str) -> int:
@@ -986,6 +1001,8 @@ def reset_demo(hid: str, x_demo_role: Optional[str] = Header(None)):
     n = _restore(hid)
     demo_labels(hid)
     build_privacy_queue(hid)
+    if hid in TEMPLATE_IDS:
+        refresh_seed(hid)
     seed_published(hid)
     return {"ok": True, "claims": n[0]}
 
@@ -997,12 +1014,9 @@ def _cleanup_sandboxes() -> None:
             db().delete("handovers", {"id": h["id"]})  # cascades to its sources, evidence, claims, versions…
 
 
-@app.post("/demo/sandbox")
-def create_sandbox(project: str = "campuskart"):
-    """Give this visitor their own copy of a demo project, so judges never see each other's changes."""
-    tid = PROJECT_KEYS.get(project)
-    if not tid:
-        raise not_found("Unknown demo project")
+def _build_sandbox(project: str) -> str:
+    """Create one private copy of a demo project (about 25 database calls, run in parallel where possible)."""
+    tid = PROJECT_KEYS[project]
     tpl = get_handover_row(tid)
     if not has_snapshot(tid):
         raise HTTPException(503, "Demo template is not ready.")
@@ -1019,16 +1033,81 @@ def create_sandbox(project: str = "campuskart"):
                                 "meta": tpl.get("meta") or (CAMPUSKART_META if tid == TEMPLATE else {})}])
     except Exception:
         db().ins("handovers", [row])
-    srcs = [s for s in db().sel("sources", {"handover_id": tid}) if s["type"] != "exit_qa"]
-    db().ins("sources", [{**s, "id": p + s["id"], "handover_id": hid} for s in srcs])
-    keep = {s["id"] for s in srcs}
-    units = [u for u in db().sel("evidence_units", {"handover_id": tid}) if u["source_id"] in keep]
-    db().ins("evidence_units", [{**u, "id": p + u["id"], "source_id": p + u["source_id"], "handover_id": hid}
-                                for u in units])
-    _restore(hid)
+    box: dict = {}
+    _par(lambda: box.__setitem__("s", db().sel("sources", {"handover_id": tid})),
+         lambda: box.__setitem__("u", db().sel("evidence_units", {"handover_id": tid})))
+    srcs = [x for x in box["s"] if x["type"] != "exit_qa"]
+    keep = {x["id"] for x in srcs}
+    units = [{**u, "id": p + u["id"], "source_id": p + u["source_id"], "handover_id": hid}
+             for u in box["u"] if u["source_id"] in keep]
+    db().ins("sources", [{**x, "id": p + x["id"], "handover_id": hid} for x in srcs])  # units reference sources
+    _par(lambda: db().ins("evidence_units", units), lambda: _restore(hid, fast=True))
     demo_labels(hid)
     build_privacy_queue(hid)
     seed_published(hid)
+    return hid
+
+
+_pool: dict[str, list[tuple[str, float]]] = {}
+_pool_lock = threading.Lock()
+_building: set = set()
+POOL_MAX_AGE = 6 * 3600.0
+
+
+def _refill(project: str) -> None:
+    """Keep one ready-made copy per project in the background, so the next visitor's click is instant."""
+    if db().__class__.__name__ == "MemStore":
+        return
+    with _pool_lock:
+        if project in _building or _pool.get(project):
+            return
+        _building.add(project)
+
+    def work():
+        try:
+            hid = _build_sandbox(project)
+            with _pool_lock:
+                _pool.setdefault(project, []).append((hid, time.monotonic()))
+        except Exception:
+            pass  # a failed spare is simply not available; the next request builds on demand
+        finally:
+            with _pool_lock:
+                _building.discard(project)
+
+    threading.Thread(target=work, daemon=True).start()
+
+
+@app.on_event("startup")
+def warm_pool() -> None:
+    def later():
+        time.sleep(20)  # let the instance finish starting and answer health checks first
+        for project in PROJECT_KEYS:
+            try:
+                _refill(project)
+                while project in _building:
+                    time.sleep(2)
+            except Exception:
+                pass
+    if db().__class__.__name__ != "MemStore" if _store is not None else (not offline()):
+        threading.Thread(target=later, daemon=True).start()
+
+
+@app.post("/demo/sandbox")
+def create_sandbox(project: str = "campuskart"):
+    """Give this visitor their own copy of a demo project, so judges never see each other's changes.
+    A ready-made spare is handed out instantly when there is one; a replacement is built in the background."""
+    if project not in PROJECT_KEYS:
+        raise not_found("Unknown demo project")
+    hid = None
+    with _pool_lock:
+        spares = _pool.get(project, [])
+        while spares and hid is None:
+            cand, born = spares.pop()
+            if time.monotonic() - born < POOL_MAX_AGE:
+                hid = cand
+    if hid is None:
+        hid = _build_sandbox(project)
+    _refill(project)
     return {"handover_id": hid, "project": project}
 
 
@@ -1085,6 +1164,7 @@ def install_project(key: str) -> bool:
     _restore(tpl)
     demo_labels(tpl)
     build_privacy_queue(tpl)
+    refresh_seed(tpl)
     seed_published(tpl)
     return True
 
@@ -1425,7 +1505,9 @@ def gap_out(r: dict) -> dict:
     out = {k: r.get(k) for k in ("id", "claim_id", "question", "evidence_found", "status", "answer",
                                  "answer_evidence_id")}
     import re
-    out["question"] = re.sub(r"[.!]+\s*\?$", "?", (out["question"] or "").strip())  # stored questions like "...account.?"
+    q = re.sub(r"[.!]+\s*\?$", "?", (out["question"] or "").strip())  # stored questions like "...account.?"
+    m = re.match(r"^Who owns(?: this)?: (.+?)\??$", q)  # older wording: "Who owns: <statement>?"
+    out["question"] = f"Who owns this, and how does the successor get access? “{m.group(1).rstrip('.!? ')}”" if m else q
     return out
 
 
