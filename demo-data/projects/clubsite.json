@@ -1734,7 +1734,7 @@
    ],
    "id": "h_2__gp_owner_cl_22",
    "claim_id": "h_2__cl_22",
-   "question": "Who owns this: The SendGrid API key is kept in the shared sheet, but I set the account up on a laptop I no longer have?",
+   "question": "Who owns this, and how does the successor get access? “The SendGrid API key is kept in the shared sheet, but I set the account up on a laptop I no longer have”",
    "handover_id": "h_2"
   }
  ]

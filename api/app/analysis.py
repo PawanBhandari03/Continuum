@@ -233,7 +233,7 @@ def detect_gaps(claims: list[Claim], units: list[EvidenceUnit]) -> tuple[list[Cl
     for c in claims:
         if c.type in ("dependency", "owner") and not c.owner and c.state != "conflicting":
             gaps.append(Gap(id=f"gp_owner_{c.id}", claim_id=c.id,
-                            question=f"Who owns this: {c.statement.rstrip('.!? ')}?",
+                            question=f"Who owns this, and how does the successor get access? “{c.statement.rstrip('.!? ')}”",
                             evidence_found=[x.evidence_id for x in c.citations]))
     return new_claims, gaps
 

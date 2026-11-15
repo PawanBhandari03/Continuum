@@ -1564,7 +1564,7 @@
    ],
    "id": "h_3__gp_owner_cl_25",
    "claim_id": "h_3__cl_25",
-   "question": "Who owns this: The Railway deploy token is stored in the shared Railway project settings, under my GitHub login?",
+   "question": "Who owns this, and how does the successor get access? “The Railway deploy token is stored in the shared Railway project settings, under my GitHub login”",
    "handover_id": "h_3"
   },
   {
@@ -1576,7 +1576,7 @@
    ],
    "id": "h_3__gp_owner_cl_26",
    "claim_id": "h_3__cl_26",
-   "question": "Who owns this: The uptime monitor API key is kept in the shared sheet, and nobody remembers creating that account?",
+   "question": "Who owns this, and how does the successor get access? “The uptime monitor API key is kept in the shared sheet, and nobody remembers creating that account”",
    "handover_id": "h_3"
   }
  ]

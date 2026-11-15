@@ -285,7 +285,7 @@ def test_gap_questions_read_cleanly(api):
     s.ins("gaps", [{"id": f"{sid}__gp_x", "handover_id": sid, "claim_id": f"{sid}__cl_3",
                     "question": "Who owns: The college SMTP account.?", "evidence_found": []}])
     q = [g["question"] for g in c.get(f"/handovers/{sid}/gaps", headers=L).json() if g["id"].endswith("gp_x")][0]
-    assert q.endswith("account?") and ".?" not in q
+    assert ".?" not in q and "The college SMTP account" in q and q.startswith("Who owns this")
 
 
 def test_signed_export_detects_any_change(api):
