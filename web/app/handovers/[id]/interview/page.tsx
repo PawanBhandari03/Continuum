@@ -72,7 +72,7 @@ export default function InterviewPage({ params }: { params: Promise<{ id: string
   const tabCls = (on: boolean) =>
     `inline-flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-bold transition-all shadow-2xs active:scale-95 ${
       on
-        ? "bg-zinc-900 text-white shadow-2xs"
+        ? "bg-brand-600 text-white shadow-sm"
         : "border border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50 hover:text-zinc-900"
     }`;
 
@@ -119,7 +119,7 @@ export default function InterviewPage({ params }: { params: Promise<{ id: string
                   <div className="rounded-md bg-slate-50 p-3">
                     <div className="mb-1 text-xs font-semibold text-slate-600">What we found</div>
                     <ul className="space-y-1.5">
-                      {(g.evidence ?? []).map((e) => <li key={e.id}><span className="font-medium">{e.source_name ?? "Source"}</span> · <i>{e.author}</i>, {fmtDate(e.ts)}: “{e.text}”</li>)}
+                      {(g.evidence ?? []).map((e) => <li key={e.id}><span className="font-medium">{e.source_name ?? "Source"}</span> · <i>{e.author}</i>, {fmtDate(e.ts)}: “{e.text.replace(/(^|\s)#{1,6}\s+/g, "$1").replace(/\*\*|`/g, "")}”</li>)}
                       {!(g.evidence ?? []).length && <li className="text-slate-600">No source mentions it at all.</li>}
                     </ul>
                   </div>

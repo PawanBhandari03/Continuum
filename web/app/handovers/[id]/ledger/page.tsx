@@ -112,7 +112,7 @@ export default function LedgerPage({ params }: { params: Promise<{ id: string }>
         <Card className="mb-6 border-zinc-200 bg-white">
           <div className="flex flex-wrap items-center justify-between gap-6">
             <div className="flex items-center gap-4">
-              <div className="relative flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-zinc-900 text-white shadow-2xs">
+              <div className="relative flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-brand-600 text-white shadow-2xs">
                 <div className="text-center">
                   <span className="text-2xl font-black leading-none">{ready.score}</span>
                   <span className="block text-[10px] font-semibold text-zinc-400">/ 100</span>

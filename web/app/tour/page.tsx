@@ -125,11 +125,11 @@ export default function TourPage() {
       <section className="rounded-2xl border border-[#dce3f1] bg-white p-5 shadow-2xs" aria-labelledby="where">
         <h2 id="where" className="text-base font-bold text-[#0f1b3a]">Where each Round 3 improvement lives</h2>
         <ul className="mt-3 space-y-2 text-sm text-[#455272]">
-          <li className="flex items-start gap-2"><span className="font-bold text-[#0f1b3a] shrink-0">1 · Conflicts across sources:</span> <span>Step 2 (side by side, a reason for every decision, a history, a reopen).</span></li>
-          <li className="flex items-start gap-2"><span className="font-bold text-[#0f1b3a] shrink-0">2 · Acknowledgement loop and version diff:</span> <span>Steps 4 to 6 (a flag becomes a question, the leaver answers, v2 shows what changed).</span></li>
-          <li className="flex items-start gap-2"><span className="font-bold text-[#0f1b3a] shrink-0">3 · Sensitive data:</span> <span>Step 3 (masked items and the review queue), step 7 (tamper-evident log), and the Guest view from the home page.</span></li>
+          <li className="flex flex-col gap-0.5 sm:flex-row sm:items-start sm:gap-2"><span className="font-bold text-[#0f1b3a] sm:shrink-0">1 · Conflicts across sources:</span> <span>Step 2 (side by side, a reason for every decision, a history, a reopen).</span></li>
+          <li className="flex flex-col gap-0.5 sm:flex-row sm:items-start sm:gap-2"><span className="font-bold text-[#0f1b3a] sm:shrink-0">2 · Acknowledgement loop and version diff:</span> <span>Steps 4 to 6 (a flag becomes a question, the leaver answers, v2 shows what changed).</span></li>
+          <li className="flex flex-col gap-0.5 sm:flex-row sm:items-start sm:gap-2"><span className="font-bold text-[#0f1b3a] sm:shrink-0">3 · Sensitive data:</span> <span>Step 3 (masked items and the review queue), step 7 (tamper-evident log), and the Guest view from the home page.</span></li>
         </ul>
-        <p className="mt-4 border-t border-zinc-100 pt-3 text-sm"><Link href="/" className="font-semibold text-zinc-900 hover:underline">Back to the home page</Link>. Press Help (top right) any time for the same steps as a small pop-up.</p>
+        <p className="mt-4 border-t border-zinc-100 pt-3 text-sm"><Link href="/" className="font-semibold text-zinc-900 hover:underline">Back to the home page</Link>. The Judge&apos;s tour link in the top bar brings you back here any time.</p>
       </section>
     </div>
   );

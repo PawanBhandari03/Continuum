@@ -70,7 +70,7 @@ export default function ReconstructPage({ params }: { params: Promise<{ id: stri
       {job?.status === "done" && job.error && <Notice tone="warn"><b>Finished with warnings.</b> Some parts did not complete, so the handover may be missing claims: {job.error}</Notice>}
       <Card className="mt-3">
         <div className="mb-3 h-2 overflow-hidden rounded-full bg-slate-200" role="progressbar" aria-valuenow={job?.progress ?? 0} aria-valuemin={0} aria-valuemax={100} aria-label="Reconstruction progress">
-          <div className="h-full bg-zinc-900 transition-all" style={{ width: `${job?.progress ?? 0}%` }} />
+          <div className="h-full bg-brand-600 transition-all" style={{ width: `${job?.progress ?? 0}%` }} />
         </div>
         <ol className="space-y-3">
           {STAGES.map((s, i) => {
