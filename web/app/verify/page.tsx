@@ -39,10 +39,10 @@ export default function VerifyPage() {
       />
       <Card>
         <label className="block text-sm font-medium">Exported file (.md)
-          <input type="file" accept=".md,text/markdown,text/plain" className="mt-1 block text-sm" onChange={(e) => onFile(e.target.files?.[0])} />
+          <input type="file" accept=".md,text/markdown,text/plain" className="mt-1.5 block w-full text-sm text-ink-soft file:mr-3 file:cursor-pointer file:rounded-lg file:border file:border-line file:bg-white file:px-3.5 file:py-2 file:text-sm file:font-semibold file:text-ink hover:file:bg-canvas" onChange={(e) => onFile(e.target.files?.[0])} />
         </label>
         <label className="mt-3 block text-sm font-medium">…or paste its text
-          <textarea className="mt-1 h-48 w-full rounded-md border border-slate-300 p-2 font-mono text-xs" value={text} onChange={(e) => setText(e.target.value)} placeholder="# Handover: Aditi → Karan (CampusKart) …" />
+          <textarea className="mt-1.5 h-48 w-full rounded-lg border border-line bg-white p-3 font-mono text-xs focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20" value={text} onChange={(e) => setText(e.target.value)} placeholder="# Handover: Aditi → Karan (CampusKart) …" />
         </label>
         <div className="mt-3"><Button variant="primary" disabled={!text.trim() || busy} onClick={() => check()}><FileCheck2 size={14} aria-hidden /> {busy ? "Checking…" : "Verify"}</Button></div>
         {err && <div className="mt-3"><Notice tone="error">{err}</Notice></div>}
