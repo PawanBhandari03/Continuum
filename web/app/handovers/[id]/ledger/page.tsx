@@ -115,7 +115,7 @@ export default function LedgerPage({ params }: { params: Promise<{ id: string }>
               <div className="relative flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-brand-600 text-white shadow-2xs">
                 <div className="text-center">
                   <span className="text-2xl font-black leading-none">{ready.score}</span>
-                  <span className="block text-[10px] font-semibold text-zinc-400">/ 100</span>
+                  <span className="block text-[10px] font-semibold text-white/90">/ 100</span>
                 </div>
               </div>
               <div>
