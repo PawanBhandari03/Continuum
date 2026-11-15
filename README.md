@@ -1,12 +1,20 @@
+<div align="center">
+
 # Continuum
 
 ### Project handovers that show their work.
 
-**Live product (no sign-in):** https://continuum-web-kodb.onrender.com · **Judge's tour (5 minutes):** https://continuum-web-kodb.onrender.com/tour
-The first visit can take up to a minute while the free server wakes.
+[![Live demo](https://img.shields.io/badge/Live_demo-open_without_sign--in-2d54d6?style=for-the-badge)](https://continuum-web-kodb.onrender.com)
+[![Judge's tour](https://img.shields.io/badge/Judge's_tour-5_minutes-0f1b3a?style=for-the-badge)](https://continuum-web-kodb.onrender.com/tour)
+[![CI](https://github.com/PawanBhandari03/Continuum/actions/workflows/ci.yml/badge.svg)](https://github.com/PawanBhandari03/Continuum/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-Team **BINARY BUILDERS** · CodeFrontier 2026, Problem 01: *Prevent Critical Knowledge From Leaving With People*
+Team **BINARY BUILDERS** · CodeFrontier 2026, Problem 01: *Prevent Critical Knowledge From Leaving With People*<br>
 **Pawan Singh Bhandari** (backend, AI, security) · **Rahul Bramhankar** (frontend, design, usability testing)
+
+<img src="docs/img/r3/02-conflict.png" alt="Continuum conflicts screen: the README says Render, newer commits configure Vercel; both sides shown with source, author, date and quote" width="860">
+
+</div>
 
 ---
 
@@ -18,9 +26,17 @@ Built for small software teams (3 to 25 people), such as student clubs and colle
 
 ## Try it in 5 minutes
 
-Open the [Judge's tour](https://continuum-web-kodb.onrender.com/tour). Each step switches role for you and opens the right screen of **your own copy** of the demo project (nothing you do affects other visitors).
+Open the [live product](https://continuum-web-kodb.onrender.com), pick a project and a role, or follow the [Judge's tour](https://continuum-web-kodb.onrender.com/tour): each step switches role for you and opens the right screen of **your own private copy** (nothing you do affects other visitors, and copies are ready in advance so the first click is instant).
 
-**Three demo projects** (pick one on the Projects page): CampusKart (Aditi to Karan), ClubSite (Neha to Arjun) and HackBot (Dev to Priya). Each was built by the real pipeline and has its own team, planted conflicts, gaps, recurring problems and privacy traps. Round 3 report: [docs/Continuum_Round3.pdf](docs/Continuum_Round3.pdf).
+| Demo project | What it is | Who leaves, who takes over | Size |
+|---|---|---|---|
+| **CampusKart** | Campus marketplace app (payments, listings, sign-in) | Aditi → Karan | 94 claims from repo, chat and notes |
+| **ClubSite** | College coding club website (events, members, payments) | Neha → Arjun | 33 claims, 2 conflicts, 2 gaps |
+| **HackBot** | Discord bot for hackathon announcements and team matching | Dev → Priya | 29 claims, 2 conflicts, 2 gaps |
+
+Each project was built by the real pipeline from synthetic sources and has its own team, planted conflicts, gaps, recurring problems and privacy traps.
+
+The guided path on CampusKart:
 
 | Step | You are | You do | You see |
 |---|---|---|---|
@@ -39,7 +55,22 @@ Open the [Judge's tour](https://continuum-web-kodb.onrender.com/tour). Each step
 | **2. Acknowledgement loop and version diff** | Published versions are frozen with a SHA-256 fingerprint. "This is unclear" becomes a question to the leaver and reviewer; the answer becomes evidence; the reviewer attaches it and publishes the next version. The successor sees what changed (added, changed, removed, with before and after text) and re-acknowledges only changed sections. | Start here, Questions, Gap Interview |
 | **3. Sensitive-data protection** | Detectors for keys, tokens, UPI IDs, PAN, Aadhaar (checksum-validated), IFSC and phone numbers; a privacy review queue where raw values never leave the server; remarks about people wait for a reviewer decision; Guest role; an audit log of views, approvals and exports where each entry fingerprints the previous one (with a Verify button); signed Markdown exports with a public Verify page; real email sign-in with database-enforced access. | Privacy, Activity, Sign in, Verify |
 
-Also new since Round 2: it **works without AI** (a rules mode finds all 8 planted facts on its own, and takes over automatically if the AI is unavailable), every visitor gets their own demo copy, prompt-injection protection, and fixes for the Round 2 rough edges (duplicate conflicts, wrong dates, version counting, hidden items now indistinguishable from missing ones).
+Also new in Round 3:
+
+- **Works without AI.** A rules mode finds all 8 planted facts on its own and takes over automatically if the AI is unavailable.
+- **Real accounts.** Email sign-in, invitations by role, and Postgres row-level security, so the database itself enforces who sees what.
+- **Three demo projects** with a private copy per visitor, handed out instantly.
+- **Prompt-injection protection.** Instructions hidden in source text are flagged, never followed.
+- **A redesigned interface.** One colour system, a workspace sidebar with live to-do badges, a role menu, notifications; works on phones down to 375 px.
+- **Faster.** A shared server cache and parallel processing: most screens answer in about 0.3 s.
+
+## Screens
+
+| | |
+|---|---|
+| <img src="docs/img/r3/04-privacy.png" alt="Privacy review queue" width="420"><br>**Privacy review.** Masked keys, UPI, PAN and Aadhaar; a remark about a teammate waits for a decision. | <img src="docs/img/r3/07-successor-what-changed.png" alt="Successor sees what changed" width="420"><br>**What changed.** The successor sees v1 → v2 and re-acknowledges only changed sections. |
+| <img src="docs/img/r3/08-leaver-answer.png" alt="Leaver answers" width="420"><br>**Gap Interview.** The leaver answers only what the evidence cannot. | <img src="docs/img/r3/09-audit.png" alt="Audit log" width="420"><br>**Audit log.** Every decision, view and export, hash-chained, with Verify. |
+| <img src="docs/img/r3/01-ledger.png" alt="Claim ledger" width="420"><br>**Claim ledger.** Every claim with its state, citations and review actions. | <img src="docs/img/r3/10-guest.png" alt="Guest view" width="420"><br>**Guest view.** Public material only; hidden items appear as a count. |
 
 ## Evidence states
 
@@ -128,11 +159,14 @@ flowchart LR
 | Planted facts found, AI mode / no-AI rules mode | 8 of 8 / 8 of 8 |
 | Privacy and injection checks on planted items | 4 of 4 in both modes |
 | Claims with a valid, checked citation | 114 of 114 (AI mode), 29 of 29 (rules mode) |
-| API tests (in-memory store, no keys) | 57 passing |
+| API tests (in-memory store, no keys) | 61 passing |
 | Live API end-to-end, three improvements and leak sweep | 19 of 19 |
 | Browser judge path on the live site | 15 of 15 |
 | Database row-level-security check (reads tables directly, bypassing the app) | 13 of 13 |
 | Accessibility (axe, serious and critical) on every screen per role; phone width 375 px | pass |
+| Handover test: a newcomer using Continuum as Successor | 6 of 6 handover questions correct, with evidence states |
+| Real Android phone: reconstruct, review, publish, export, acknowledge | all worked; the Contributor export withheld exactly the 3 lead-only claims |
+| Survey of club leads and developers | 6 responses; most-lost knowledge: why decisions were made, who owns what (4 of 6 each) |
 
 ## Run it yourself
 
@@ -155,13 +189,13 @@ Copy `.env.example` to `api/.env` for the real database and Gemini. Never commit
 api/                FastAPI backend, pipeline, rules mode, tests, live and database check scripts
 web/                Next.js app and browser tests
 supabase/migrations Schema, row-level security, accounts and membership
-demo-data/          Synthetic "CampusKart" dataset: chat export, notes, stored run, GitHub snapshot, answer key
-docs/               Project document, evaluation, testing, user research, API contracts, Round 3 design notes
+demo-data/          Synthetic datasets: CampusKart (chat export, notes, stored run, GitHub snapshot, answer key), ClubSite and HackBot
+docs/               Round 3 report (PDF), evaluation, testing, user research, API contracts, design notes
 ```
 
 ## Documents
 
-[Final product document (PDF)](docs/Continuum_Round3.pdf) · [Evaluation and measurements](docs/evaluation.md) · [Testing](docs/testing.md) · [User research](docs/user-research.md) · [API contracts](docs/contracts.md) · [Project overview and build log](PROJECT_OVERVIEW.md)
+[Round 3 report (PDF)](docs/Continuum_Round3.pdf) · [Evaluation and measurements](docs/evaluation.md) · [Testing](docs/testing.md) · [User research](docs/user-research.md) · [API contracts](docs/contracts.md) · [Project overview and build log](PROJECT_OVERVIEW.md)
 
 ## Disclosure (AI use, services, libraries)
 
@@ -171,3 +205,4 @@ docs/               Project document, evaluation, testing, user research, API co
 - **Libraries (each under its own open-source licence):** Web: Next.js, React, Tailwind CSS, lucide-react, Playwright, axe-core. API: FastAPI, Uvicorn, Pydantic, httpx, rapidfuzz, pypdf, python-multipart.
 - **Templates:** `web/` was scaffolded with `create-next-app@15`; everything else is written by us.
 - **Data:** all demo data is synthetic. Every key, ID number and phone number in it is fake.
+- **Licence:** MIT (see [LICENSE](LICENSE)).
