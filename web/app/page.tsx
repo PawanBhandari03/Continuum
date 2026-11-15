@@ -103,7 +103,7 @@ function Example({ state, text, src, cls, Icon }: { state: string; text: string;
   return (
     <div className="group rounded-2xl border border-[#dce3f1] bg-white p-5 text-left shadow-2xs transition-all hover:border-[#7b9bf0] hover:shadow-xs">
       <div className="flex items-center justify-between">
-        <span className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-semibold ${cls}`}>
+        <span className={`inline-flex whitespace-nowrap items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-semibold ${cls}`}>
           <Icon size={13} aria-hidden /> {state}
         </span>
         <span className="font-mono text-[11px] text-[#55627f]">git:campuskart</span>
@@ -143,7 +143,7 @@ export default function Landing() {
       {/* Top Tagline Banner & Mood Pills from Theme */}
       <section id="demo" className="pt-4 lg:pt-8">
         <div className="mb-4 flex flex-wrap items-center gap-2">
-          <div className="inline-flex items-center gap-2 rounded-full border border-[#b7c7f5] bg-[#e9efff] px-3.5 py-1 text-xs font-semibold text-[#1d3a9e] shadow-2xs">
+          <div className="inline-flex whitespace-nowrap items-center gap-2 rounded-full border border-[#b7c7f5] bg-[#e9efff] px-3.5 py-1 text-xs font-semibold text-[#1d3a9e] shadow-2xs">
             <Terminal size={14} className="text-[#2d54d6]" />
             <span>CodeFrontier 2026 · Problem 01: Prevent Critical Knowledge From Leaving With People</span>
           </div>
@@ -221,7 +221,7 @@ export default function Landing() {
                 <span className="flex items-center gap-1.5 text-[#455272]">
                   <GitCommit size={14} className="text-[#55627f]" /> Leaver: <b className="text-[#0f1b3a]">Aditi</b> ➔ Successor: <b className="text-[#0f1b3a]">Karan</b>
                 </span>
-                <span className="inline-flex items-center gap-1 text-[#1d3a9e] font-medium bg-[#e9efff] border border-[#b7c7f5] px-2.5 py-0.5 rounded-full">
+                <span className="inline-flex whitespace-nowrap items-center gap-1 text-[#1d3a9e] font-medium bg-[#e9efff] border border-[#b7c7f5] px-2.5 py-0.5 rounded-full">
                   <CheckCircle2 size={12} className="text-[#2d54d6]" /> Every quote checked by code
                 </span>
               </div>
@@ -237,8 +237,8 @@ export default function Landing() {
                   Project: <strong className="font-semibold text-[#0f1b3a]">CampusKart</strong> (synthetic Git data) · Aditi leaves, Karan takes over
                 </p>
               </div>
-              <span className="rounded-full border border-[#b7c7f5] bg-[#e9efff] px-2.5 py-1 text-xs font-semibold text-[#1d3a9e]">
-                Live & Isolated
+              <span className="ml-3 shrink-0 whitespace-nowrap rounded-full border border-[#b7c7f5] bg-[#e9efff] px-2.5 py-1 text-xs font-semibold text-[#1d3a9e]">
+                Your own copy
               </span>
             </div>
 
@@ -473,7 +473,7 @@ export default function Landing() {
       <section className="rounded-3xl border border-[#243566] bg-[#0f1b3a] text-white p-8 sm:p-10 shadow-xs relative overflow-hidden">
         <div className="grid lg:grid-cols-2 gap-8 items-center">
           <div>
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-[#33406a] bg-[#0d1735] px-3.5 py-1 text-xs font-semibold text-[#7b9bf0]">
+            <span className="inline-flex whitespace-nowrap items-center gap-1.5 rounded-full border border-[#33406a] bg-[#0d1735] px-3.5 py-1 text-xs font-semibold text-[#7b9bf0]">
               <History size={13} /> Versioned handover loop <span className="font-mono">↖</span>
             </span>
             <h2 className="mt-4 text-3xl font-bold tracking-tight text-white sm:text-4xl">
@@ -618,7 +618,7 @@ export default function Landing() {
       {/* Final Call to Action */}
       <section className="rounded-3xl border border-[#dce3f1] bg-[#e5eaf6] p-10 text-center text-[#0f1b3a] shadow-2xs">
         <div className="max-w-2xl mx-auto">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-[#c8d2e8] bg-white px-3.5 py-1 text-xs font-semibold text-[#0f1b3a] shadow-2xs">
+          <span className="inline-flex whitespace-nowrap items-center gap-1.5 rounded-full border border-[#c8d2e8] bg-white px-3.5 py-1 text-xs font-semibold text-[#0f1b3a] shadow-2xs">
             <Sparkles size={13} className="text-[#2d54d6]" /> Ready to evaluate?
           </span>
           <h2 className="mt-4 text-3xl font-bold sm:text-4xl text-[#0f1b3a]">

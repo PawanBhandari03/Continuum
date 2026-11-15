@@ -28,7 +28,7 @@ export function StateBadge({ state }: { state: EvidenceState }) {
   const s = STATE[state];
   const Icon = s.icon;
   return (
-    <span title={s.tip} className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-semibold ${s.cls}`}>
+    <span title={s.tip} className={`inline-flex whitespace-nowrap items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-semibold ${s.cls}`}>
       <Icon size={13} className="shrink-0" aria-hidden /> {s.label}
     </span>
   );
@@ -47,7 +47,7 @@ export function SourceStatusChip({ status, reason }: { status: SourceStatus; rea
   };
   const t: Record<SourceStatus, string> = { ok: "OK", partial: "Partial", failed: "Failed", pending: "Pending" };
   return (
-    <span title={reason ?? undefined} className={`inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-semibold ${m[status]}`}>
+    <span title={reason ?? undefined} className={`inline-flex whitespace-nowrap items-center rounded-full border px-2 py-0.5 text-xs font-semibold ${m[status]}`}>
       {t[status]}
     </span>
   );

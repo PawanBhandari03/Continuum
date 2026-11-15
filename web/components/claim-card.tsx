@@ -45,7 +45,7 @@ export function ClaimCard({ claim, actions, footer, showReview = false }: { clai
         {claim.sensitive && <span className="rounded-md border border-rose-300 bg-rose-50 px-2 py-0.5 text-xs font-semibold text-rose-900">Sensitive</span>}
         {claim.method === "rules" && <span title="Found by deterministic rules, without AI" className="rounded border border-[#dce3f1] bg-[#f6f8fd] px-1.5 py-0.5 text-[11px] font-medium text-[#455272]">Rule</span>}
         {claim.method === "human" && <span title="Written or confirmed by a person" className="rounded border border-[#dce3f1] bg-[#f6f8fd] px-1.5 py-0.5 text-[11px] font-medium text-[#455272]">Human</span>}
-        {showReview && <span className={`ml-auto rounded-full px-2.5 py-0.5 text-xs font-semibold ${claim.review_status === "pending" ? "border border-[#dce3f1] bg-[#f6f8fd] text-[#455272]" : rejected ? "border border-rose-200 bg-rose-50 text-rose-700" : "border border-emerald-200 bg-emerald-50 text-emerald-800"}`}>{REVIEW_LABEL[claim.review_status]}</span>}
+        {showReview && <span className={`ml-auto whitespace-nowrap rounded-full px-2.5 py-0.5 text-xs font-semibold ${claim.review_status === "pending" ? "border border-[#dce3f1] bg-[#f6f8fd] text-[#455272]" : rejected ? "border border-rose-200 bg-rose-50 text-rose-700" : "border border-emerald-200 bg-emerald-50 text-emerald-800"}`}>{REVIEW_LABEL[claim.review_status]}</span>}
       </div>
       <div className={rejected ? "line-through" : ""}><Statement claim={claim} /></div>
       <div className="mt-2.5 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-[#455272]">
