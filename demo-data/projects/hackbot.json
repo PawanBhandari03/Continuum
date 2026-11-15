@@ -1265,7 +1265,7 @@
    "id": "h_3__cl_28",
    "handover_id": "h_3",
    "type": "fact",
-   "statement": "- **Data:** members, teams and reminders are stored in a Postgres database.",
+   "statement": "Data: members, teams and reminders are stored in a Postgres database. (AI inference — not stated in any source)",
    "state": "conflicting",
    "confidence_reason": "Conflicts with another claim; not auto-resolved",
    "workstream": "database",
@@ -1280,7 +1280,7 @@
     {
      "evidence_id": "h_3__ev_note_architecture.md_044",
      "quote": "- **Data:** members, teams and reminders are stored in a Postgres database.",
-     "support": "full"
+     "support": "partial"
     }
    ],
    "conflict_id": "h_3__cf_2",
@@ -1550,7 +1550,7 @@
     "h_3__cl_2",
     "h_3__cl_28"
    ],
-   "summary": "Sources disagree about database: \"The bot keeps its data in a local SQLite file.\" vs \"- **Data:** members, teams and reminders are stored in a Postgres database.\"",
+   "summary": "Sources disagree about database: \"The bot keeps its data in a local SQLite file.\" vs \"Data: members, teams and reminders are stored in a Postgres database. (AI inference — not stated in any source)\"",
    "handover_id": "h_3"
   }
  ],

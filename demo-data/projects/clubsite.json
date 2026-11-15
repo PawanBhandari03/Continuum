@@ -1330,7 +1330,7 @@
    "id": "h_2__cl_29",
    "handover_id": "h_2",
    "type": "fact",
-   "statement": "- **Data:** events and members live in a Postgres database.",
+   "statement": "Data: events and members live in a Postgres database. (AI inference — not stated in any source)",
    "state": "conflicting",
    "confidence_reason": "Conflicts with another claim; not auto-resolved",
    "workstream": "database",
@@ -1345,7 +1345,7 @@
     {
      "evidence_id": "h_2__ev_note_architecture.md_047",
      "quote": "- **Data:** events and members live in a Postgres database.",
-     "support": "full"
+     "support": "partial"
     }
    ],
    "conflict_id": "h_2__cf_2",
@@ -1386,7 +1386,7 @@
    "id": "h_2__cl_30",
    "handover_id": "h_2",
    "type": "open_question",
-   "statement": "- Dark mode: discussed briefly, not decided.",
+   "statement": "Dark mode: discussed briefly, not decided.",
    "state": "verified",
    "confidence_reason": "Rule match: the source states this word for word (no AI)",
    "workstream": "general",

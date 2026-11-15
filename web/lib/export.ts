@@ -124,7 +124,7 @@ export function headerLines(m: ExportModel): string[] {
 export function toMarkdown(m: ExportModel): string {
   const h = m.handover;
   const out: string[] = [];
-  out.push(`# Handover: ${cap(h.leaver)} → ${cap(h.successor)} (CampusKart)`, "");
+  out.push(`# Handover: ${cap(h.leaver)} → ${cap(h.successor)}${h.title ? ` (${h.title})` : ""}`, "");
   headerLines(m).forEach((l) => out.push(`- ${l}`));
   out.push("", `> ${GENERATED_LINE}`, "");
   if (!m.version) out.push("> **Draft.** The reviewer has not approved or published this version.", "");

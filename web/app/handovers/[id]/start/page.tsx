@@ -5,7 +5,7 @@ import { api } from "@/lib/api";
 import { ROLE_META, useSession } from "@/lib/session";
 import type { Role, SuccessorView, Task, VersionDiff } from "@/lib/types";
 import { Button, Card, Notice, PageTitle, fmtDate } from "@/components/ui";
-import { HandoverNav, RoleGuard, notifyChanged } from "@/components/shell";
+import { HandoverNav, RoleGuard, notifyChanged, projectName } from "@/components/shell";
 import { ClaimCard } from "@/components/claim-card";
 import { AttentionTiles } from "@/components/attention";
 import { ExportButtons } from "@/components/export";
@@ -85,8 +85,8 @@ export default function StartPage({ params }: { params: Promise<{ id: string }> 
       <HandoverNav hid={id} />
       <AttentionTiles hid={id} />
       <PageTitle
-        title={h ? (eff === "guest" ? "Public handover (Guest view)" : `Start here, ${h.successor}`) : "Start here"}
-        sub={h ? <>Handover from <span className="capitalize">{h.leaver}</span> · CampusKart · target {fmtDate(h.target_date)}. Every claim shows its evidence state; click a source to read the original.</> : undefined}
+        title={h ? (eff === "guest" ? "Public handover (Guest view)" : `Start here, ${h.successor.charAt(0).toUpperCase()}${h.successor.slice(1)}`) : "Start here"}
+        sub={h ? <>Handover from <span className="capitalize">{h.leaver}</span> · {projectName(h)} · target {fmtDate(h.target_date)}. Every claim shows its evidence state; click a source to read the original.</> : undefined}
         right={view && !view.not_published && role !== "guest" ? <ExportButtons hid={id} version={view.draft ? undefined : view.version} /> : undefined}
       />
       {loadErr && <div className="mb-3"><LoadError message={loadErr} onRetry={load} /></div>}

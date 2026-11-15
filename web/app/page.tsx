@@ -16,6 +16,12 @@ import type { Role } from "@/lib/types";
 
 const ORDER: Role[] = ["lead", "leaver", "contributor"];
 
+const DEMOS = [
+  { key: "campuskart", title: "CampusKart", what: "Campus marketplace app", leaver: "Aditi Rao", successor: "Karan Verma" },
+  { key: "clubsite", title: "ClubSite", what: "College coding club website", leaver: "Neha Rao", successor: "Arjun Mehta" },
+  { key: "hackbot", title: "HackBot", what: "Discord hackathon bot", leaver: "Dev Patel", successor: "Priya Sharma" },
+] as const;
+
 const ROLE_INFO: Record<Role, { name: string; step: string; title: string; blurb: string }> = {
   lead: {
     name: "Engineering Lead",
@@ -123,6 +129,11 @@ export default function Landing() {
     api.getDemoProjects().catch(() => {}); // wakes the server and fills its cache before the first click
   }, []);
   const [busy, setBusy] = useState<Role | null>(null);
+  const [demo, setDemo] = useState<(typeof DEMOS)[number]>(DEMOS[0]);
+  const first = (n: string) => n.split(" ")[0];
+  const roleName = (r: Role) => (r === "leaver" ? demo.leaver : r === "contributor" ? demo.successor : ROLE_INFO[r].name);
+  const roleTitle = (r: Role) =>
+    r === "leaver" ? `Enter as Leaver (${first(demo.leaver)})` : r === "contributor" ? `Enter as Successor (${first(demo.successor)})` : ROLE_INFO[r].title;
   const [err, setErr] = useState<string | null>(null);
 
   const enter = async (r: Role) => {
@@ -130,7 +141,7 @@ export default function Landing() {
     setBusy(r);
     setRole(r);
     try {
-      const hid = await ensureDemo();
+      const hid = await ensureDemo(demo.key);
       router.push(ROLE_META[r].home(hid));
     } catch (e) {
       setErr(friendlyError(e));
@@ -143,8 +154,8 @@ export default function Landing() {
       {/* Top Tagline Banner & Mood Pills from Theme */}
       <section id="demo" className="pt-4 lg:pt-8">
         <div className="mb-4 flex flex-wrap items-center gap-2">
-          <div className="inline-flex whitespace-nowrap items-center gap-2 rounded-full border border-[#b7c7f5] bg-[#e9efff] px-3.5 py-1 text-xs font-semibold text-[#1d3a9e] shadow-2xs">
-            <Terminal size={14} className="text-[#2d54d6]" />
+          <div className="inline-flex max-w-full items-center gap-2 rounded-2xl border border-[#b7c7f5] bg-[#e9efff] px-3.5 py-1 text-xs font-semibold text-[#1d3a9e] shadow-2xs sm:rounded-full">
+            <Terminal size={14} className="shrink-0 text-[#2d54d6]" />
             <span>CodeFrontier 2026 · Problem 01: Prevent Critical Knowledge From Leaving With People</span>
           </div>
         </div>
@@ -234,7 +245,7 @@ export default function Landing() {
               <div>
                 <h2 className="text-xl font-bold tracking-tight text-[#0f1b3a]">Try the demo</h2>
                 <p className="mt-0.5 text-xs text-[#455272]">
-                  Project: <strong className="font-semibold text-[#0f1b3a]">CampusKart</strong> (synthetic Git data) · Aditi leaves, Karan takes over
+                  <strong className="font-semibold text-[#0f1b3a]">{demo.title}</strong> · {demo.what} · {first(demo.leaver)} leaves, {first(demo.successor)} takes over
                 </p>
               </div>
               <span className="ml-3 shrink-0 whitespace-nowrap rounded-full border border-[#b7c7f5] bg-[#e9efff] px-2.5 py-1 text-xs font-semibold text-[#1d3a9e]">
@@ -242,8 +253,28 @@ export default function Landing() {
               </span>
             </div>
 
+            <p className="mt-4 text-xs font-bold uppercase tracking-wider text-[#455272]">1. Pick a demo project</p>
+            <div className="mt-2 grid grid-cols-3 gap-2" role="radiogroup" aria-label="Demo project">
+              {DEMOS.map((d) => (
+                <button
+                  key={d.key}
+                  role="radio"
+                  aria-checked={demo.key === d.key}
+                  onClick={() => setDemo(d)}
+                  disabled={busy !== null}
+                  className={`min-h-11 rounded-xl border px-2 py-2 text-center text-sm font-semibold transition ${
+                    demo.key === d.key
+                      ? "border-brand-600 bg-brand-600 text-white shadow-sm"
+                      : "border-[#dce3f1] bg-white text-[#0f1b3a] hover:border-[#7b9bf0] hover:bg-[#f6f8fd]"
+                  }`}
+                >
+                  {d.title}
+                </button>
+              ))}
+            </div>
+
             <p className="mt-4 text-xs font-bold uppercase tracking-wider text-[#455272]">
-              Pick a role to test (suggested order):
+              2. Pick a role (suggested order):
             </p>
 
             <div className="mt-3 space-y-3">
@@ -262,7 +293,7 @@ export default function Landing() {
                         <Loader2 size={22} className="animate-spin text-[#0f1b3a]" aria-hidden />
                       ) : (
                         <UserAvatar
-                          name={info.name}
+                          name={roleName(r)}
                           role={r}
                           size={48}
                           className="rounded-xl border-0"
@@ -271,7 +302,7 @@ export default function Landing() {
                     </div>
                     <span className="min-w-0 flex-1">
                       <span className="block text-[11px] font-bold uppercase tracking-wider text-[#55627f]">{info.step}</span>
-                      <span className="block font-bold text-[#0f1b3a] sm:text-base">{info.title}</span>
+                      <span className="block font-bold text-[#0f1b3a] sm:text-base">{roleTitle(r)}</span>
                       <span className="block text-xs leading-snug text-[#455272] font-normal">{info.blurb}</span>
                     </span>
                     <ArrowRight className="shrink-0 text-[#55627f] transition group-hover:translate-x-1 group-hover:text-[#0f1b3a]" size={18} aria-hidden />
@@ -304,11 +335,11 @@ export default function Landing() {
               </Link>
             </div>
             <div className="mt-3 rounded-xl bg-[#f6f8fd] p-3 text-xs text-[#455272] ring-1 ring-[#dce3f1]">
-              <span className="font-semibold text-[#0f1b3a]">3 demo projects:</span> CampusKart (Aditi to Karan), ClubSite (Neha to Arjun) and HackBot (Dev to Priya), each with its own team and planted problems.{" "}
+              Each project has its own team, sources and planted problems. See them side by side:{" "}
               <button onClick={() => { setRole("lead"); router.push("/handovers"); }} className="font-semibold text-[#2d54d6] underline hover:text-[#0f1b3a]">Browse all projects</button>
             </div>
             <p className="mt-3 text-[11px] leading-relaxed text-[#55627f]">
-              Deterministic fallback enabled: finds all 8 planted facts in this demo even if external AI is unreachable.
+              Works even without the AI: the built-in rules engine finds all 8 planted facts in CampusKart.
             </p>
           </div>
         </div>

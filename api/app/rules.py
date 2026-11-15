@@ -71,9 +71,16 @@ def _sentences(text: str) -> list[str]:
     return out
 
 
+def plain(text: str) -> str:
+    """Statement text without Markdown list markers, headings, bold or code marks (the quote keeps the original)."""
+    t = re.sub(r"^\s*(?:[-*+]|#{1,6}|\d+[.)])\s+", "", text)
+    t = re.sub(r"(\*\*|__|`)", "", t)
+    return t.strip()
+
+
 def _claim(typ: str, sentence: str, unit: EvidenceUnit, owner: str | None = None, extra: list[RawCitation] = ()) -> RawClaim:
     s = sentence.strip()[:220]
-    return RawClaim(type=typ, statement=s, workstream="general", entity_key="general", owner=owner,
+    return RawClaim(type=typ, statement=plain(s) or s, workstream="general", entity_key="general", owner=owner,
                     date=unit.timestamp[:10], inferred=False, method="rules",
                     citations=[RawCitation(evidence_id=unit.id, quote=s), *extra])
 

@@ -84,11 +84,11 @@ export default function ConnectPage({ params }: { params: Promise<{ id: string }
       {err && <div className="mb-3"><Notice tone="error">{err}</Notice></div>}
       <div className="grid gap-4 md:grid-cols-5">
         <div className="space-y-4 md:col-span-3">
-          <Card>
+          {sources?.length === 0 && <Card>
             <h2 className="font-semibold">Quick start for judges</h2>
             <p className="mt-1 text-sm text-slate-600">Loads the synthetic CampusKart sources (repo, chat, notes, issues, a lead-only mentor note).</p>
             <Button className="mt-3" variant="primary" onClick={() => add({ type: "github", name: "CampusKart sample sources", sample: true })}>Use CampusKart sample sources</Button>
-          </Card>
+          </Card>}
 
           <Card>
             <h2 className="font-semibold">GitHub repository</h2>

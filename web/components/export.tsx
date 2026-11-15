@@ -81,7 +81,7 @@ function PrintableHandover({ model }: { model: ExportModel }) {
   const h = model.handover;
   return (
     <div id="print-portal" className="print-portal">
-      <h1>Handover: {h.leaver} → {h.successor} (CampusKart)</h1>
+      <h1 style={{ textTransform: "capitalize" }}>Handover: {h.leaver} → {h.successor}{h.title ? ` (${h.title})` : ""}</h1>
       <ul>{headerLines(model).map((l) => <li key={l}>{l}</li>)}</ul>
       <p><em>{GENERATED_LINE}</em></p>
       {!model.version && <p><strong>Draft.</strong> The reviewer has not approved or published this version.</p>}
