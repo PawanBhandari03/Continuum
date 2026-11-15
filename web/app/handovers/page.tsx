@@ -129,7 +129,7 @@ export default function ProjectsPage() {
                 <Button variant="primary" className="w-full" disabled={opening !== null} onClick={() => open(p.key)} aria-busy={isOpening}>
                   {isOpening ? <><Loader2 size={15} className="animate-spin" aria-hidden /> Preparing your copy…</> : <>Open as {ROLE_META[role].short} <ArrowRight size={15} aria-hidden /></>}
                 </Button>
-                {isOpening && <p className="mt-2 text-xs text-ink-soft" role="status">Creating your own copy. This takes a few seconds (up to a minute if the free server was asleep).</p>}
+                {isOpening && <p className="mt-2 text-xs text-ink-soft" role="status">Preparing your own copy…</p>}
               </div>
             </Card>
           );

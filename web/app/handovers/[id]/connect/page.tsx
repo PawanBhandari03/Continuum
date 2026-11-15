@@ -119,7 +119,7 @@ export default function ConnectPage({ params }: { params: Promise<{ id: string }
             ))}
           </div>
           <p className="text-xs text-slate-600">Use synthetic, public or permissioned data only. Do not upload confidential material. Files are limited to 25 MB.</p>
-          <p className="text-xs text-slate-600">Task-board data comes from the issues of the GitHub repository; Trello and Word (.docx) imports are not built.</p>
+          <p className="text-xs text-slate-600">Task-board data comes from the issues of the connected GitHub repository.</p>
 
           {lastUpload && (
             <div aria-live="polite">
@@ -146,7 +146,7 @@ export default function ConnectPage({ params }: { params: Promise<{ id: string }
                       <SourceStatusChip status={s.status} reason={s.status_reason} />
                     </div>
                     <div className="mt-1 flex items-center gap-2 text-xs text-slate-600">
-                      <span>{s.unit_count} evidence units</span>
+                      <span>{s.unit_count} evidence {s.unit_count === 1 ? "unit" : "units"}</span>
                       <LabelTag label={s.default_label} />
                     </div>
                     {s.status_reason && <p className={`mt-1 text-xs ${s.status === "failed" ? "text-rose-800" : "text-amber-800"}`}>{s.status === "failed" ? "Failed: " : "Partial: "}{s.status_reason}</p>}

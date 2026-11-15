@@ -632,11 +632,12 @@ export default function Landing() {
         <h2 id="faq" className="text-2xl font-bold tracking-tight text-[#0f1b3a] sm:text-3xl">Questions judges ask</h2>
         <div className="mt-4 space-y-2.5">
           {[
-            ["Is this real data?", "No. CampusKart is a synthetic student project made for this demo. Each visitor gets their own copy, so nothing you do affects anyone else."],
+            ["Is this real data?", "No. CampusKart, ClubSite and HackBot are synthetic student projects made for this demo, each with its own team, sources and planted problems. Each visitor gets their own copy, so nothing you do affects anyone else."],
             ["Do I need to sign in?", "No. Pick a role on this page and you get your own copy of the demo. To run your own private handovers, sign in with an email link: invited people then see only what their role allows, enforced by the database."],
             ["Can the AI make things up?", "It can be wrong, which is why every claim must cite a source, the quote is checked against it, and only a passing check can be called Verified. Anything else is labelled Inferred, Conflicting or Missing."],
             ["How is a successor kept from seeing confidential sources?", "A claim is visible only if the role may read all of its evidence. Hidden items are never sent to the browser; only a count is shown."],
-            ["What are the limits?", "Built for small software teams (3 to 25 people). It reads a GitHub repo plus chat and notes exports today; live Slack sync is on the roadmap. The free server can take up to a minute to wake on the first visit."],
+            ["Does it need the AI to work?", "No. A built-in rules engine runs the whole pipeline on its own and finds all 8 planted facts in CampusKart. When the AI is available it adds more claims, and if it fails mid-run the rules engine takes over automatically."],
+            ["Who is it for?", "Small software teams of 3 to 25 people where members rotate: student clubs, college projects, early startups and research groups. It reads a GitHub repository, chat exports and notes; live Slack and Discord sync is next on the roadmap."],
           ].map(([q, a]) => (
             <details key={q} className="group rounded-xl border border-[#dce3f1] bg-white p-4 shadow-2xs open:border-[#b7c7f5]">
               <summary className="cursor-pointer text-sm font-semibold text-[#0f1b3a]">{q}</summary>

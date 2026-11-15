@@ -3,7 +3,7 @@ import Link from "next/link";
 import { use, useEffect, useRef, useState } from "react";
 import { Bot, CheckCircle2, Circle, Cog, Loader2, XCircle } from "lucide-react";
 import { api } from "@/lib/api";
-import type { AiStatus, JobStatus } from "@/lib/types";
+import type { AiStatus, Handover, JobStatus } from "@/lib/types";
 import { Button, Card, Notice, PageTitle } from "@/components/ui";
 import { HandoverNav, RoleGuard } from "@/components/shell";
 import { friendlyError } from "@/lib/status";
@@ -22,6 +22,12 @@ export default function ReconstructPage({ params }: { params: Promise<{ id: stri
   const [err, setErr] = useState<string | null>(null);
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
   const [ai, setAi] = useState<AiStatus | null>(null);
+  const [h, setH] = useState<Handover | null>(null);
+  useEffect(() => {
+    api.getHandover(id).then(setH).catch(() => {});
+  }, [id]);
+  /** Already reconstructed earlier (any status past draft): show the finished pipeline until it is run again. */
+  const earlier = !job && !!h && h.status !== "draft";
   useEffect(() => {
     api.getAiStatus().then(setAi).catch(() => setAi(null));
   }, [job?.status]);
@@ -48,12 +54,13 @@ export default function ReconstructPage({ params }: { params: Promise<{ id: stri
   }
   useEffect(() => () => { if (timer.current) clearInterval(timer.current); }, []);
 
-  const idx = job?.stage ? STAGES.findIndex((s) => s.key === job.stage) : job?.status === "done" ? STAGES.length : -1;
+  const finished = job?.status === "done" || earlier;
+  const idx = earlier ? STAGES.length : job?.stage ? STAGES.findIndex((s) => s.key === job.stage) : job?.status === "done" ? STAGES.length : -1;
 
   return (
     <RoleGuard hid={id} allow={["lead"]}>
       <HandoverNav hid={id} />
-      <PageTitle title="Reconstruct" sub="Runs the pipeline on the connected sources. Failures are shown with a reason, never hidden." right={<Button variant="primary" onClick={start} disabled={job?.status === "running" || job?.status === "queued"}>{job ? "Run again" : "Start reconstruction"}</Button>} />
+      <PageTitle title="Reconstruct" sub="Runs the pipeline on the connected sources. Failures are shown with a reason, never hidden." right={<Button variant="primary" onClick={start} disabled={job?.status === "running" || job?.status === "queued"}>{job || earlier ? "Run again" : "Start reconstruction"}</Button>} />
       {ai && (
         <div className="mb-4 flex flex-wrap items-center gap-2 text-sm">
           {ai.mode === "rules" || !ai.model_configured ? (
@@ -69,17 +76,17 @@ export default function ReconstructPage({ params }: { params: Promise<{ id: stri
       {job?.status === "failed" && <Notice tone="error">Reconstruction failed: {job.error ?? "unknown error"}. Nothing was published; you can run it again.</Notice>}
       {job?.status === "done" && job.error && <Notice tone="warn"><b>Finished with warnings.</b> Some parts did not complete, so the handover may be missing claims: {job.error}</Notice>}
       <Card className="mt-3">
-        <div className="mb-3 h-2 overflow-hidden rounded-full bg-slate-200" role="progressbar" aria-valuenow={job?.progress ?? 0} aria-valuemin={0} aria-valuemax={100} aria-label="Reconstruction progress">
-          <div className="h-full bg-brand-600 transition-all" style={{ width: `${job?.progress ?? 0}%` }} />
+        <div className="mb-3 h-2 overflow-hidden rounded-full bg-slate-200" role="progressbar" aria-valuenow={earlier ? 100 : job?.progress ?? 0} aria-valuemin={0} aria-valuemax={100} aria-label="Reconstruction progress">
+          <div className="h-full bg-brand-600 transition-all" style={{ width: `${earlier ? 100 : job?.progress ?? 0}%` }} />
         </div>
         <ol className="space-y-3">
           {STAGES.map((s, i) => {
-            const done = idx > i || job?.status === "done";
+            const done = idx > i || finished;
             const active = idx === i && job?.status === "running";
             const failed = job?.status === "failed" && job.stage === s.key;
             return (
               <li key={s.key} className="flex items-start gap-3">
-                {failed ? <XCircle className="mt-0.5 text-rose-600" size={18} aria-hidden /> : done ? <CheckCircle2 className="mt-0.5 text-emerald-600" size={18} aria-hidden /> : active ? <Loader2 className="mt-0.5 animate-spin text-zinc-900" size={18} aria-hidden /> : <Circle className="mt-0.5 text-slate-300" size={18} aria-hidden />}
+                {failed ? <XCircle className="mt-0.5 text-rose-600" size={18} aria-hidden /> : done ? <CheckCircle2 className="mt-0.5 text-emerald-600" size={18} aria-hidden /> : active ? <Loader2 className="mt-0.5 animate-spin text-brand-600" size={18} aria-hidden /> : <Circle className="mt-0.5 text-slate-300" size={18} aria-hidden />}
                 <div>
                   <div className="font-medium">{i + 1}. {s.title} <span className="text-xs font-normal text-slate-600">{done ? "done" : active ? "running…" : failed ? "failed" : "waiting"}</span></div>
                   <div className="text-sm text-slate-600">{s.desc}</div>
@@ -89,10 +96,10 @@ export default function ReconstructPage({ params }: { params: Promise<{ id: stri
           })}
         </ol>
       </Card>
-      {job?.status === "done" && (
+      {finished && (
         <div className="mt-4 flex flex-wrap items-center gap-3">
-          <Notice>Reconstruction finished. Claims are ready for review.</Notice>
-          <Link href={`/handovers/${id}/ledger`} className="rounded-md bg-zinc-900 px-3 py-2 text-sm font-medium text-white hover:bg-zinc-800">Open the claim ledger →</Link>
+          <Notice>{earlier ? "This handover has already been reconstructed. Its claims are in the ledger; run again after adding sources." : "Reconstruction finished. Claims are ready for review."}</Notice>
+          <Link href={`/handovers/${id}/ledger`} className="rounded-lg bg-brand-600 px-3.5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-brand-700">Open the claim ledger →</Link>
         </div>
       )}
     </RoleGuard>
