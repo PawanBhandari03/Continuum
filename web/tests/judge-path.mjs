@@ -69,9 +69,10 @@ try {
   await shot("privacy");
   const card = page.getByText("Judgement about a person", { exact: true }).first().locator("xpath=ancestor::section[1]");
   await card.getByLabel("Reason").fill("Personal remark about a teammate; lead only.");
+  const decided = page.waitForResponse((r) => /redactions\/.+\/decide/.test(r.url()), { timeout: T });
   await card.getByRole("button", { name: /Make this passage lead-only/ }).click();
-  await page.getByText(/Nothing waiting for a decision|Waiting for your decision/).first().waitFor({ timeout: T });
-  check("people remark escalated to lead-only", true);
+  const dr = await decided;
+  check("people remark escalated to lead-only", dr.status() === 200, `HTTP ${dr.status()}`);
 
   // 3. successor question already answered by the leaver -> attach to a claim
   await page.goto(`${BASE}/handovers/${hid}/tasks`);
