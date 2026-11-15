@@ -228,9 +228,9 @@ export default function Landing() {
                   <p className="text-[#a8b4d0]">✓ Version frozen with a SHA-256 fingerprint: <span className="text-[#7b9bf0] font-bold">04e0ef3...</span></p>
                 </div>
               </div>
-              <div className="border-t border-[#dce3f1] bg-[#f6f8fd] p-3 flex items-center justify-between text-xs">
-                <span className="flex items-center gap-1.5 text-[#455272]">
-                  <GitCommit size={14} className="text-[#55627f]" /> Leaver: <b className="text-[#0f1b3a]">Aditi</b> ➔ Successor: <b className="text-[#0f1b3a]">Karan</b>
+              <div className="border-t border-[#dce3f1] bg-[#f6f8fd] p-3 flex flex-wrap items-center justify-between gap-2 text-xs">
+                <span className="flex items-center gap-1.5 whitespace-nowrap text-[#455272]">
+                  <GitCommit size={14} className="shrink-0 text-[#55627f]" /> Leaver: <b className="text-[#0f1b3a]">Aditi</b> ➔ Successor: <b className="text-[#0f1b3a]">Karan</b>
                 </span>
                 <span className="inline-flex whitespace-nowrap items-center gap-1 text-[#1d3a9e] font-medium bg-[#e9efff] border border-[#b7c7f5] px-2.5 py-0.5 rounded-full">
                   <CheckCircle2 size={12} className="text-[#2d54d6]" /> Every quote checked by code
@@ -262,7 +262,7 @@ export default function Landing() {
                   aria-checked={demo.key === d.key}
                   onClick={() => setDemo(d)}
                   disabled={busy !== null}
-                  className={`min-h-11 rounded-xl border px-2 py-2 text-center text-sm font-semibold transition ${
+                  className={`min-h-11 rounded-xl border px-1 py-2 text-center text-[13px] font-semibold transition-colors sm:text-sm ${
                     demo.key === d.key
                       ? "border-brand-600 bg-brand-600 text-white shadow-sm"
                       : "border-[#dce3f1] bg-white text-[#0f1b3a] hover:border-[#7b9bf0] hover:bg-[#f6f8fd]"
