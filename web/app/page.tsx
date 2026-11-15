@@ -1,7 +1,8 @@
 "use client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { api } from "@/lib/api";
 import {
   AlertTriangle, ArrowRight, BadgeCheck, CircleHelp, History,
   Lightbulb, Loader2, MessageSquareText, ShieldCheck, Globe2,
@@ -118,6 +119,9 @@ function Example({ state, text, src, cls, Icon }: { state: string; text: string;
 export default function Landing() {
   const { setRole, ensureDemo } = useSession();
   const router = useRouter();
+  useEffect(() => {
+    api.getDemoProjects().catch(() => {}); // wakes the server and fills its cache before the first click
+  }, []);
   const [busy, setBusy] = useState<Role | null>(null);
   const [err, setErr] = useState<string | null>(null);
 

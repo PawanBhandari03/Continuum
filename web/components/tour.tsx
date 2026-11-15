@@ -48,7 +48,7 @@ export function TourProvider({ children }: { children: ReactNode }) {
     try {
       const s = Number(window.localStorage.getItem(POS));
       if (Number.isInteger(s) && s >= 0 && s < STEPS.length) setStep(s);
-      if (!window.localStorage.getItem(SEEN)) setVisible(true);
+      if (!window.localStorage.getItem(SEEN) && window.location.pathname.startsWith("/handovers/")) setVisible(true);
     } catch {
       setVisible(true);
     }

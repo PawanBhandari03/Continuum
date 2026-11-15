@@ -68,6 +68,17 @@ function SiteFooter() {
   );
 }
 
+const noteCache: Record<string, { at: number; p: Promise<{ items: NotificationItem[] }> }> = {};
+/** Components on one page share a single request instead of each asking the server. */
+function sharedNotifications(hid: string) {
+  const hit = noteCache[hid];
+  if (hit && Date.now() - hit.at < 4000) return hit.p;
+  const p = api.getNotifications(hid);
+  noteCache[hid] = { at: Date.now(), p };
+  p.catch(() => delete noteCache[hid]);
+  return p;
+}
+
 /** Polls the role's to-do counts for the open handover (every 30 s). */
 export function useNotifications(hid: string | null) {
   const { role } = useSession();
@@ -75,7 +86,7 @@ export function useNotifications(hid: string | null) {
   const load = useCallback(async () => {
     if (!hid || !role) return;
     try {
-      setItems((await api.getNotifications(hid)).items);
+      setItems((await sharedNotifications(hid)).items);
     } catch {
       /* the bell never blocks the page */
     }
@@ -94,7 +105,11 @@ export function useNotifications(hid: string | null) {
 }
 
 /** Tell the header bell and sidebar badges that something changed. */
-export const notifyChanged = () => typeof window !== "undefined" && window.dispatchEvent(new Event("continuum:changed"));
+export const notifyChanged = () => {
+  if (typeof window === "undefined") return;
+  for (const k of Object.keys(noteCache)) delete noteCache[k];
+  window.dispatchEvent(new Event("continuum:changed"));
+};
 
 function useClickAway(open: boolean, close: () => void) {
   const ref = useRef<HTMLDivElement>(null);
