@@ -5,7 +5,7 @@ import { UserPlus } from "lucide-react";
 import { api } from "@/lib/api";
 import { getSession } from "@/lib/auth";
 import { ROLE_META } from "@/lib/session";
-import type { Role } from "@/lib/types";
+import type { Handover, Role } from "@/lib/types";
 import { Button, Card, Notice, PageTitle, fmtDate } from "@/components/ui";
 import { HandoverNav, RoleGuard } from "@/components/shell";
 import { LoadError, SkeletonList } from "@/components/feedback";
@@ -22,6 +22,12 @@ export default function PeoplePage({ params }: { params: Promise<{ id: string }>
   const [loadErr, setLoadErr] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const signedIn = typeof window !== "undefined" && !!getSession();
+  const [h, setH] = useState<Handover | null>(null);
+  useEffect(() => {
+    api.getHandover(id).then(setH).catch(() => {});
+  }, [id]);
+  const demoRole = (r: string) =>
+    /leaving/i.test(r) ? "Leaver" : /successor/i.test(r) ? "Successor" : /lead|mentor/i.test(r) ? "Can review" : null;
 
   const load = useCallback(async () => {
     setLoadErr(null);
@@ -53,7 +59,36 @@ export default function PeoplePage({ params }: { params: Promise<{ id: string }>
     <RoleGuard hid={id} allow={["lead"]}>
       <HandoverNav hid={id} />
       <PageTitle title="People" sub="Who can open this handover, and as what. A person signs in with the invited email and sees only what their role allows; the database enforces it, not just this app." />
-      {!signedIn && <Notice tone="warn">This is a shared demo handover with one-click roles, so it has no member list. <Link className="underline" href="/signin">Sign in</Link> and create your own handover to invite people.</Notice>}
+      {!signedIn && (
+        <>
+          {!!h?.meta?.team?.length && (
+            <Card>
+              <h2 className="font-semibold text-ink">Project team</h2>
+              <p className="mt-1 text-sm text-ink-soft">The people in this demo project. Everyone else on the team would be invited as a Contributor or Guest.</p>
+              <ul className="mt-4 grid gap-3 sm:grid-cols-2">
+                {h.meta.team.map((m) => {
+                  const tag = demoRole(m.role);
+                  return (
+                    <li key={m.name} className="flex min-w-0 items-center gap-3 rounded-xl border border-line bg-white p-3">
+                      <span aria-hidden className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-50 text-sm font-bold text-brand-700">
+                        {m.name.split(" ").map((x) => x[0]).join("").slice(0, 2)}
+                      </span>
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate font-semibold text-ink">{m.name}</span>
+                        <span className="block truncate text-sm text-ink-soft">{m.role}</span>
+                      </span>
+                      {tag && <span className="shrink-0 whitespace-nowrap rounded-full border border-line bg-canvas px-2 py-0.5 text-xs font-semibold text-ink-soft">{tag}</span>}
+                    </li>
+                  );
+                })}
+              </ul>
+            </Card>
+          )}
+          <div className="mt-4">
+            <Notice tone="info">In the demo you switch roles from the menu at the top right. <Link className="underline" href="/signin">Sign in</Link> and create your own handover to invite real people by email; the database then enforces what each person can see.</Notice>
+          </div>
+        </>
+      )}
       {loadErr && signedIn && <LoadError message={loadErr} onRetry={load} />}
       {!rows && !loadErr && signedIn && <SkeletonList rows={2} label="Loading people" />}
       {signedIn && rows && (
