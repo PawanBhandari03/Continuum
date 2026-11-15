@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Continuum: Round 3 project document</title>
+<style>
+  @page { size: A4; margin: 16mm 14mm; }
+  * { box-sizing: border-box; }
+  body { font-family: "Segoe UI", Arial, sans-serif; color: #1b2133; font-size: 10.3pt; line-height: 1.45; margin: 0; }
+  h1 { font-size: 26pt; margin: 0 0 2pt; color: #1e2a55; }
+  h2 { font-size: 14pt; margin: 16pt 0 6pt; color: #1e2a55; border-bottom: 2px solid #d9def0; padding-bottom: 3pt; break-after: avoid; }
+  h3 { font-size: 11.3pt; margin: 10pt 0 3pt; color: #2b3a74; break-after: avoid; }
+  p { margin: 4pt 0 6pt; }
+  .tag { font-size: 12.5pt; color: #4a5688; margin-bottom: 8pt; }
+  table { width: 100%; border-collapse: collapse; margin: 6pt 0 10pt; font-size: 9.4pt; }
+  th, td { border: 1px solid #cfd5e8; padding: 4pt 6pt; text-align: left; vertical-align: top; }
+  th { background: #eef1fb; }
+  tr { break-inside: avoid; }
+  .ok { color: #0b6b3a; font-weight: 600; }
+  .no { color: #8a5a00; font-weight: 600; }
+  .box { border: 1px solid #cfd5e8; background: #f7f8fd; padding: 8pt 10pt; border-radius: 4pt; margin: 8pt 0; }
+  ul, ol { margin: 4pt 0 6pt 16pt; padding: 0; }
+  li { margin: 2pt 0; }
+  code { background: #eef1fb; padding: 0 2pt; border-radius: 2pt; font-size: 9pt; }
+  .small { font-size: 9pt; color: #555d78; }
+  .flow { break-inside: avoid; display: flex; flex-wrap: wrap; gap: 5pt; align-items: stretch; margin: 6pt 0; }
+  .node { border: 1.5px solid #8fa0dd; background: #eef1fb; border-radius: 5pt; padding: 5pt 7pt; font-size: 8.8pt; flex: 1 1 28%; }
+  .node b { display: block; color: #1e2a55; margin-bottom: 1pt; }
+  .arrow { align-self: center; font-size: 13pt; color: #6a78b8; }
+  .node.lock { border-color: #c98ad6; background: #faf0fd; }
+  .node.human { border-color: #86c79b; background: #eef9f1; }
+  .shots { display: flex; flex-wrap: wrap; gap: 6pt; margin: 6pt 0; }
+  .shots figure { margin: 0; flex: 0 0 48.8%; break-inside: avoid; }
+  .shots img { width: 100%; border: 1px solid #cfd5e8; }
+  figcaption { font-size: 8.4pt; color: #555d78; margin-top: 2pt; }
+  .pb { break-before: page; }
+</style>
+</head><body>
+<h1>Continuum</h1>
+<p class="tag">Project handovers that show their work.</p>
+<p><b>Round 3 final report</b> · CodeFrontier, Problem 01: <i>Prevent Critical Knowledge From Leaving With People</i><br>
+Team <b>BINARY BUILDERS</b>: Pawan Singh Bhandari (backend, AI/ML, team lead) and Rahul Bramhankar (frontend, design, user research, testing) · 15 Nov 2026</p>
+<table>
+<tr><th style="width:26%">Working product (no sign-in)</th><td>https://continuum-web-kodb.onrender.com — click "Enter as Reviewer". Guided 5-minute tour: /tour</td></tr>
+<tr><th>API</th><td>https://continuum-api-945j.onrender.com (health: <code>/health</code>)</td></tr>
+<tr><th>Source code</th><td>https://github.com/PawanBhandari03/Continuum</td></tr>
+<tr><th>Public signed-export check</th><td>/verify on the web app</td></tr>
+</table>
+
+<h2>1. Summary</h2>
+<p>Continuum rebuilds the current state of a software project from its repository, chat, notes and task board, and turns it into a handover where <b>every statement points to its source</b>, uncertainty is labelled, conflicts are shown side by side and never auto-resolved, and a reviewer approves exactly what the successor may see. The leaver answers only the questions the evidence cannot answer (the Gap Interview), and the successor closes the loop by acknowledging sections or flagging them unclear.</p>
+<p>Round 3 delivered the three improvements we committed to, plus a real login with database-level access rules, a rules mode that works with no AI at all, three demo projects, and a redesigned interface. Everything below can be tried in the live product; the screenshots were taken from the live site by the automated judge-path test.</p>
+
+<h2>2. The three promised improvements, delivered</h2>
+<h3>Improvement 1: Cross-source conflict resolution</h3>
+<p>Project-wide contradiction detection (by named values such as hosting, database, payments) with a side-by-side resolution screen. Decisions: keep one side, both true (with scope), correct (write the right version), defer to the successor, or reopen. Every decision needs a reason and is kept in a history. Documentation older than the newest activity is flagged as <i>out of date</i> rather than silently trusted, and the newest side is never assumed correct. Publishing is blocked until each conflict is settled or deferred.</p>
+<div class="shots"><figure><img src="img/r3/02-conflict.png"><figcaption>Conflicts: README says Render, commits since 2 Oct configure Vercel. Both sides, dates, sources, quotes.</figcaption></figure><figure><img src="img/r3/03-conflict-settled.png"><figcaption>Settled with a written reason and a history entry.</figcaption></figure></div>
+<h3>Improvement 2: Acknowledgement loop and version diff</h3>
+<p>Published versions are frozen with a SHA-256 fingerprint. The successor acknowledges each section or flags it "unclear"; a flag becomes a question to the leaver, who answers it; the reviewer attaches the answer to a claim or creates a new one and publishes v2. The successor then sees exactly what changed from v1 to v2, and only changed sections ask for acknowledgement again.</p>
+<div class="shots"><figure><img src="img/r3/07-successor-what-changed.png"><figcaption>Successor: what changed from v1 to v2.</figcaption></figure><figure><img src="img/r3/08-leaver-answer.png"><figcaption>Leaver answers the successor's unclear flag.</figcaption></figure></div>
+<h3>Improvement 3: Sensitive-data protection, roles, audit and export</h3>
+<p>Ingestion detects India-aware identifiers (PAN, Aadhaar with checksum, UPI IDs, IFSC) and API keys, tokens and JWTs, and masks them; a privacy review queue lets a reviewer redact or keep each finding, and publishing is blocked while people-judgement remarks (a note criticising a named teammate) or prompt-injection lines are undecided. A Guest role sees public material only. A hash-chained, append-only audit log records views, approvals, decisions and exports, and a Verify button proves the chain is intact. Approved handovers export to Markdown and PDF with citations as links, signed with an HMAC that anyone can check on the public Verify page.</p>
+<div class="shots"><figure><img src="img/r3/04-privacy.png"><figcaption>Privacy queue: findings shown masked, never raw.</figcaption></figure><figure><img src="img/r3/10-guest.png"><figcaption>Guest: public view with a count of what is hidden.</figcaption></figure><figure><img src="img/r3/09-audit.png"><figcaption>Audit log with chain verification.</figcaption></figure><figure><img src="img/r3/06-published-v2.png"><figcaption>Published v2, frozen and fingerprinted.</figcaption></figure></div>
+
+<h2 class="pb">3. Everything else delivered in Round 3</h2>
+<ul>
+<li><b>Real login and database-level permissions.</b> Supabase Auth magic-link sign-in with workspace membership; Postgres row-level security reads as the signed-in user. A script checks 13 access cases against the live database.</li>
+<li><b>Rules mode.</b> The whole pipeline (extraction, citation check, conflicts, gaps) also runs with no AI at all, so the product keeps working if a model quota runs out.</li>
+<li><b>Three demo projects</b> built by the real pipeline: CampusKart (Aditi to Karan), ClubSite (Neha to Arjun) and HackBot (Dev to Priya), each with planted conflicts, gaps, recurring problems and privacy traps. Every visitor gets a private copy, so judges never see each other's changes; copies are prepared in advance so the first click is instant.</li>
+<li><b>Redesigned interface.</b> One colour system, a workspace sidebar with project context and badges, a role and account menu, notifications for to-dos, responsive down to 375 px with no horizontal page scroll.</li>
+<li><b>Speed.</b> A shared server read cache and parallel copy-building: warm calls answer in about 0.3 s (the network floor); a cold demo-copy build dropped from 27 s to about 20 s and is hidden behind ready-made spares.</li>
+<li><b>Tests and CI.</b> GitHub Actions runs the API tests and a production build on every push.</li>
+</ul>
+
+<h2>4. Architecture and data flow</h2>
+<div class="flow">
+  <div class="node"><b>1. Sources</b>GitHub (README, commits, PRs, issues, TODOs) · Slack-format chat export · notes (.md, .txt, .pdf) · Exit Q&amp;A</div><div class="arrow">→</div>
+  <div class="node"><b>2. Ingest and protect</b>Parse to evidence units; drop noise; thread chat; mask secrets, PAN, Aadhaar, UPI, phone, email; access label per source</div><div class="arrow">→</div>
+  <div class="node lock"><b>3. Evidence store</b>PostgreSQL on Supabase; each unit keeps its label; row-level security</div>
+</div>
+<div class="flow">
+  <div class="node lock"><b>4. Permission before generation</b>Lead-only and contributor evidence go through separate passes; claims take the strictest label of their evidence</div><div class="arrow">→</div>
+  <div class="node"><b>5. Extract</b>Gemini through a JSON schema (or the rules engine): type, statement, cited evidence ids and exact quotes</div><div class="arrow">→</div>
+  <div class="node"><b>6. Verify</b>Code: ids exist, quote fuzzy-matches the source. Model: supports / partially / does not. Only "supports" can be Verified</div>
+</div>
+<div class="flow">
+  <div class="node"><b>7. Conflicts and gaps</b>Named-value contradictions, staleness, required topics become Gap Interview questions, readiness score</div><div class="arrow">→</div>
+  <div class="node human"><b>8. Human review</b>Approve, edit, reject, redact, mark sensitive; settle conflicts; privacy queue; publish freezes a version</div><div class="arrow">→</div>
+  <div class="node human"><b>9. Handover loop</b>Role-scoped Start here; acknowledge or flag unclear; leaver answers; v2 and diff; signed export; audit log</div>
+</div>
+<table>
+<tr><th style="width:20%">Layer</th><th>What we use</th></tr>
+<tr><td>Frontend</td><td>Next.js 15 (TypeScript), React 19, Tailwind CSS v4, lucide-react; Playwright and axe-core for tests</td></tr>
+<tr><td>Backend</td><td>Python 3.11, FastAPI, Pydantic, httpx, rapidfuzz, pypdf, reportlab</td></tr>
+<tr><td>Database and auth</td><td>PostgreSQL on Supabase with row-level security (migrations 0001 to 0004), Supabase Auth</td></tr>
+<tr><td>AI model</td><td>Google Gemini API behind a swappable provider, with automatic fallback to the rules engine</td></tr>
+<tr><td>Hosting</td><td>Render (web and API), Supabase; UptimeRobot keeps the free instances awake</td></tr>
+<tr><td>Data</td><td>Only synthetic data (fictional projects, fake secrets and IDs for testing masking)</td></tr>
+<tr><td>AI coding assistance</td><td>Claude (Anthropic) via Claude Code assisted with planning, code and documents; the team reviews and can explain it. Disclosed in README.md</td></tr>
+</table>
+
+<h2 class="pb">5. Testing and results</h2>
+<table>
+<tr><th style="width:34%">Check</th><th>Result</th></tr>
+<tr><td>API tests (pytest)</td><td>61 pass, including permission, publish lock, privacy gate, conflict decisions, audit chain, cache behaviour</td></tr>
+<tr><td>Planted-facts score, rules mode (no AI)</td><td>8/8 planted facts, 4/4 Round 3 checks, 29/29 claims with a valid citation</td></tr>
+<tr><td>Planted-facts score, AI mode</td><td>8/8, 4/4, 114/114 claims with a valid citation (one run; AI output varies between runs)</td></tr>
+<tr><td>Database access rules (live)</td><td>13/13 cases pass as signed-in users</td></tr>
+<tr><td>Live end-to-end judge path</td><td>15/15 checks pass on the deployed site: own copy, conflict settled, privacy decision, leaver answer, v2, diff, successor sees no lead-only text, acknowledgement, flag and answer, audit chain verifies, guest view</td></tr>
+<tr><td>Browser tests</td><td>Playwright journey for every role plus axe-core accessibility and 375 px checks on every screen</td></tr>
+<tr><td>Failure cases</td><td>Empty sources, malformed exports, API timeouts and a sleeping server show a plain message with Retry; a failed source is reported as partial, never silently dropped</td></tr>
+</table>
+<p>Usability sessions and the manual testing report are in <code>docs/usability-sessions.md</code>, <code>docs/testing.md</code> and the Round 2 testing report.</p>
+
+<h2>6. Privacy, security, accessibility and responsible design</h2>
+<ul>
+<li><b>Permission before generation.</b> A viewer only ever receives claims whose evidence their role may read; hidden items answer 404 and appear only as a count.</li>
+<li><b>No false certainty.</b> Verified requires a source quote check and a support check; everything else is labelled Inferred, Conflicting or Missing.</li>
+<li><b>Humans decide.</b> Nothing reaches a successor until a reviewer publishes; privacy findings and judgements about people block publishing until decided.</li>
+<li><b>Tamper evidence.</b> Frozen versions, hash-chained audit log and signed exports.</li>
+<li><b>Accessibility.</b> State shown as icon plus text, never colour alone; keyboard focus; dialogs close on Esc; axe-core checks on every screen.</li>
+<li><b>Data.</b> Only synthetic, public or permissioned data; connectors use read-only tokens.</li>
+</ul>
+
+<h2>7. Scope and roadmap</h2>
+<p>Continuum is built for small software teams and reads GitHub, Slack-format exports and notes today. Next: live Slack and Discord connectors, Trello and DOCX import, local multilingual embeddings for Hinglish chat, a workspace admin console, and a larger study with real club handovers.</p>
+
+<h2>8. Team and contributions</h2>
+<table>
+<tr><th style="width:26%">Pawan Singh Bhandari</th><td>Backend and AI: connectors, evidence store and access labels, privacy detection, extraction and verification, conflicts and gaps, rules mode, audit and signed exports, authentication and row-level security, performance, API tests and evaluation, deployment, demo projects.</td></tr>
+<tr><th>Rahul Bramhankar</th><td>Frontend and research: the Next.js app and screens, evidence viewer, tour and failure handling, usability sessions and manual testing, browser tests and accessibility checks, the demo chat and notes, documents.</td></tr>
+</table>
+<p class="small">Both members can explain the whole system. Both used Claude Code for assistance, as disclosed in the README.</p>
+</body></html>

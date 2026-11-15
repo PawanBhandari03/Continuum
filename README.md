@@ -20,6 +20,8 @@ Built for small software teams (3 to 25 people), such as student clubs and colle
 
 Open the [Judge's tour](https://continuum-web-kodb.onrender.com/tour). Each step switches role for you and opens the right screen of **your own copy** of the demo project (nothing you do affects other visitors).
 
+**Three demo projects** (pick one on the Projects page): CampusKart (Aditi to Karan), ClubSite (Neha to Arjun) and HackBot (Dev to Priya). Each was built by the real pipeline and has its own team, planted conflicts, gaps, recurring problems and privacy traps. Round 3 report: [docs/Continuum_Round3.pdf](docs/Continuum_Round3.pdf).
+
 | Step | You are | You do | You see |
 |---|---|---|---|
 | 1 | Reviewer | Conflicts: keep the Vercel side, write who confirmed it | One disagreement, both sources with dates, a decision history |
