@@ -1003,6 +1003,10 @@ def reset_demo(hid: str, x_demo_role: Optional[str] = Header(None)):
     build_privacy_queue(hid)
     if hid in TEMPLATE_IDS:
         refresh_seed(hid)
+        with _pool_lock:  # spare copies were built from the previous stored run
+            for key, tid in PROJECT_KEYS.items():
+                if tid == hid:
+                    _pool.pop(key, None)
     seed_published(hid)
     return {"ok": True, "claims": n[0]}
 
