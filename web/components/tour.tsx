@@ -96,7 +96,7 @@ export function TourProvider({ children }: { children: ReactNode }) {
           <p className="mt-1 text-sm text-[#455272]">{cur.body}</p>
           {cur.go && (
             <button
-              className="mt-3 inline-flex w-full items-center justify-center gap-1.5 rounded-xl bg-[#0f1b3a] px-3.5 py-2 text-sm font-semibold text-white shadow-xs transition hover:bg-[#0a1330] active:scale-95"
+              className="mt-3 inline-flex w-full items-center justify-center gap-1.5 rounded-xl bg-brand-600 px-3.5 py-2 text-sm font-semibold text-white shadow-xs transition hover:bg-brand-700 active:scale-95"
               onClick={async () => {
                 setRole(cur.go!.role);
                 const hid = await ensureDemo();

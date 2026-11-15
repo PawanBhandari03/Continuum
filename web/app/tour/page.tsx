@@ -110,7 +110,7 @@ export default function TourPage() {
                   <p className="mt-1.5 text-sm leading-relaxed text-[#455272]">{s.body}</p>
                   {s.go && READ_FOR[s.go.path] && <p className="mt-2 rounded-md bg-[#f6f8fd] border border-[#dce3f1] p-2 text-xs text-[#455272]"><b>What to do:</b> {READ_FOR[s.go.path]}</p>}
                   {s.go && (
-                    <button onClick={() => go(i)} disabled={busy !== null} aria-busy={busy === i} className="mt-3.5 inline-flex items-center gap-1.5 rounded-xl bg-[#0f1b3a] px-4 py-2 text-sm font-semibold text-white shadow-2xs transition hover:bg-[#0a1330] active:scale-95 disabled:cursor-wait disabled:opacity-70">
+                    <button onClick={() => go(i)} disabled={busy !== null} aria-busy={busy === i} className="mt-3.5 inline-flex items-center gap-1.5 rounded-xl bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-2xs transition hover:bg-brand-700 active:scale-95 disabled:cursor-wait disabled:opacity-70">
                       {busy === i ? <><Loader2 size={15} className="animate-spin" aria-hidden /> Preparing your copy…</> : <>{s.go.label} <ArrowRight size={15} className="text-[#7b9bf0]" aria-hidden /></>}
                     </button>
                   )}

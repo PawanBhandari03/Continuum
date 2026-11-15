@@ -143,21 +143,15 @@ export default function Landing() {
             <Terminal size={14} className="text-[#2d54d6]" />
             <span>CodeFrontier 2026 · Problem 01: Prevent Critical Knowledge From Leaving With People</span>
           </div>
-          <div className="hidden sm:inline-flex items-center gap-1.5 text-xs font-medium text-[#455272]">
-            <span className="rounded-full border border-[#c8d2e8] bg-white px-3 py-0.5 shadow-2xs">Calm</span>
-            <span className="rounded-full border border-[#c8d2e8] bg-white px-3 py-0.5 shadow-2xs">Confidence</span>
-            <span className="rounded-full border border-[#c8d2e8] bg-white px-3 py-0.5 shadow-2xs">Modern</span>
-            <span className="rounded-full border border-[#c8d2e8] bg-white px-3 py-0.5 shadow-2xs">Powerful</span>
-          </div>
         </div>
 
         <div className="grid items-start gap-10 lg:grid-cols-[1.1fr_1fr]">
           <div>
-            <h1 className="text-4xl font-extrabold leading-[1.08] tracking-tight text-[#0f1b3a] sm:text-5xl xl:text-6xl">
-              Project handovers that{" "}
-              <span className="relative inline-block text-[#0f1b3a]">
-                <span className="relative z-10">show their work.</span>
-                <span className="absolute bottom-1 left-0 -z-0 h-3 w-full rounded bg-[#7b9bf0]/45 sm:bottom-2"></span>
+            <h1 className="text-[2.1rem] font-extrabold leading-[1.12] tracking-tight text-[#0f1b3a] sm:text-5xl xl:text-[3.4rem]">
+              <span className="block">Project handovers</span>
+              <span className="relative block w-fit">
+                <span className="relative z-10">that show their work.</span>
+                <span className="absolute bottom-1 left-0 z-0 h-3 w-full rounded bg-[#7b9bf0]/45 sm:bottom-2" aria-hidden></span>
               </span>
             </h1>
             <p className="mt-5 max-w-xl text-lg leading-relaxed text-[#455272] font-normal">
@@ -181,9 +175,9 @@ export default function Landing() {
             <div className="mt-8 flex flex-wrap items-center gap-4">
               <Link
                 href="/tour"
-                className="inline-flex items-center gap-2 rounded-xl bg-[#0f1b3a] px-6 py-3 text-sm font-semibold text-white shadow-xs transition hover:bg-[#0a1330] active:scale-95"
+                className="inline-flex items-center gap-2 rounded-xl bg-brand-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-700 active:scale-95"
               >
-                <Sparkles size={16} className="text-[#7b9bf0]" /> Open Judge&apos;s 5-Min Tour <span className="font-mono text-[#7b9bf0]">↗</span>
+                <Sparkles size={16} className="text-white" /> Open Judge&apos;s 5-Min Tour <span className="font-mono">↗</span>
               </Link>
               <a
                 href="#how"
@@ -203,7 +197,7 @@ export default function Landing() {
                   <span className="ml-2 font-semibold text-[#0f1b3a]">campuskart-core — git:main</span>
                 </div>
                 <span className="rounded-md bg-white px-2 py-0.5 font-bold text-[#1d3a9e] border border-[#b7c7f5] text-[11px]">
-                  Hex #7b9bf0 · Pipeline
+                  Pipeline
                 </span>
               </div>
               <div className="p-4 font-mono text-xs text-[#d2dbee] space-y-2 bg-[#0f1b3a]">
@@ -304,6 +298,10 @@ export default function Landing() {
               <Link href="/tour" className="text-xs font-semibold text-[#2d54d6] hover:text-[#0f1b3a] underline">
                 Tour guide
               </Link>
+            </div>
+            <div className="mt-3 rounded-xl bg-[#f6f8fd] p-3 text-xs text-[#455272] ring-1 ring-[#dce3f1]">
+              <span className="font-semibold text-[#0f1b3a]">3 demo projects:</span> CampusKart (Aditi to Karan), ClubSite (Neha to Arjun) and HackBot (Dev to Priya), each with its own team and planted problems.{" "}
+              <button onClick={() => { setRole("lead"); router.push("/handovers"); }} className="font-semibold text-[#2d54d6] underline hover:text-[#0f1b3a]">Browse all projects</button>
             </div>
             <p className="mt-3 text-[11px] leading-relaxed text-[#55627f]">
               Deterministic fallback enabled: finds all 8 planted facts in this demo even if external AI is unreachable.
@@ -472,7 +470,7 @@ export default function Landing() {
         <div className="grid lg:grid-cols-2 gap-8 items-center">
           <div>
             <span className="inline-flex items-center gap-1.5 rounded-full border border-[#33406a] bg-[#0d1735] px-3.5 py-1 text-xs font-semibold text-[#7b9bf0]">
-              <History size={13} /> Hex #7b9bf0 · Versioned Handover Loop <span className="font-mono">↖</span>
+              <History size={13} /> Versioned handover loop <span className="font-mono">↖</span>
             </span>
             <h2 className="mt-4 text-3xl font-bold tracking-tight text-white sm:text-4xl">
               A handover is a living loop, <br className="hidden sm:inline" />
@@ -628,11 +626,11 @@ export default function Landing() {
           <div className="mt-6 flex flex-wrap justify-center items-center gap-3">
             <button
               onClick={() => enter("lead")}
-              className="inline-flex items-center gap-2.5 rounded-xl bg-[#0f1b3a] px-7 py-3 text-sm font-bold text-white shadow-xs transition hover:bg-[#0a1330] active:scale-95"
+              className="inline-flex items-center gap-2.5 rounded-xl bg-brand-600 px-7 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-brand-700 active:scale-95"
             >
               <UserAvatar name="Lead Reviewer" role="lead" size={24} className="rounded-full border border-[#33406a]" />
               <span>Start as Reviewer</span>
-              <ArrowRight size={16} className="text-[#7b9bf0]" aria-hidden />
+              <ArrowRight size={16} className="text-white" aria-hidden />
             </button>
             <Link
               href="/tour"

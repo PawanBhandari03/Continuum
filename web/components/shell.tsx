@@ -188,7 +188,7 @@ function RoleAvatar({ role, size = 28 }: { role: Role; size?: number }) {
   if (role === "guest") {
     return <span className="inline-flex shrink-0 items-center justify-center rounded-full bg-brand-100 text-brand-800" style={{ width: size, height: size }}><Globe2 size={size * 0.55} aria-hidden /></span>;
   }
-  return <UserAvatar name={ROLE_META[role].actor} role={role} size={size} />;
+  return <span aria-hidden className="inline-flex shrink-0"><UserAvatar name={ROLE_META[role].actor} role={role} size={size} /></span>;
 }
 
 /** One menu for everything about "who am I and what can I do here": role switch, tour, account, demo copy. */
