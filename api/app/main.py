@@ -1052,6 +1052,7 @@ _pool: dict[str, list[tuple[str, float]]] = {}
 _pool_lock = threading.Lock()
 _building: set = set()
 POOL_MAX_AGE = 6 * 3600.0
+POOL_SIZE = 2
 
 
 def _refill(project: str) -> None:
@@ -1059,7 +1060,7 @@ def _refill(project: str) -> None:
     if db().__class__.__name__ == "MemStore":
         return
     with _pool_lock:
-        if project in _building or _pool.get(project):
+        if project in _building or len(_pool.get(project, [])) >= POOL_SIZE:
             return
         _building.add(project)
 
@@ -1082,12 +1083,13 @@ def warm_pool() -> None:
     def later():
         time.sleep(20)  # let the instance finish starting and answer health checks first
         for project in PROJECT_KEYS:
-            try:
-                _refill(project)
-                while project in _building:
-                    time.sleep(2)
-            except Exception:
-                pass
+            for _ in range(POOL_SIZE):
+                try:
+                    _refill(project)
+                    while project in _building:
+                        time.sleep(2)
+                except Exception:
+                    pass
     if db().__class__.__name__ != "MemStore" if _store is not None else (not offline()):
         threading.Thread(target=later, daemon=True).start()
 
